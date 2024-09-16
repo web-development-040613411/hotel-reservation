@@ -1,8 +1,10 @@
 import { sql } from "@/libs/db";
+import { unlink } from "node:fs/promises";
 import { uploadFile } from "@/libs/uploadFile";
 import { addRoomTypeSchema } from "@/libs/validation";
 import Elysia from "elysia";
 import { ZodError } from "zod";
+import { join } from "path";
 
 export const roomTypeRoutes = new Elysia({ prefix: "/room-type" })
   .get("/", async ({ set }) => {
@@ -99,10 +101,10 @@ export const roomTypeRoutes = new Elysia({ prefix: "/room-type" })
       const data = addRoomTypeSchema.parse(body);
       const { name, detail, capacity, price, image } = data;
 
-      const existingRoomType =
+      const [existingRoomType] =
         await sql`SELECT * FROM room_type WHERE name=${name} AND id!=${roomType.id}`;
 
-      if (existingRoomType[0]) {
+      if (existingRoomType) {
         set.status = 400;
         return {
           status: "error",
@@ -165,17 +167,20 @@ export const roomTypeRoutes = new Elysia({ prefix: "/room-type" })
     try {
       const { id } = params;
 
-      const roomType = await sql`SELECT * FROM room_type WHERE id=${id}`;
+      const [roomType] = await sql`SELECT * FROM room_type WHERE id=${id}`;
 
-      if (!roomType[0]) {
+      if (!roomType) {
         set.status = 404;
         return {
           status: "error",
           message: "Room type not found",
         };
       }
+      const path = join(".", process.env.UPLOAD_FOLDER!, roomType.picture_path.split("/").pop());
 
-      await sql`DELETE FROM room_type WHERE id=${roomType[0].id}`;
+      await sql`DELETE FROM room_type WHERE id=${roomType.id}`;
+
+      await unlink(path);
 
       return {
         status: "success",

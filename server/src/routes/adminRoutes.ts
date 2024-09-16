@@ -17,3 +17,4 @@ export const adminRoutes = new Elysia({ prefix: "/admin" }).group(
         return { employees };
       })
 );
+

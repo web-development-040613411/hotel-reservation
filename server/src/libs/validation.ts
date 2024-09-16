@@ -13,7 +13,7 @@ export const addRoomTypeSchema = z.object({
     .string({ message: "price is require" })
     .min(1, "Price is required")
     .transform((data) => parseFloat(data)),
-  image: z.instanceof(File),
+  image: z.instanceof(File).optional(),
 });
 
 export type AddRoomTypeValues = z.infer<typeof addRoomTypeSchema>;

@@ -9,9 +9,11 @@
     "@elysiajs/cors": "^1.1.1",
     "elysia": "latest",
     "postgres": "^3.4.4",
+    "uuid": "^10.0.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "bun-types": "latest"
   },
   "module": "src/index.js"

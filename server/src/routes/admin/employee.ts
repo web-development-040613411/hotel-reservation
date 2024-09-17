@@ -1,6 +1,10 @@
 import { sql } from '@/libs/db';
 import Elysia from 'elysia';
-import { addEmployeeSchema, updateEmployeeSchema } from '@/libs/validation';
+import {
+    addEmployeeSchema,
+    ResetPasswordSchema,
+    updateEmployeeSchema,
+} from '@/libs/validation';
 import { join } from 'path';
 import { unlink } from 'node:fs/promises';
 import { ZodError } from 'zod';
@@ -92,7 +96,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employee' })
                     status: 'error',
                     message: 'Internal server error, please try again later',
                 };
-            }   
+            }
 
             const Query_roles = await sql`SELECT enum_range(NULL::role);`;
             const all_roles = Object.values(Query_roles[0].enum_range);
@@ -244,3 +248,44 @@ export const employeeRoutes = new Elysia({ prefix: '/employee' })
             };
         }
     });
+
+export const resetPasswordRoutes = new Elysia({ prefix: '/employee/resetPassword' }).put(
+    '/id/:id',
+    async ({ params: { id }, body, set }) => {
+      
+        try {
+            const employee = await sql`SELECT * FROM employee WHERE id=${id}`;
+            if (employee.length === 0) {
+                set.status = 404;
+                return {
+                    status: 'error',
+                    message: 'Employee not found',
+                };
+            }
+            const data = ResetPasswordSchema.parse(body);
+            const { password, confirm_password } = data;
+            if (password !== confirm_password) {
+                set.status = 400;
+                return {
+                    status: 'error',
+                    message: 'Password and confirm password does not match',
+                };
+            }
+            const Hash_password = await Bun.password.hash(password, {
+                algorithm: 'bcrypt',
+                cost: 10,
+            });
+            await sql`UPDATE employee SET password=${Hash_password} WHERE id=${id}`;
+            return {
+                status: 'success',
+                message: 'Password updated successfully',
+            };
+        } catch (error) {
+            set.status = 500;
+            return {
+                status: 'error',
+                message: 'Internal server error, please try again later',
+            };
+        }
+    }
+);

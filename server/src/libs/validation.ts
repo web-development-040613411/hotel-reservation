@@ -41,3 +41,10 @@ export const updateEmployeeSchema = z.object({
 });
 
 export type UpdateEmployeeValues = z.infer<typeof updateEmployeeSchema>;
+
+export const ResetPasswordSchema = z.object({
+  password: z.string({ message: "password is require" }).min(6, "Password is required"),
+  confirm_password: z.string({ message: "confirm password is require" }).min(6, "Password is required"),
+});
+
+export type ResetPasswordValues = z.infer<typeof ResetPasswordSchema>;

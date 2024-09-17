@@ -9,7 +9,7 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
       const { number, type_id } = body;
 
       try {
-        await sql`      INSERT INTO room(number, type_id) 
+        await sql`      INSERT INTO rooms(number, type_id) 
                         VALUES (${number}, ${type_id})`;
       } catch (error) {
         if (error instanceof postgres.PostgresError && error.code == "23505") {
@@ -47,4 +47,26 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
       message: "",
     };
   })
-  .delete("/delete", async () => {});
+  .delete("/delete/:id", async ({ params }) => {
+    const { id } = params;
+    try {
+      await sql`DELETE FROM rooms
+                WHERE id=${id}`
+    } catch (error) {
+      if ( error instanceof postgres.PostgresError ) {
+        if ( error.code == "22P02" ) {
+          return {
+            status : 'error',
+            message : 'id is not uuid.'
+          }
+        }  
+      }
+
+      console.log( error );
+    }
+
+    return {
+      status : 'success',
+      message : 'Your room have been removed.'
+    }
+  });

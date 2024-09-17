@@ -46,13 +46,14 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
     };
   })
   .put("/update", async ( {query} ) => {
-    const { id, number, type_id } = query;
+    const { id, number, type_id, status } = query;
 
     try {
       await sql`
         UPDATE rooms
         SET number = ${number},
-        type_id = ${type_id}
+        type_id = ${type_id},
+        current_status = ${status}
         WHERE id = ${id}
       `
     } catch (error) {
@@ -60,7 +61,7 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
         if ( error.code == "22P02") {
           return {
             status : "error",
-            message : "id or type_id is not uuid."
+            message : "type wrong"
           }
         } 
 
@@ -72,8 +73,11 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
         }
       }
 
+      console.log( error );
+
       return {
-        status : "error"
+        status : "error",
+        message : error
       }
     }
 
@@ -85,7 +89,8 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
     query : t.Object({
       id : t.String(),
       number : t.String(),
-      type_id : t.String()
+      type_id : t.String(),
+      status : t.String()
     })
   })
   .delete("/delete/:id", async ({ params }) => {

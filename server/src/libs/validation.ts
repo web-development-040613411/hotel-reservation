@@ -18,15 +18,26 @@ export const addRoomTypeSchema = z.object({
 
 export type AddRoomTypeValues = z.infer<typeof addRoomTypeSchema>;
 
-export const employeeSchema = z.object({
+export const addEmployeeSchema = z.object({
   user_name: z.string({ message: "username is require" }).min(1, "Name is required"),
   firstname: z.string({ message: "firstname is require" }).min(1, "firstname is required"),
   lastname: z.string({ message: "lastname is require" }).min(1, "lastname is required"),
   date_of_birth: z.string({ message: "date of birth is require" }).min(1, "date of birth is required"),
   password: z.string({ message: "password is require" }).min(6, "Password is required"),
-  role: z.string({ message: "role is require" })
+  confirm_password: z.string({ message: "confirm password is require" }).min(6, "Password is required"),
+  role: z.string({ message: "role is require" }),
+  image: z.instanceof(File)
 });
 
-export type EmployeeValues = z.infer<typeof employeeSchema>;
+export type AddEmployeeValues = z.infer<typeof addEmployeeSchema>;
 
-//dateformat : YYYY-MM-DD
+export const updateEmployeeSchema = z.object({
+  user_name: z.string({ message: "username is require" }).min(1, "Name is required"),
+  firstname: z.string({ message: "firstname is require" }).min(1, "firstname is required"),
+  lastname: z.string({ message: "lastname is require" }).min(1, "lastname is required"),
+  date_of_birth: z.string({ message: "date of birth is require" }).min(1, "date of birth is required"),
+  role: z.string({ message: "role is require" }),
+  image: z.instanceof(File).optional()
+});
+
+export type UpdateEmployeeValues = z.infer<typeof updateEmployeeSchema>;

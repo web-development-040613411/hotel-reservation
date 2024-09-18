@@ -10,7 +10,7 @@ import { unlink } from 'node:fs/promises';
 import { ZodError } from 'zod';
 import { uploadFile } from '@/libs/uploadFile';
 
-export const employeeRoutes = new Elysia({ prefix: '/employee' })
+export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .get('/', async ({ set }) => {
         try {
             const employees = await sql`SELECT * FROM employee`;
@@ -249,7 +249,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employee' })
         }
     });
 
-export const resetPasswordRoutes = new Elysia({ prefix: '/employee/resetPassword' }).put(
+export const resetPasswordRoutes = new Elysia({ prefix: '/resetEmployeePassword' }).put(
     '/:id',
     async ({ params: { id } , body, set }) => {
 

@@ -4,7 +4,10 @@ import { adminRoutes } from "./routes/admin";
 import { fileRoute } from "./routes/fileRoute";
 
 const app = new Elysia()
-  .onError(({ error }) => {
+  .onError(({ error, code }) => {
+    if(code === "NOT_FOUND") {
+      return new Response("Not Found :(");
+    }
     console.error(error);
     return {
       status: "error",

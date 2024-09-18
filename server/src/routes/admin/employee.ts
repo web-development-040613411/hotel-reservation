@@ -49,7 +49,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
         const {
-            user_name,
+            username,
             first_name,
             last_name,
             date_of_birth,
@@ -60,7 +60,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         } = validateData.data;
 
         const IsEmployeeExist =
-            await sql`SELECT * FROM employee WHERE user_name=${user_name}`;
+            await sql`SELECT * FROM employee WHERE username=${username}`;
         if (IsEmployeeExist.length > 0) {
             set.status = 400;
             return {
@@ -107,7 +107,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         }
 
         const employee =
-            await sql`INSERT INTO employee (user_name, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${user_name}, ${first_name}, ${last_name}, ${date_of_birth}, ${Hash_password}, ${role} , ${url})`;
+            await sql`INSERT INTO employee (username, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${Hash_password}, ${role} , ${url})`;
         return {
             status: 'success',
             message: 'Employee added successfully',
@@ -123,7 +123,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 message: validateData.error.errors[0].message,
             };
         }
-        const { user_name, first_name, last_name, date_of_birth, role, image } =
+        const { username, first_name, last_name, date_of_birth, role, image } =
             validateData.data;
 
         const [existsingEmployee] =
@@ -175,7 +175,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         }
 
         const employee =
-            await sql`UPDATE employee SET user_name=${user_name}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url} WHERE id=${id}`;
+            await sql`UPDATE employee SET username=${username}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url} WHERE id=${id}`;
         return {
             status: 'success',
             message: 'Employee updated successfully',

@@ -26,7 +26,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employee' })
             };
         }
     })
-    .get('/id/:id', async ({ params: { id }, set }) => {
+    .get('/:id', async ({ params: { id }, set }) => {
         try {
             const employee = await sql`SELECT * FROM employee WHERE id=${id}`;
             if (employee.length === 0) {
@@ -131,7 +131,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employee' })
         }
     })
 
-    .put('/id/:id', async ({ params: { id }, body, set }) => {
+    .put('/:id', async ({ params: { id }, body, set }) => {
         try {
             const data = updateEmployeeSchema.parse(body);
 
@@ -216,7 +216,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employee' })
         }
     })
 
-    .delete('/id/:id', async ({ params: { id }, set }) => {
+    .delete('/:id', async ({ params: { id }, set }) => {
         try {
             const [employee] = await sql`SELECT * FROM employee WHERE id=${id}`;
             if (!employee) {
@@ -250,9 +250,9 @@ export const employeeRoutes = new Elysia({ prefix: '/employee' })
     });
 
 export const resetPasswordRoutes = new Elysia({ prefix: '/employee/resetPassword' }).put(
-    '/id/:id',
-    async ({ params: { id }, body, set }) => {
-      
+    '/:id',
+    async ({ params: { id } , body, set }) => {
+
         try {
             const employee = await sql`SELECT * FROM employee WHERE id=${id}`;
             if (employee.length === 0) {

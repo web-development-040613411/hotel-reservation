@@ -4,6 +4,13 @@ import { adminRoutes } from "./routes/admin";
 import { fileRoute } from "./routes/fileRoute";
 
 const app = new Elysia()
+  .onError(({ error }) => {
+    console.error(error);
+    return {
+      status: "error",
+      message: "Internal server error, please try again later",
+    };
+  })
   .use(adminRoutes)
   .use(fileRoute)
   .use(cors())

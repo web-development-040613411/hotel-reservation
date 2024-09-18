@@ -11,6 +11,9 @@ import { ZodError } from 'zod';
 import { uploadFile } from '@/libs/uploadFile';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
+    .onError(({ code, error }) => {
+        return new Response(error.toString());
+    })
     .get('/', async ({ set }) => {
         try {
             const employees = await sql`SELECT * FROM employee`;
@@ -50,7 +53,14 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
     })
     .post('/', async ({ body, set }) => {
         try {
-            const data = addEmployeeSchema.parse(body);
+            const validateData = addEmployeeSchema.safeParse(body);
+            if (!validateData.success) {
+                set.status = 400;
+                return {
+                    status: 'error',
+                    message: validateData.error.errors[0].message,
+                };
+            }
             const {
                 user_name,
                 firstname,
@@ -60,7 +70,8 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 confirm_password,
                 role,
                 image,
-            } = data;
+            } = validateData.data;
+
             const IsEmployeeExist =
                 await sql`SELECT * FROM employee WHERE user_name=${user_name}`;
             if (IsEmployeeExist.length > 0) {
@@ -133,8 +144,14 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
 
     .put('/:id', async ({ params: { id }, body, set }) => {
         try {
-            const data = updateEmployeeSchema.parse(body);
-
+            const validateData = updateEmployeeSchema.safeParse(body);
+            if (!validateData.success) {
+                set.status = 400;
+                return {
+                    status: 'error',
+                    message: validateData.error.errors[0].message,
+                };
+            }
             const {
                 user_name,
                 firstname,
@@ -142,7 +159,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 date_of_birth,
                 role,
                 image,
-            } = data;
+            } = validateData.data;
 
             const [existsingEmployee] =
                 await sql`SELECT * FROM employee WHERE id=${id}`;
@@ -249,43 +266,49 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         }
     });
 
-export const resetPasswordRoutes = new Elysia({ prefix: '/resetEmployeePassword' }).put(
-    '/:id',
-    async ({ params: { id } , body, set }) => {
-
-        try {
-            const employee = await sql`SELECT * FROM employee WHERE id=${id}`;
-            if (employee.length === 0) {
-                set.status = 404;
-                return {
-                    status: 'error',
-                    message: 'Employee not found',
-                };
-            }
-            const data = ResetPasswordSchema.parse(body);
-            const { password, confirm_password } = data;
-            if (password !== confirm_password) {
-                set.status = 400;
-                return {
-                    status: 'error',
-                    message: 'Password and confirm password does not match',
-                };
-            }
-            const Hash_password = await Bun.password.hash(password, {
-                algorithm: 'bcrypt',
-                cost: 10,
-            });
-            await sql`UPDATE employee SET password=${Hash_password} WHERE id=${id}`;
-            return {
-                status: 'success',
-                message: 'Password updated successfully',
-            };
-        } catch (error) {
-            set.status = 500;
+export const resetPasswordRoutes = new Elysia({
+    prefix: '/resetEmployeePassword',
+}).put('/:id', async ({ params: { id }, body, set }) => {
+    try {
+        const validateData = ResetPasswordSchema.safeParse(body);
+        if (!validateData.success) {
+            set.status = 400;
             return {
                 status: 'error',
-                message: 'Internal server error, please try again later',
+                message: validateData.error.errors[0].message,
             };
         }
+        const { password, confirm_password } = validateData.data;
+
+        const employee = await sql`SELECT * FROM employee WHERE id=${id}`;
+        if (employee.length === 0) {
+            set.status = 404;
+            return {
+                status: 'error',
+                message: 'Employee not found',
+            };
+        }
+        if (password !== confirm_password) {
+            set.status = 400;
+            return {
+                status: 'error',
+                message: 'Password and confirm password does not match',
+            };
+        }
+        const Hash_password = await Bun.password.hash(password, {
+            algorithm: 'bcrypt',
+            cost: 10,
+        });
+        await sql`UPDATE employee SET password=${Hash_password} WHERE id=${id}`;
+        return {
+            status: 'success',
+            message: 'Password updated successfully',
+        };
+    } catch (error) {
+        set.status = 500;
+        return {
+            status: 'error',
+            message: 'Internal server error, please try again later',
+        };
     }
-);
+});

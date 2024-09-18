@@ -164,8 +164,8 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        const Query_roles = await sql`SELECT enum_range(NULL::role);`;
-        const all_roles = Object.values(Query_roles[0].enum_range);
+        const query_roles = await sql`SELECT enum_range(NULL::role);`;
+        const all_roles = Object.values(query_roles[0].enum_range);
         if (!all_roles.includes(role)) {
             set.status = 400;
             return {

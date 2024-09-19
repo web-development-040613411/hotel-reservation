@@ -1,18 +1,16 @@
 import { z } from "zod";
 
 export const addRoomTypeSchema = z.object({
-  name: z.string({ message: "name is require" }).min(1, "Name is required"),
+  name: z.string({ message: "Name is require" }).min(1, "Name is required"),
   detail: z
-    .string({ message: "detail is require" })
+    .string({ message: "Detail is require" })
     .min(1, "Detail is required"),
-  capacity: z
-    .string({ message: "capacity is require" })
-    .min(1, "Capacity is required")
-    .transform((data) => parseFloat(data)),
-  price: z
-    .string({ message: "price is require" })
-    .min(1, "Price is required")
-    .transform((data) => parseFloat(data)),
+  capacity: z.coerce
+    .number({ message: "Capacity is required" })
+    .min(1, "Capacity is required"),
+  price: z.coerce
+    .number({ message: "Price is required" })
+    .min(1, "Price is required"),
   image: z.instanceof(File).optional(),
 });
 

@@ -12,7 +12,7 @@ export const uploadFile = async (file: File) => {
   const url = `/file/${fileName}`;
 
   try {
-    await Bun.write(path, buffer);
+    await Bun.write(path, buffer as any);
     return url;
   } catch (error) {
     console.log(error)

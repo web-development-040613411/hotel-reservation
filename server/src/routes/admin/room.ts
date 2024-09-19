@@ -38,14 +38,16 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         };
       }
 
-      await sql`INSERT INTO rooms(number, type_id) 
-                VALUES (${number}, ${type_id})`;
+      const [res] = await sql`INSERT INTO rooms(number, type_id) 
+                            VALUES (${number}, ${type_id})
+                            RETURNING rooms.id`;
 
       set.status = 201;
 
       return {
         status: "success",
         message: "You have already a created new room.",
+        room_id: res.id,
       };
     },
     {
@@ -57,7 +59,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
   )
   .get("/", async () => {
       const res =
-        await sql`SELECT room.number, room.current_status, room_type.name,  room_type.price
+        await sql`SELECT rooms.number, rooms.current_status, room_type.name,  room_type.price
                               FROM rooms
                               INNER JOIN room_type
                               ON rooms.type_id = room_type.id;`;
@@ -81,8 +83,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         };
       }
 
-      const res =
-        await sql`SELECT rooms.number, rooms.current_status, room_type.name, room_type.price 
+      const res = await sql`SELECT rooms.number, rooms.current_status, room_type.name, room_type.price 
                           FROM rooms
                           INNER JOIN room_type
                           ON rooms.type_id = room_type.id
@@ -136,21 +137,21 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
       }),
     }
   )
-  .delete("/delete/:id", async ({ params }) => {
+  .delete("/delete/:id", async ({ set, params }) => {
     const { id } = params;
-    try {
-      await sql`DELETE FROM rooms
-                WHERE id=${id}`;
-    } catch (error) {
-      if (error instanceof postgres.PostgresError) {
-        if (error.code == "22P02") {
-          return {
-            status: "error",
-            message: "id is not uuid.",
-          };
-        }
-      }
+
+    const validation = z.string().uuid().safeParse(id); 
+
+    if ( !validation.success ) { 
+      set.status = 400;
+      return {
+        status: "error",
+        message: "id is not uuid.",
+      };
     }
+
+    await sql`DELETE FROM rooms
+              WHERE id=${id}`;
 
     return {
       status: "success",

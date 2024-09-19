@@ -3,8 +3,10 @@ import { createAndUpdateRoomSchema } from "@/libs/validation";
 import Elysia, { t } from "elysia";
 import postgres from "postgres";
 
-export const roomRoutes = new Elysia({ prefix: "/room" })
-  .onError(({error}) => {
+export const roomRoutes = new Elysia({ prefix: "/rooms" })
+  .onError(({ set, error }) => {
+    set.status = 409;
+
     if (error instanceof postgres.PostgresError && error.code == "23505") {
       if (error.constraint_name == "room_number_key") {
         return {
@@ -14,28 +16,31 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
       }
     }
 
-    console.log( error );
+    console.log(error);
   })
   .post(
     "/create",
-    async ({ body }) => {
+    async ({ set, body }) => {
       const { number, type_id } = body;
 
       const validation = createAndUpdateRoomSchema.safeParse({
         number: number,
-        type_id: type_id
-      })
+        type_id: type_id,
+      });
 
-      if ( !validation.success ) {
+      if (!validation.success) {
+        set.status = 400;
         const error = validation.error.issues[0].message;
         return {
-          status : "error",
-          message : error
-        }
+          status: "error",
+          message: error,
+        };
       }
 
       await sql`INSERT INTO rooms(number, type_id) 
                 VALUES (${number}, ${type_id})`;
+
+      set.status = 201;
 
       return {
         status: "success",
@@ -49,40 +54,13 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
       }),
     }
   )
-  .get(
-    "/",
-    async ({set}) => {
-      try {
-        const res = await sql`SELECT room.number, room.current_status, room_type.name,  room_type.price
+  .get("/", async ({ set }) => {
+    try {
+      const res =
+        await sql`SELECT room.number, room.current_status, room_type.name,  room_type.price
                               FROM rooms
                               INNER JOIN room_type
                               ON rooms.type_id = room_type.id;`;
-        return {
-          status: "success",
-          data: res,
-        };
-      } catch (error) {
-        set.status = 400;
-        if (error instanceof postgres.PostgresError) {
-          if (error.code == "22P02") {
-            return {
-              status: "error",
-              message: "id is not uuid.",
-            };
-          }
-        }
-      }
-    }
-  )
-  .get("/:id" , async ({ params,set }) => {
-    const { id } = params;
-
-    try {
-      const res = await sql`SELECT rooms.number, rooms.current_status, room_type.name, room_type.price 
-                            FROM rooms
-                            INNER JOIN room_type
-                            ON rooms.type_id = room_type.id
-                            WHERE rooms.id = ${id}`
       return {
         status: "success",
         data: res,
@@ -98,41 +76,70 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
         }
       }
     }
-  }, {
-    params : t.Object( {
-      id : t.String()
-      }
-    )
   })
+  .get(
+    "/:id",
+    async ({ params, set }) => {
+      const { id } = params;
+
+      try {
+        const res =
+          await sql`SELECT rooms.number, rooms.current_status, room_type.name, room_type.price 
+                            FROM rooms
+                            INNER JOIN room_type
+                            ON rooms.type_id = room_type.id
+                            WHERE rooms.id = ${id}`;
+        return {
+          status: "success",
+          data: res,
+        };
+      } catch (error) {
+        set.status = 400;
+        if (error instanceof postgres.PostgresError) {
+          if (error.code == "22P02") {
+            return {
+              status: "error",
+              message: "id is not uuid.",
+            };
+          }
+        }
+      }
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+    }
+  )
   .put(
     "/update",
-    async ({ body }) => {
+    async ({ set, body }) => {
       const { id, number, type_id } = body;
 
       const validation = createAndUpdateRoomSchema.safeParse({
         number: number,
-        type_id: type_id
-      })
+        type_id: type_id,
+      });
 
-      if ( !validation.success ) {
+      if (!validation.success) {
+        set.status = 400;
         const error = validation.error.issues[0].message;
         return {
-          status : "error",
-          message : error
-        }
+          status: "error",
+          message: error,
+        };
       }
 
       await sql`
         UPDATE rooms
         SET number=${number}, type_id=${type_id} 
         WHERE id=${id}
-      `
+      `;
 
       return {
-        status : "success",
-        message : "Update successfully."
-      }
-
+        status: "success",
+        message: "Update successfully.",
+      };
     },
     {
       body: t.Object({

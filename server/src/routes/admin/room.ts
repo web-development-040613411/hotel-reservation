@@ -13,6 +13,8 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
         };
       }
     }
+
+    console.log( error );
   })
   .post(
     "/create",
@@ -102,7 +104,7 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
       }
     )
   })
-  .patch(
+  .put(
     "/update",
     async ({ body }) => {
       const { id, number, type_id } = body;
@@ -119,13 +121,24 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
           message : error
         }
       }
-      
+
+      await sql`
+        UPDATE rooms
+        SET number=${number}, type_id=${type_id} 
+        WHERE id=${id}
+      `
+
+      return {
+        status : "success",
+        message : "Update successfully."
+      }
+
     },
     {
       body: t.Object({
         id: t.String(),
-        number: t.Optional(t.String()),
-        type_id: t.Optional(t.String()),
+        number: t.String(),
+        type_id: t.String(),
       }),
     }
   )

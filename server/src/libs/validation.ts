@@ -16,7 +16,7 @@ export const addRoomTypeSchema = z.object({
   image: z.instanceof(File),
 });
 
-export const createRoomSchema = z.object({
+export const createAndUpdateRoomSchema = z.object({
   number : z.string().length(3, { message : "Room number must have 3 digits."}),
   type_id : z.string().uuid({message : "type_id should be UUID"})
 })

@@ -1,5 +1,5 @@
 import { sql } from "@/libs/db";
-import { createRoomSchema } from "@/libs/validation";
+import { createAndUpdateRoomSchema } from "@/libs/validation";
 import Elysia, { t } from "elysia";
 import postgres from "postgres";
 
@@ -19,7 +19,7 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
     async ({ body }) => {
       const { number, type_id } = body;
 
-      const validation = createRoomSchema.safeParse({
+      const validation = createAndUpdateRoomSchema.safeParse({
         number: number,
         type_id: type_id
       })
@@ -52,9 +52,9 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
     async ({set}) => {
       try {
         const res = await sql`SELECT room.number, room.current_status, room_type.name,  room_type.price
-                      FROM rooms
-                      INNER JOIN room_type
-                      ON rooms.type_id = room_type.id;`;
+                              FROM rooms
+                              INNER JOIN room_type
+                              ON rooms.type_id = room_type.id;`;
         return {
           status: "success",
           data: res,
@@ -105,67 +105,27 @@ export const roomRoutes = new Elysia({ prefix: "/room" })
   .patch(
     "/update",
     async ({ body }) => {
-      const { id, number, type_id, status } = body;
+      const { id, number, type_id } = body;
 
-      if (status == "maintenance" || status == "off_market") {
-        const roomIDs = await sql`
-          SELECT * 
-          FROM reservation
-          WHERE id = ${id}
-        `;
+      const validation = createAndUpdateRoomSchema.safeParse({
+        number: number,
+        type_id: type_id
+      })
 
-        return { roomIDs };
+      if ( !validation.success ) {
+        const error = validation.error.issues[0].message;
+        return {
+          status : "error",
+          message : error
+        }
       }
-
-      // try {
-      //   await sql.begin(async (sql) => {});
-
-      //   await sql`
-      //   UPDATE rooms
-      //   SET number = ${number},
-      //   type_id = ${type_id},
-      //   current_status = ${status}
-      //   WHERE id = ${id}
-      // `;
-      // } catch (error) {
-      //   if (error instanceof postgres.PostgresError) {
-      //     if (error.code == "22P02") {
-      //       return {
-      //         status: "error",
-      //         message: "type wrong.",
-      //       };
-      //     }
-
-      //     if (
-      //       error.code == "23505" &&
-      //       error.constraint_name == "room_number_key"
-      //     ) {
-      //       return {
-      //         status: "error",
-      //         message: "This room number is already taken.",
-      //       };
-      //     }
-      //   }
-
-      //   console.log(error);
-
-      //   return {
-      //     status: "error",
-      //     message: error,
-      //   };
-      // }
-
-      // return {
-      //   status: "success",
-      //   message: "Update successfully.",
-      // };
+      
     },
     {
       body: t.Object({
         id: t.String(),
         number: t.Optional(t.String()),
         type_id: t.Optional(t.String()),
-        status: t.Optional(t.String()),
       }),
     }
   )

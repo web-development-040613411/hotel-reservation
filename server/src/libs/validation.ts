@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const addRoomTypeSchema = z.object({
-    name: z.string({ message: 'Name is require' }).min(1, 'Name is required'),
+    name: z.string({ message: 'Name is required' }).min(1, 'Name is required'),
     detail: z
         .string({ message: 'Detail is require' })
         .min(1, 'Detail is required'),
@@ -18,24 +18,24 @@ export type AddRoomTypeValues = z.infer<typeof addRoomTypeSchema>;
 
 export const addEmployeeSchema = z.object({
     username: z
-        .string({ message: 'username is require' })
+        .string({ message: 'username is required' })
         .min(1, 'Name is required'),
     first_name: z
-        .string({ message: 'firstname is require' })
+        .string({ message: 'firstname is required' })
         .min(1, 'firstname is required'),
     last_name: z
-        .string({ message: 'lastname is require' })
+        .string({ message: 'lastname is required' })
         .min(1, 'lastname is required'),
     date_of_birth: z
-        .string({ message: 'date of birth is require' })
+        .string({ message: 'date of birth is required' })
         .min(1, 'date of birth is required'),
     password: z
-        .string({ message: 'password is require' })
+        .string({ message: 'password is required' })
         .min(6, 'Password is required'),
     confirm_password: z
-        .string({ message: 'confirm password is require' })
+        .string({ message: 'confirm password is required' })
         .min(6, 'Password is required'),
-    role: z.string({ message: 'role is require' }),
+    role: z.string({ message: 'role is required' }),
     image: z.instanceof(File),
 });
 
@@ -43,18 +43,18 @@ export type AddEmployeeValues = z.infer<typeof addEmployeeSchema>;
 
 export const updateEmployeeSchema = z.object({
     username: z
-        .string({ message: 'username is require' })
+        .string({ message: 'username is required' })
         .min(1, 'Name is required'),
     first_name: z
-        .string({ message: 'firstname is require' })
+        .string({ message: 'firstname is required' })
         .min(1, 'firstname is required'),
     last_name: z
-        .string({ message: 'lastname is require' })
+        .string({ message: 'lastname is required' })
         .min(1, 'lastname is required'),
     date_of_birth: z
-        .string({ message: 'date of birth is require' })
+        .string({ message: 'date of birth is required' })
         .min(1, 'date of birth is required'),
-    role: z.string({ message: 'role is require' }),
+    role: z.string({ message: 'role is required' }),
     image: z.instanceof(File).optional(),
 });
 
@@ -62,11 +62,20 @@ export type UpdateEmployeeValues = z.infer<typeof updateEmployeeSchema>;
 
 export const ResetPasswordSchema = z.object({
     password: z
-        .string({ message: 'password is require' })
+        .string({ message: 'password is required' })
         .min(6, 'Password is required'),
     confirm_password: z
-        .string({ message: 'confirm password is require' })
+        .string({ message: 'confirm password is required' })
         .min(6, 'Password is required'),
 });
 
 export type ResetPasswordValues = z.infer<typeof ResetPasswordSchema>;
+
+export const loginSchema = z.object({
+    username: z
+        .string({ message: 'Username is required' })
+        .min(1, 'Username is required'),
+    password: z
+        .string({ message: 'Password is required' })
+        .min(1, 'Password is required'),
+});

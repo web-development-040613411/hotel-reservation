@@ -2,6 +2,7 @@ import { adminRoutes } from '@/routes/admin';
 import cors from '@elysiajs/cors';
 import { Elysia } from 'elysia';
 import { fileRoute } from './routes/fileRoute';
+import { authRoutes } from './routes/authRoute';
 
 const app = new Elysia()
     .onError(({ error, code }) => {
@@ -14,6 +15,7 @@ const app = new Elysia()
             message: 'Internal server error, please try again later',
         };
     })
+    .use(authRoutes)
     .use(adminRoutes)
     .use(fileRoute)
     .use(cors())

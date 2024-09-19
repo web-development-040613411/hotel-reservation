@@ -20,7 +20,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
     console.log(error);
   })
   .post(
-    "/create",
+    "/",
     async ({ set, body }) => {
       const { number, type_id } = body;
 

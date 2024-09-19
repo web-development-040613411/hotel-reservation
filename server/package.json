@@ -1,20 +1,23 @@
 {
-  "name": "app",
-  "version": "1.0.50",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
-  },
-  "dependencies": {
-    "@elysiajs/cors": "^1.1.1",
-    "elysia": "latest",
-    "postgres": "^3.4.4",
-    "uuid": "^10.0.0",
-    "zod": "^3.23.8"
-  },
-  "devDependencies": {
-    "@types/uuid": "^10.0.0",
-    "bun-types": "latest"
-  },
-  "module": "src/index.js"
+    "name": "app",
+    "version": "1.0.50",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "dev": "bun run --watch src/index.ts",
+        "prettier": "prettier --write ."
+    },
+    "dependencies": {
+        "@elysiajs/cors": "^1.1.1",
+        "@lucia-auth/adapter-postgresql": "^3.1.2",
+        "elysia": "latest",
+        "lucia": "^3.2.0",
+        "postgres": "^3.4.4",
+        "uuid": "^10.0.0",
+        "zod": "^3.23.8"
+    },
+    "devDependencies": {
+        "@types/uuid": "^10.0.0",
+        "bun-types": "latest"
+    },
+    "module": "src/index.js"
 }

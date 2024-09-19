@@ -1,13 +1,13 @@
 import { sql } from '@/libs/db';
-import Elysia from 'elysia';
+import { uploadFile } from '@/libs/uploadFile';
 import {
     addEmployeeSchema,
     ResetPasswordSchema,
     updateEmployeeSchema,
 } from '@/libs/validation';
-import { join } from 'path';
+import Elysia from 'elysia';
 import { unlink } from 'node:fs/promises';
-import { uploadFile } from '@/libs/uploadFile';
+import { join } from 'path';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .get('/', async ({ set }) => {

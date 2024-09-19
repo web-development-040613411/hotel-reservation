@@ -2,6 +2,7 @@ import { sql } from "@/libs/db";
 import { createAndUpdateRoomSchema } from "@/libs/validation";
 import Elysia, { t } from "elysia";
 import postgres from "postgres";
+import { z } from "zod";
 
 export const roomRoutes = new Elysia({ prefix: "/rooms" })
   .onError(({ set, error }) => {
@@ -54,8 +55,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
       }),
     }
   )
-  .get("/", async ({ set }) => {
-    try {
+  .get("/", async () => {
       const res =
         await sql`SELECT room.number, room.current_status, room_type.name,  room_type.price
                               FROM rooms
@@ -65,45 +65,32 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         status: "success",
         data: res,
       };
-    } catch (error) {
-      set.status = 400;
-      if (error instanceof postgres.PostgresError) {
-        if (error.code == "22P02") {
-          return {
-            status: "error",
-            message: "id is not uuid.",
-          };
-        }
-      }
-    }
   })
   .get(
     "/:id",
     async ({ params, set }) => {
       const { id } = params;
 
-      try {
-        const res =
-          await sql`SELECT rooms.number, rooms.current_status, room_type.name, room_type.price 
-                            FROM rooms
-                            INNER JOIN room_type
-                            ON rooms.type_id = room_type.id
-                            WHERE rooms.id = ${id}`;
-        return {
-          status: "success",
-          data: res,
-        };
-      } catch (error) {
+      const validation = z.string().uuid().safeParse(id);
+
+      if ( !validation.success ) {
         set.status = 400;
-        if (error instanceof postgres.PostgresError) {
-          if (error.code == "22P02") {
-            return {
-              status: "error",
-              message: "id is not uuid.",
-            };
-          }
-        }
+        return {
+          status: "error",
+          message: "id is not uuid.",
+        };
       }
+
+      const res =
+        await sql`SELECT rooms.number, rooms.current_status, room_type.name, room_type.price 
+                          FROM rooms
+                          INNER JOIN room_type
+                          ON rooms.type_id = room_type.id
+                          WHERE rooms.id = ${id}`;
+      return {
+        status: "success",
+        data: res,
+      };
     },
     {
       params: t.Object({

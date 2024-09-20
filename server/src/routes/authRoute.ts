@@ -3,9 +3,8 @@ import { lucia } from '@/libs/lucia';
 import { loginSchema } from '@/libs/validation';
 import Elysia from 'elysia';
 
-export const authRoutes = new Elysia({ prefix: '/auth' }).post(
-    '/login',
-    async ({ set, cookie, body }) => {
+export const authRoutes = new Elysia({ prefix: '/auth' })
+    .post('/login', async ({ set, cookie, body }) => {
         const validate = loginSchema.safeParse(body);
 
         if (!validate.success) {
@@ -55,5 +54,28 @@ export const authRoutes = new Elysia({ prefix: '/auth' }).post(
             status: 'success',
             message: 'Login successful',
         };
-    }
-);
+    })
+    .get('/logout', async ({ cookie, set }) => {
+        const sessionId = cookie['auth_session'].value;
+
+        if (!sessionId) {
+            set.status = 400;
+            return {
+                status: 'error',
+                message: 'User not logged in',
+            };
+        }
+
+        await lucia.invalidateSession(sessionId);
+        const sessionCookie = lucia.createBlankSessionCookie();
+
+        cookie[sessionCookie.name].set({
+            value: sessionCookie.value,
+            ...sessionCookie.attributes,
+        });
+
+        return {
+            status: 'success',
+            message: 'Logout successful',
+        };
+    });

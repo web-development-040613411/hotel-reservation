@@ -96,7 +96,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
           message: "Room not found.",
         };
       }
-      
+
       return {
         status: "success",
         data: res,
@@ -127,6 +127,16 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         };
       }
 
+      const [res] = await sql`SELECT * FROM rooms WHERE id=${id}`;
+
+      if (res === undefined) {
+        set.status = 404;
+        return {
+          status: "error",
+          message: "Room not found.",
+        };
+      }
+
       await sql`
         UPDATE rooms
         SET number=${number}, type_id=${type_id} 
@@ -146,7 +156,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
       }),
     }
   )
-  .delete("/delete/:id", async ({ set, params }) => {
+  .delete("/:id", async ({ set, params }) => {
     const { id } = params;
 
     const validation = z.string().uuid().safeParse(id); 
@@ -156,6 +166,16 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
       return {
         status: "error",
         message: "id is not uuid.",
+      };
+    }
+
+    const [res] = await sql`SELECT * FROM rooms WHERE id=${id}`;
+
+    if (res === undefined) {
+      set.status = 404;
+      return {
+        status: "error",
+        message: "Room not found.",
       };
     }
 

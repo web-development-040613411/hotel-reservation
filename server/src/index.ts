@@ -6,6 +6,16 @@ import { swagger } from "@elysiajs/swagger";
 
 export const app = new Elysia()
   .use(swagger())
+  .onError(({ error, code }) => {
+    if(code === "NOT_FOUND") {
+      return new Response("Not Found :(");
+    }
+    console.error(error);
+    return {
+      status: "error",
+      message: "Internal server error, please try again later",
+    };
+  })
   .use(adminRoutes)
   .use(fileRoute)
   .use(cors())

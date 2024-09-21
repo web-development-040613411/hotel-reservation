@@ -78,7 +78,7 @@ CREATE table districts (
   id  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   code  varchar(10) UNIQUE,
   name_en varchar(255),
-  province_id UUID REFERENCES provinces(id),
+  province_code VARCHAR REFERENCES provinces(code),
   postal_code varchar(10)
 );
 
@@ -86,7 +86,7 @@ CREATE table sub_districts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   code  varchar(10) UNIQUE,
   name_en varchar(255),
-  district_id UUID REFERENCES districts(id)
+  district_code VARCHAR REFERENCES districts(code)
 );
 
 
@@ -95,7 +95,7 @@ CREATE TABLE customer_detail (
   first_name VARCHAR NOT NULL,
   last_name VARCHAR NOT NULL,
   address VARCHAR NOT NULL,
-  sub_district_id VARCHAR NOT NULL,
+  sub_district_id VARCHAR NOT NULL REFERENCES sub_districts(id),
   district_id VARCHAR NOT NULL REFERENCES districts(id),
   province_id UUID NOT NULL REFERENCES provinces(id),
   postal_code VARCHAR NOT NULL,

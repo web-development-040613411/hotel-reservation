@@ -88,6 +88,15 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
                           INNER JOIN room_type
                           ON rooms.type_id = room_type.id
                           WHERE rooms.id = ${id}`;
+
+      if ( res.length === 0 ) {
+        set.status = 404;
+        return {
+          status: "error",
+          message: "Room not found.",
+        };
+      }
+      
       return {
         status: "success",
         data: res,
@@ -100,7 +109,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
     }
   )
   .put(
-    "/update",
+    "/",
     async ({ set, body }) => {
       const { id, number, type_id } = body;
 

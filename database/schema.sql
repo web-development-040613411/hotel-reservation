@@ -70,13 +70,13 @@ CREATE TABLE rooms (
 
 CREATE table provinces (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  code  varchar(4),
+  code  varchar(4) UNIQUE,
   name_en varchar(255)
 );
 
 CREATE table districts (
   id  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  code  varchar(10),
+  code  varchar(10) UNIQUE,
   name_en varchar(255),
   province_id UUID REFERENCES provinces(id),
   postal_code varchar(10)
@@ -84,7 +84,7 @@ CREATE table districts (
 
 CREATE table sub_districts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  code  varchar(10),
+  code  varchar(10) UNIQUE,
   name_en varchar(255),
   district_id UUID REFERENCES districts(id)
 );

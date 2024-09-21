@@ -5,20 +5,6 @@ import postgres from "postgres";
 import { z } from "zod";
 
 export const roomRoutes = new Elysia({ prefix: "/rooms" })
-  .onError(({ set, error }) => {
-    set.status = 409;
-
-    if (error instanceof postgres.PostgresError && error.code == "23505") {
-      if (error.constraint_name == "room_number_key") {
-        return {
-          status: "error",
-          message: "This room number have already used.",
-        };
-      }
-    }
-
-    console.log(error);
-  })
   .post(
     "/",
     async ({ set, body }) => {
@@ -109,9 +95,10 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
     }
   )
   .put(
-    "/",
-    async ({ set, body }) => {
-      const { id, number, type_id } = body;
+    "/:id",
+    async ({ params, set, body }) => {
+      const { number, type_id } = body;
+      const { id } = params;
 
       const validation = createAndUpdateRoomSchema.safeParse({
         number: number,
@@ -150,10 +137,12 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
     },
     {
       body: t.Object({
-        id: t.String(),
         number: t.String(),
         type_id: t.String(),
-      }),
+      }), 
+    params : t.Object({
+      id : t.String()
+    }),
     }
   )
   .delete("/:id", async ({ set, params }) => {
@@ -186,4 +175,8 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
       status: "success",
       message: "Your room have been removed.",
     };
+  })
+  .patch('/status', async ({ set, body }) => {  
+
+
   });

@@ -158,6 +158,18 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
       };
     }
 
+    const reservation = await sql`SELECT * FROM reservations 
+                                  WHERE room_id=${id}
+                                  AND check_out > NOW()`;
+
+    if (reservation.length !== 0) {
+      set.status = 400;
+      return {
+        status: "error",
+        message: "There are some guests who use this room.",
+      };
+    }
+
     const [res] = await sql`SELECT * FROM rooms WHERE id=${id}`;
 
     if (res === undefined) {

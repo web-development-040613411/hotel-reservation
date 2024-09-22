@@ -18,7 +18,7 @@ CREATE TYPE current_status AS ENUM (
   'departing'
 );
 
-CREATE TABLE reservation (
+CREATE TABLE reservations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   customer_id UUID NOT NULL,
   room_id UUID NOT NULL,

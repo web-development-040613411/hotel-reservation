@@ -1,3 +1,4 @@
+import { fontdeskRoute } from "./routes/fontdesk";
 import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
 import { adminRoutes } from "./routes/admin";
@@ -18,7 +19,6 @@ export const app = new Elysia()
       }
     }
 
-
     if(code === "NOT_FOUND") {
       return new Response("Not Found :(");
     }
@@ -30,6 +30,7 @@ export const app = new Elysia()
     
   })
   .use(adminRoutes)
+  .use(fontdeskRoute)
   .use(fileRoute)
   .use(cors())
   .listen(3001);

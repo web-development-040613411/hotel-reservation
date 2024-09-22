@@ -1,3 +1,8 @@
+CREATE TABLE user_session (
+    id TEXT PRIMARY KEY,
+    expires_at TIMESTAMPTZ NOT NULL,
+)
+
 CREATE TYPE transaction_status AS ENUM (
   'preserve',
   'paid'
@@ -63,28 +68,40 @@ CREATE TABLE rooms (
   current_status current_status DEFAULT 'vacant'
 );
 
+CREATE table provinces (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  code  varchar(4) UNIQUE,
+  name_en varchar(255)
+);
+
+CREATE table districts (
+  id  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  code  varchar(10) UNIQUE,
+  name_en varchar(255),
+  province_code VARCHAR REFERENCES provinces(code),
+  postal_code varchar(10)
+);
+
+CREATE table sub_districts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  code  varchar(10) UNIQUE,
+  name_en varchar(255),
+  district_code VARCHAR REFERENCES districts(code)
+);
+
+
 CREATE TABLE customer_detail (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   first_name VARCHAR NOT NULL,
   last_name VARCHAR NOT NULL,
   address VARCHAR NOT NULL,
-  sub_district VARCHAR NOT NULL,
-  district VARCHAR NOT NULL,
-  province_id UUID NOT NULL,
-  post_number VARCHAR NOT NULL,
+  sub_district_id VARCHAR NOT NULL REFERENCES sub_districts(id),
+  district_id VARCHAR NOT NULL REFERENCES districts(id),
+  province_id UUID NOT NULL REFERENCES provinces(id),
+  postal_code VARCHAR NOT NULL,
   phone_number VARCHAR NOT NULL,
   email VARCHAR NOT NULL
 );
-
-CREATE TABLE provinces (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  name VARCHAR NOT NULL
-)
-
-CREATE TABLE user_session (
-    id TEXT PRIMARY KEY,
-    expires_at TIMESTAMPTZ NOT NULL,
-)
 
 ALTER TABLE room ADD FOREIGN KEY (type_id) REFERENCES room_type (id);
 
@@ -95,82 +112,3 @@ ALTER TABLE reservation ADD FOREIGN KEY (customer_id) REFERENCES customer_detail
 ALTER TABLE customer_detail ADD FOREIGN KEY (province_id) REFERENCES provinces (id);
 
 ALTER TABLE user_session ADD FOREIGN KEY (user_id) REFERENCES employee (id);
-
-INSERT INTO provinces (province) VALUES
-('Bangkok'),
-('Amnat Charoen'),
-('Ang Thong'),
-('Bueng Kan'),
-('Buri Ram'),
-('Chachoengsao'),
-('Chai Nat'),
-('Chaiyaphum'),
-('Chanthaburi'),
-('Chiang Mai'),
-('Chiang Rai'),
-('Chonburi'),
-('Chumphon'),
-('Kalasin'),
-('Kamphaeng Phet'),
-('Kanchanaburi'),
-('Khon Kaen'),
-('Krabi'),
-('Lampang'),
-('Lamphun'),
-('Loei'),
-('Lopburi'),
-('Mae Hong Son'),
-('Maha Sarakham'),
-('Mukdahan'),
-('Nakhon Nayok'),
-('Nakhon Pathom'),
-('Nakhon Phanom'),
-('Nakhon Ratchasima'),
-('Nakhon Sawan'),
-('Nakhon Si Thammarat'),
-('Nan'),
-('Narathiwat'),
-('Nong Bua Lam Phu'),
-('Nong Khai'),
-('Nonthaburi'),
-('Pathum Thani'),
-('Pattani'),
-('Phang Nga'),
-('Phatthalung'),
-('Phayao'),
-('Phetchabun'),
-('Phetchaburi'),
-('Phichit'),
-('Phitsanulok'),
-('Phrae'),
-('Phuket'),
-('Prachinburi'),
-('Prachuap Khiri Khan'),
-('Ranong'),
-('Ratchaburi'),
-('Rayong'),
-('Roi Et'),
-('Sa Kaeo'),
-('Sakon Nakhon'),
-('Samut Prakan'),
-('Samut Sakhon'),
-('Samut Songkhram'),
-('Saraburi'),
-('Satun'),
-('Sing Buri'),
-('Sisaket'),
-('Songkhla'),
-('Sukhothai'),
-('Suphan Buri'),
-('Surat Thani'),
-('Surin'),
-('Tak'),
-('Trang'),
-('Trat'),
-('Ubon Ratchathani'),
-('Udon Thani'),
-('Uthai Thani'),
-('Uttaradit'),
-('Yala'),
-('Yasothon');
-

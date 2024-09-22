@@ -64,7 +64,7 @@ describe("Elysia", () => {
   it("[create-room] right-format", async () => {
     const formData = new FormData();
 
-    formData.append("number", "456");
+    formData.append("number", "457");
     formData.append("type_id", "b0ea90de-1c75-408f-8ff4-7e246a46c480");
 
     const response = await app

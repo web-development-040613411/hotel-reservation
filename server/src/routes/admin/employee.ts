@@ -1,5 +1,4 @@
 import { sql } from '@/libs/db';
-import { uploadFile } from '@/libs/uploadFile';
 import {
     addEmployeeSchema,
     ResetPasswordSchema,
@@ -8,6 +7,7 @@ import {
 import Elysia from 'elysia';
 import { unlink } from 'node:fs/promises';
 import { join } from 'path';
+import { uploadFile } from '@/libs/upload-file';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .get('/', async ({ set }) => {
@@ -207,7 +207,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
     });
 
 export const resetPasswordRoutes = new Elysia({
-    prefix: '/resetEmployeePassword',
+    prefix: '/reset-password',
 }).put('/:id', async ({ params: { id }, body, set }) => {
     const validateData = ResetPasswordSchema.safeParse(body);
     if (!validateData.success) {

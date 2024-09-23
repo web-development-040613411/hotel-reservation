@@ -29,8 +29,8 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         }
 
         const validPassword = await Bun.password.verify(
-            user.password,
             password,
+            user.password,
             'bcrypt'
         );
 

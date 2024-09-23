@@ -14,6 +14,11 @@ export const addRoomTypeSchema = z.object({
   image: z.instanceof(File).optional(),
 });
 
+export const createAndUpdateRoomSchema = z.object({
+  number : z.string().length(3, { message : "Room number must have 3 digits."}),
+  type_id : z.string().uuid({message : "type_id should be UUID"})
+})
+
 export type AddRoomTypeValues = z.infer<typeof addRoomTypeSchema>;
 
 export const addEmployeeSchema = z.object({

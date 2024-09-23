@@ -7,7 +7,7 @@ import {
 } from '@/libs/validation';
 import { join } from 'path';
 import { unlink } from 'node:fs/promises';
-import { uploadFile } from '@/libs/uploadFile';
+import { uploadFile } from '@/libs/upload-file';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .get('/', async ({ set }) => {
@@ -207,7 +207,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
     });
 
 export const resetPasswordRoutes = new Elysia({
-    prefix: '/resetEmployeePassword',
+    prefix: '/reset-password',
 }).put('/:id', async ({ params: { id }, body, set }) => {
     const validateData = ResetPasswordSchema.safeParse(body);
     if (!validateData.success) {

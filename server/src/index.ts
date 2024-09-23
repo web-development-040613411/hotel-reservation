@@ -1,8 +1,8 @@
-import { fontdeskRoute } from "./routes/fontdesk";
+import { frontdeskRoute } from "./routes/frontdesk";
 import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
 import { adminRoutes } from "./routes/admin";
-import { fileRoute } from "./routes/fileRoute";
+import { fileRoute } from "./routes/file-route";
 import { swagger } from "@elysiajs/swagger";
 import postgres from "postgres";
 
@@ -30,7 +30,7 @@ export const app = new Elysia()
     
   })
   .use(adminRoutes)
-  .use(fontdeskRoute)
+  .use(frontdeskRoute)
   .use(fileRoute)
   .use(cors())
   .listen(3001);

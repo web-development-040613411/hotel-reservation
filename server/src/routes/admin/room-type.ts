@@ -1,11 +1,11 @@
 import Elysia from "elysia";
 import { sql } from "@/libs/db";
 import { unlink } from "node:fs/promises";
-import { uploadFile } from "@/libs/uploadFile";
+import { uploadFile } from "@/libs/upload-file";
 import { addRoomTypeSchema } from "@/libs/validation";
 import { join } from "path";
 
-export const roomTypeRoutes = new Elysia({ prefix: "/room-type" })
+export const roomTypeRoutes = new Elysia({ prefix: "/room-types" })
   .get("/", async () => {
     const roomTypes = await sql`SELECT * FROM room_type`;
     return {

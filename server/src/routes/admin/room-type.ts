@@ -25,8 +25,8 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         }
 
         const { name, detail, capacity, price, image } = validateData.data;
-        
-        if (!image?.length) {
+
+        if (!image) {
             set.status = 400;
             return {
                 status: 'error',
@@ -45,19 +45,19 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
             };
         }
 
-        const url = await uploadFile(image);
+        const uploadResult = await uploadFile(image);
 
-        if (!url) {
-            set.status = 500;
+        if (uploadResult.status === 'error') {
+            set.status = 400;
             return {
                 status: 'error',
-                message: 'Internal server error, please try again later',
+                message: uploadResult.message,
             };
         }
 
         await sql`
             INSERT INTO room_types (name, detail, capacity, price, picture_path)
-            VALUES (${name}, ${detail}, ${capacity}, ${price}, ${url})
+            VALUES (${name}, ${detail}, ${capacity}, ${price}, ${uploadResult.url})
         `;
 
         return {
@@ -98,28 +98,23 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
             };
         }
 
-        let url;
-
+        let url = roomType.picture_path;
         if (image) {
-            url = await uploadFile(image);
+            const uploadResult = await uploadFile(image);
 
-            if (!url) {
-                set.status = 500;
-                return {
-                    status: 'error',
-                    message: 'Internal server error, please try again later',
-                };
+            if (uploadResult.status === 'error') {
+                set.status = 400;
+                return uploadResult;
             }
-        } else {
-            url = roomType.picture_path;
-        }
 
-        if (!url) {
-            set.status = 500;
-            return {
-                status: 'error',
-                message: 'Internal server error, please try again later',
-            };
+            const path = join(
+                '.',
+                process.env.UPLOAD_FOLDER!,
+                roomType.picture_path.split('/').pop()
+            );
+            await unlink(path);
+
+            url = uploadResult.url;
         }
 
         await sql`

@@ -65,12 +65,12 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             cost: 10,
         });
 
-        const url = await uploadFile(image);
-        if (!url) {
-            set.status = 500;
+        const uploadResult = await uploadFile(image);
+        if (uploadResult.status === 'error') {
+            set.status = 400;
             return {
                 status: 'error',
-                message: 'Internal server error, please try again later',
+                message: uploadResult.message,
             };
         }
 
@@ -84,7 +84,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        await sql`INSERT INTO employees (username, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role} , ${url})`;
+        await sql`INSERT INTO employees (username, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role} , ${uploadResult.url})`;
 
         return {
             status: 'success',
@@ -113,8 +113,17 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        let url;
+        let url = existsingEmployee.profile_picture;
         if (image) {
+            const uploadResult = await uploadFile(image);
+            if (uploadResult.status === 'error') {
+                set.status = 400;
+                return {
+                    status: 'error',
+                    message: uploadResult.message,
+                };
+            }
+
             const path = join(
                 '.',
                 process.env.UPLOAD_FOLDER!,
@@ -122,16 +131,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             );
             await unlink(path);
 
-            url = await uploadFile(image);
-            if (!url) {
-                set.status = 500;
-                return {
-                    status: 'error',
-                    message: 'Internal server error, please try again later',
-                };
-            }
-        } else {
-            url = existsingEmployee.profile_picture;
+            url = uploadResult.url;
         }
 
         const queryRoles = await sql`SELECT enum_range(NULL::role);`;

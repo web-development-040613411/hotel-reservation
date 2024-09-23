@@ -7,7 +7,7 @@ import { join } from 'path';
 
 export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
     .get('/', async () => {
-        const roomTypes = await sql`SELECT * FROM room_type`;
+        const roomTypes = await sql`SELECT * FROM room_types`;
         return {
             status: 'success',
             data: roomTypes,
@@ -27,7 +27,7 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         const { name, detail, capacity, price, image } = validateData.data;
 
         const [roomType] =
-            await sql`SELECT * FROM room_type WHERE name=${name}`;
+            await sql`SELECT * FROM room_types WHERE name=${name}`;
 
         if (roomType) {
             set.status = 400;

@@ -3,7 +3,7 @@ import { Lucia } from 'lucia';
 import { sql } from './db';
 
 const adapter = new PostgresJsAdapter(sql, {
-    user: 'employee',
+    user: 'employees',
     session: 'user_session',
 });
 

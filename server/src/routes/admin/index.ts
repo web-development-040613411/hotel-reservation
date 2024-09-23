@@ -1,5 +1,5 @@
 import Elysia from 'elysia';
-import { roomTypeRoutes } from './roomType';
+import { roomTypeRoutes } from './room-type';
 import { employeeRoutes , resetPasswordRoutes } from './employee';
 import { roomRoutes } from "./room";
 

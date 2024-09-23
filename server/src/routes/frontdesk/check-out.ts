@@ -2,11 +2,11 @@ import { sql } from '@/libs/db';
 import Elysia from 'elysia';
 import { reservationType } from '@/libs/type';
 
-export const checkInRoute = new Elysia({ prefix: '/checkIn' }).patch(
+export const checkOutRoute = new Elysia({ prefix: '/check-out' }).patch(
     '/:id',
     async ({ params: { id }, set }) => {
         const queryReservation =
-            await sql`SELECT * FROM reservation WHERE id=${id}`;
+            await sql`SELECT * FROM reservations WHERE id=${id}`;
 
         if (queryReservation.count === 0) {
             set.status = 404;
@@ -21,30 +21,35 @@ export const checkInRoute = new Elysia({ prefix: '/checkIn' }).patch(
             set.status = 400;
             return {
                 status: 'error',
-                message: 'Can not check in, reservation is preserved',
+                message: 'Can not check out, reservation is preserved',
             };
         }
 
         const currentDate = new Date().toDateString();
-        const checkInDate = new Date(thisReservation.check_in).toDateString();
+        const checkOutDate = new Date(thisReservation.check_out).toDateString();
 
-        if (currentDate < checkInDate) {
+        if (currentDate > checkOutDate) {
             set.status = 400;
             return {
                 status: 'error',
-                message: 'Can not check in, reservation is not started yet',    
+                message: 'Can not check out, reservation is already finished',
             };
         }
 
         const updateRoom = await sql`
             UPDATE rooms
-            SET status='occupied'
+            SET current_status ='vacant'
             WHERE id=${thisReservation.room_id}
         `;
 
+        const updateReservation = await sql`
+            UPDATE reservations
+            SET check_out = ${currentDate}
+            WHERE id=${thisReservation.id};`;
+
         return {
             status: 'success',
-            message: 'Check in success',
+            message: 'Check out success',
         };
     }
 );

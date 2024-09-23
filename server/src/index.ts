@@ -3,6 +3,7 @@ import cors from "@elysiajs/cors";
 import { adminRoutes } from "./routes/admin";
 import { fileRoute } from "./routes/fileRoute";
 import { fontdeskRoute } from "./routes/fontdesk";
+import { reservationRoute } from "./routes/reservation";
 
 const app = new Elysia()
   .onError(({ error, code }) => {
@@ -18,6 +19,7 @@ const app = new Elysia()
   .use(adminRoutes)
   .use(fontdeskRoute)
   .use(fileRoute)
+  .use( reservationRoute )
   .use(cors())
   .listen(3001);
 

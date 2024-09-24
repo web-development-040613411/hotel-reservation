@@ -12,7 +12,7 @@ import { DataTable } from "./data-table";
 
 async function getReservationData(): Promise<reservationList[]> {
   const response = await fetch(
-    "http://localhost:3001/progress2/reservation-list"
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/progress2/reservation-list`
   );
   const res = await response.json();
   return res.data;
@@ -20,14 +20,16 @@ async function getReservationData(): Promise<reservationList[]> {
 
 async function getCustomerDetails(): Promise<customerDetails[]> {
   const response = await fetch(
-    "http://localhost:3001/progress2/customer-detalis"
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/progress2/customer-details`
   );
   const res = await response.json();
   return res.data;
 }
 
 async function getIncome(): Promise<income[]> {
-  const response = await fetch("http://localhost:3001/progress2/income");
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}/progress2/income`
+  );
   const res = await response.json();
   return res.data;
 }

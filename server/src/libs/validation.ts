@@ -90,3 +90,10 @@ export const loginSchema = z.object({
         .string({ message: 'Password is required' })
         .min(1, 'Password is required'),
 });
+
+export const GetVacantRoomsSchema = z.object({
+    check_in: z.string({ message: 'Check in date is required' }).date(),
+    check_out: z.string({ message: 'Check out date is required' }).date(),
+    room_id: z.string({ message: 'id is required' }).uuid(),
+    type_id: z.string({ message: 'type_id is required' }).uuid()
+});

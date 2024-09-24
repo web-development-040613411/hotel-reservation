@@ -5,6 +5,7 @@ import { adminRoutes } from "./routes/admin";
 import { fileRoute } from "./routes/file-route";
 import { swagger } from "@elysiajs/swagger";
 import postgres from "postgres";
+import { progress2Route } from "./routes/for-progress2";
 
 export const app = new Elysia()
   .use(swagger())
@@ -32,6 +33,7 @@ export const app = new Elysia()
   .use(adminRoutes)
   .use(frontdeskRoute)
   .use(fileRoute)
+  .use(progress2Route)
   .use(cors())
   .listen(3001);
 

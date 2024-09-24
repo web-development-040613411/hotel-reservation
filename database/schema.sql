@@ -78,8 +78,7 @@ CREATE table districts (
   id  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   code  varchar(10) UNIQUE,
   name_en varchar(255),
-  province_code VARCHAR REFERENCES provinces(code),
-  postal_code varchar(10)
+  province_code VARCHAR REFERENCES provinces(code)
 );
 
 CREATE table sub_districts (

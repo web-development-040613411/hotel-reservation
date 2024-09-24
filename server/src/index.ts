@@ -6,6 +6,7 @@ import { frontdeskRoute } from './routes/frontdesk';
 import { reservationRoute } from './routes/reservation';
 import { swagger } from '@elysiajs/swagger';
 import postgres from 'postgres';
+import { guestRoutes } from './routes/guest';
 
 export const app = new Elysia()
     .use(swagger())
@@ -32,6 +33,7 @@ export const app = new Elysia()
     .use(adminRoutes)
     .use(frontdeskRoute)
     .use(fileRoute)
+    .use(guestRoutes)
     .use(reservationRoute)
     .use(cors())
     .listen(3001);

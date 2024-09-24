@@ -2,7 +2,7 @@ import { sql } from '@/libs/db';
 import Elysia from 'elysia';
 
 export const customerDetailsRoute = new Elysia({
-    prefix: '/customer-detalis',
+    prefix: '/customer-details',
 }).get('/', async ({ set }) => {
     const customerDetails = await sql`SELECT
 	customer_details.first_name, 
@@ -11,7 +11,7 @@ export const customerDetailsRoute = new Elysia({
 	sub_districts.name_en AS sub_district, 
 	districts.name_en AS district, 
 	provinces.name_en AS province, 
-  districts.postal_code AS postal_code, 
+    districts.postal_code AS postal_code, 
 	customer_details.email, 
 	customer_details.phone_number
 FROM
@@ -31,12 +31,12 @@ FROM
 	ON 
 		districts.code = sub_districts.district_code AND
 		customer_details.sub_district_id = sub_districts."id"`;
-
+		
     if (customerDetails.length === 0) {
         set.status = 404;
         return {
             status: 'error',
-            message: 'Customers not found',
+            message: 'No customer details found',
         };
     }
 

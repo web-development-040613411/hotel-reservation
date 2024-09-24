@@ -11,7 +11,7 @@ FROM reservations GROUP BY "month" , "year" ORDER BY "year" , "month"`;
             set.status = 404;
             return {
                 status: 'error',
-                message: 'incomeList not found',
+                message: 'No income list found',
             };
         }
 

@@ -25,7 +25,7 @@ FROM
             set.status = 404;
             return {
                 status: 'error',
-                message: 'Reservation not found',
+                message: 'No reservation list found',
             };
         }
 

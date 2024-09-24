@@ -4,7 +4,7 @@ import Elysia, { t } from 'elysia';
 export const roomRoutes = new Elysia({ prefix: '/rooms' }).get(
     '/vacant-rooms',
     async ({ query }) => {
-        const roomTypes = await sql`SELECT id FROM rooms_type`;
+        const roomTypes = await sql`SELECT id FROM room_types`;
         const uniqueRooms = [];
 
         const { check_in, check_out } = query;
@@ -16,13 +16,13 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' }).get(
                       SELECT
                         rooms."id" AS room_id,
                         rooms."number",
-                        rooms_type."name",
-                        ${diffDate} * rooms_type.price AS price,
-                        rooms_type.detail,
-                        rooms_type.picture_path
+                        room_types."name",
+                        ${diffDate} * room_types.price AS price,
+                        room_types.detail,
+                        room_types.picture_path
                       FROM
                         rooms
-                        LEFT JOIN rooms_type ON rooms.type_id = rooms_type."id" 
+                        LEFT JOIN room_types ON rooms.type_id = room_types."id" 
                       WHERE
                         (
                         SELECT

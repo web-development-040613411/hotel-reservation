@@ -1,7 +1,25 @@
 import { join } from 'path';
 import { v4 as uuidv4 } from 'uuid';
 
-export const uploadFile = async (file: File) => {
+type UploadFileResult =
+    | { status: 'error'; message: string }
+    | { status: 'success'; url: string };
+
+export const uploadFile = async (file: File): Promise<UploadFileResult> => {
+    if (!process.env.UPLOAD_FOLDER) {
+        return {
+            status: 'error',
+            message: 'Upload folder is not set',
+        };
+    }
+
+    if (!file.size || file.size === 0) {
+        return {
+            status: 'error',
+            message: 'File is empty',
+        };
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -13,11 +31,10 @@ export const uploadFile = async (file: File) => {
     const path = join('.', process.env.UPLOAD_FOLDER!, fileName);
     const url = `/file/${fileName}`;
 
-    try {
-        await Bun.write(path, buffer as any);
-        return url;
-    } catch (error) {
-        console.log(error);
-        return null;
-    }
+    await Bun.write(path, buffer);
+
+    return {
+        status: 'success',
+        url,
+    };
 };

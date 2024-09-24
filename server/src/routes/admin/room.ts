@@ -1,19 +1,12 @@
 import { sql } from "@/libs/db";
 import { createAndUpdateRoomSchema } from "@/libs/validation";
-import Elysia, { t } from "elysia";
-import postgres from "postgres";
-import { z } from "zod";
+import Elysia from "elysia";
 
 export const roomRoutes = new Elysia({ prefix: "/rooms" })
   .post(
     "/",
     async ({ set, body }) => {
-      const { number, type_id } = body;
-
-      const validation = createAndUpdateRoomSchema.safeParse({
-        number: number,
-        type_id: type_id,
-      });
+      const validation = createAndUpdateRoomSchema.safeParse(body);
 
       if (!validation.success) {
         set.status = 400;
@@ -23,6 +16,8 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
           message: error,
         };
       }
+
+      const { number, type_id } = validation.data;
 
       const [res] = await sql`INSERT INTO rooms(number, type_id) 
                             VALUES (${number}, ${type_id})
@@ -36,19 +31,13 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         room_id: res.id,
       };
     },
-    {
-      body: t.Object({
-        number: t.String(),
-        type_id: t.String(),
-      }),
-    }
   )
   .get("/", async () => {
       const res =
-        await sql`SELECT rooms.number, rooms.current_status, room_type.name,  room_type.price
+        await sql`SELECT rooms.number, rooms.current_status, room_types.name,  room_types.price
                               FROM rooms
-                              INNER JOIN room_type
-                              ON rooms.type_id = room_type.id;`;
+                              INNER JOIN room_types
+                              ON rooms.type_id = room_types.id;`;
       return {
         status: "success",
         data: res,
@@ -59,23 +48,13 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
     async ({ params, set }) => {
       const { id } = params;
 
-      const validation = z.string().uuid().safeParse(id);
-
-      if ( !validation.success ) {
-        set.status = 400;
-        return {
-          status: "error",
-          message: "id is not uuid.",
-        };
-      }
-
-      const res = await sql`SELECT rooms.number, rooms.current_status, room_type.name, room_type.price 
+      const [res] = await sql`SELECT rooms.number, rooms.current_status, room_types.name, room_types.price 
                           FROM rooms
-                          INNER JOIN room_type
-                          ON rooms.type_id = room_type.id
+                          INNER JOIN room_types
+                          ON rooms.type_id = room_types.id
                           WHERE rooms.id = ${id}`;
 
-      if ( res.length === 0 ) {
+      if (!res) {
         set.status = 404;
         return {
           status: "error",
@@ -88,22 +67,13 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         data: res,
       };
     },
-    {
-      params: t.Object({
-        id: t.String(),
-      }),
-    }
   )
   .put(
     "/:id",
     async ({ params, set, body }) => {
-      const { number, type_id } = body;
       const { id } = params;
-
-      const validation = createAndUpdateRoomSchema.safeParse({
-        number: number,
-        type_id: type_id,
-      });
+      
+      const validation = createAndUpdateRoomSchema.safeParse(body);
 
       if (!validation.success) {
         set.status = 400;
@@ -114,9 +84,11 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         };
       }
 
+      const { number, type_id } = validation.data;
+
       const [res] = await sql`SELECT * FROM rooms WHERE id=${id}`;
 
-      if (res === undefined) {
+      if (!res) {
         set.status = 404;
         return {
           status: "error",
@@ -135,28 +107,9 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
         message: "Update successfully.",
       };
     },
-    {
-      body: t.Object({
-        number: t.String(),
-        type_id: t.String(),
-      }), 
-    params : t.Object({
-      id : t.String()
-    }),
-    }
   )
   .delete("/:id", async ({ set, params }) => {
     const { id } = params;
-
-    const validation = z.string().uuid().safeParse(id); 
-
-    if ( !validation.success ) { 
-      set.status = 400;
-      return {
-        status: "error",
-        message: "id is not uuid.",
-      };
-    }
 
     const reservation = await sql`SELECT * FROM reservations 
                                   WHERE room_id=${id}
@@ -172,7 +125,7 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
 
     const [res] = await sql`SELECT * FROM rooms WHERE id=${id}`;
 
-    if (res === undefined) {
+    if (!res) {
       set.status = 404;
       return {
         status: "error",
@@ -189,6 +142,5 @@ export const roomRoutes = new Elysia({ prefix: "/rooms" })
     };
   })
   .patch('/status', async ({ set, body }) => {  
-
 
   });

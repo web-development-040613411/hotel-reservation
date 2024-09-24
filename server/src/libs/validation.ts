@@ -43,7 +43,9 @@ export const addEmployeeSchema = z.object({
         .string({ message: 'confirm password is required' })
         .min(6, 'Password is required'),
     role: z.string({ message: 'role is required' }),
-    image: z.instanceof(File),
+    image: z.instanceof(File, { message: "Image is required" }),
+}).refine((data) => data.password === data.confirm_password, {
+    message: "Password and confirm password doesn't match",
 });
 
 export type AddEmployeeValues = z.infer<typeof addEmployeeSchema>;

@@ -26,6 +26,14 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
 
         const { name, detail, capacity, price, image } = validateData.data;
 
+        if (!image) {
+            set.status = 400;
+            return {
+                status: 'error',
+                message: 'Image is required',
+            };
+        }
+
         const [roomType] =
             await sql`SELECT * FROM room_types WHERE name=${name}`;
 
@@ -37,27 +45,19 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
             };
         }
 
-        if (!image) {
+        const uploadResult = await uploadFile(image);
+
+        if (uploadResult.status === 'error') {
             set.status = 400;
             return {
                 status: 'error',
-                message: 'Image is required',
-            };
-        }
-
-        const url = await uploadFile(image);
-
-        if (!url) {
-            set.status = 500;
-            return {
-                status: 'error',
-                message: 'Internal server error, please try again later',
+                message: uploadResult.message,
             };
         }
 
         await sql`
-          INSERT INTO room_type (name, detail, capacity, price, picture_path)
-          VALUES (${name}, ${detail}, ${capacity}, ${price}, ${url})
+            INSERT INTO room_types (name, detail, capacity, price, picture_path)
+            VALUES (${name}, ${detail}, ${capacity}, ${price}, ${uploadResult.url})
         `;
 
         return {
@@ -65,10 +65,8 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
             message: 'Room type added successfully',
         };
     })
-    .put('/:id', async ({ params, body, set }) => {
-        const { id } = params;
-
-        const [roomType] = await sql`SELECT * FROM room_type WHERE id=${id}`;
+    .put('/:id', async ({ params: { id }, body, set }) => {
+        const [roomType] = await sql`SELECT * FROM room_types WHERE id=${id}`;
 
         if (!roomType) {
             set.status = 404;
@@ -90,7 +88,7 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         const { name, detail, capacity, price, image } = validateData.data;
 
         const [existingRoomType] =
-            await sql`SELECT * FROM room_type WHERE name=${name} AND id!=${roomType.id}`;
+            await sql`SELECT * FROM room_types WHERE name=${name} AND id!=${roomType.id}`;
 
         if (existingRoomType) {
             set.status = 400;
@@ -100,45 +98,38 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
             };
         }
 
-        let url;
-
+        let url = roomType.picture_path;
         if (image) {
-            url = await uploadFile(image);
+            const uploadResult = await uploadFile(image);
 
-            if (!url) {
-                set.status = 500;
-                return {
-                    status: 'error',
-                    message: 'Internal server error, please try again later',
-                };
+            if (uploadResult.status === 'error') {
+                set.status = 400;
+                return uploadResult;
             }
-        } else {
-            url = roomType.picture_path;
-        }
 
-        if (!url) {
-            set.status = 500;
-            return {
-                status: 'error',
-                message: 'Internal server error, please try again later',
-            };
+            const path = join(
+                '.',
+                process.env.UPLOAD_FOLDER!,
+                roomType.picture_path.split('/').pop()
+            );
+            await unlink(path);
+
+            url = uploadResult.url;
         }
 
         await sql`
-        UPDATE room_type
+        UPDATE room_types
         SET name=${name}, detail=${detail}, capacity=${capacity}, price=${price}, picture_path=${url}
         WHERE id=${roomType.id}
-      `;
+        `;
 
         return {
             status: 'success',
             message: 'Room type updated successfully',
         };
     })
-    .delete('/:id', async ({ params, set }) => {
-        const { id } = params;
-
-        const [roomType] = await sql`SELECT * FROM room_type WHERE id=${id}`;
+    .delete('/:id', async ({ params: { id }, set }) => {
+        const [roomType] = await sql`SELECT * FROM room_types WHERE id=${id}`;
 
         if (!roomType) {
             set.status = 404;
@@ -153,7 +144,7 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
             roomType.picture_path.split('/').pop()
         );
 
-        await sql`DELETE FROM room_type WHERE id=${roomType.id}`;
+        await sql`DELETE FROM room_types WHERE id=${roomType.id}`;
 
         await unlink(path);
 

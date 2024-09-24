@@ -1,21 +1,40 @@
-import { join } from "path";
-import { v4 as uuidv4 } from "uuid"
+import { join } from 'path';
+import { v4 as uuidv4 } from 'uuid';
 
-export const uploadFile = async (file: File) => {
-  const bytes = await file.arrayBuffer();
-  const buffer = Buffer.from(bytes);
+type UploadFileResult =
+    | { status: 'error'; message: string }
+    | { status: 'success'; url: string };
 
-  const date = new Date();
+export const uploadFile = async (file: File): Promise<UploadFileResult> => {
+    if (!process.env.UPLOAD_FOLDER) {
+        return {
+            status: 'error',
+            message: 'Upload folder is not set',
+        };
+    }
 
-  const fileName = `${uuidv4()}-${date.getDate()}-${date.getMonth()}.${file.type.split("/")[1]}`;
-  const path = join(".", process.env.UPLOAD_FOLDER!, fileName);  
-  const url = `/file/${fileName}`;
+    if (!file.size || file.size === 0) {
+        return {
+            status: 'error',
+            message: 'File is empty',
+        };
+    }
 
-  try {
-    await Bun.write(path, buffer as any);
-    return url;
-  } catch (error) {
-    console.log(error)
-    return null;
-  }
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    const date = new Date();
+
+    const fileName = `${uuidv4()}-${date.getDate()}-${date.getMonth()}.${
+        file.type.split('/')[1]
+    }`;
+    const path = join('.', process.env.UPLOAD_FOLDER!, fileName);
+    const url = `/file/${fileName}`;
+
+    await Bun.write(path, buffer);
+
+    return {
+        status: 'success',
+        url,
+    };
 };

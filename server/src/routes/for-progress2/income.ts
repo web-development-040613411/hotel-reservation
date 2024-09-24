@@ -7,7 +7,7 @@ export const incomeRoute = new Elysia({ prefix: '/income' }).get(
         const incomeList = await sql`SELECT SUM(reservations.price), EXTRACT(MONTH FROM reservations."createAt") "month" , EXTRACT(YEAR FROM reservations."createAt") "year"
 FROM reservations GROUP BY "month" , "year" ORDER BY "year" , "month"`;
 
-        if (incomeList.count === 0) {
+        if (incomeList.length === 0) {
             set.status = 404;
             return {
                 status: 'error',

@@ -32,7 +32,7 @@ FROM
 		districts.code = sub_districts.district_code AND
 		customer_details.sub_district_id = sub_districts."id"`;
 
-    if (customerDetails.count === 0) {
+    if (customerDetails.length === 0) {
         set.status = 404;
         return {
             status: 'error',

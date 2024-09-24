@@ -21,7 +21,7 @@ FROM
 	ON 
 		rooms.type_id = room_types."id"`;
 
-        if (queryReservationList.count === 0) {
+        if (queryReservationList.length === 0) {
             set.status = 404;
             return {
                 status: 'error',

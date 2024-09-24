@@ -128,7 +128,7 @@ export const reservationRoute = new Elysia({ prefix: '/reservations' })
         if (reservations.length === 0) {
             return {
                 status: 'error',
-                message: 'No reservation found',
+                message: [],
             };
         }
 

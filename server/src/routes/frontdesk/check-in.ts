@@ -29,21 +29,20 @@ export const checkInRoute = new Elysia({ prefix: '/check-in' }).patch(
         const checkInDate = new Date(thisReservation.check_in).toDateString();
         const checkOutDate = new Date(thisReservation.check_out).toDateString();
 
-        if (currentDate < checkInDate ) {
+        if (currentDate < checkInDate) {
             set.status = 400;
             return {
                 status: 'error',
-                message: 'Can not check in, reservation is not started yet',    
+                message: 'Can not check in, reservation is not started yet',
             };
         }
-        if(currentDate > checkOutDate){
+        if (currentDate > checkOutDate) {
             set.status = 400;
             return {
                 status: 'error',
-                message: 'Can not check in, reservation is already finished',    
+                message: 'Can not check in, reservation is already finished',
             };
         }
-
 
         const updateRoom = await sql`
             UPDATE rooms

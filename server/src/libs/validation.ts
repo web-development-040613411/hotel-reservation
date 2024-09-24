@@ -23,30 +23,32 @@ export const createAndUpdateRoomSchema = z.object({
 
 export type AddRoomTypeValues = z.infer<typeof addRoomTypeSchema>;
 
-export const addEmployeeSchema = z.object({
-    username: z
-        .string({ message: 'username is required' })
-        .min(1, 'Name is required'),
-    first_name: z
-        .string({ message: 'firstname is required' })
-        .min(1, 'firstname is required'),
-    last_name: z
-        .string({ message: 'lastname is required' })
-        .min(1, 'lastname is required'),
-    date_of_birth: z
-        .string({ message: 'date of birth is required' })
-        .min(1, 'date of birth is required'),
-    password: z
-        .string({ message: 'password is required' })
-        .min(6, 'Password is required'),
-    confirm_password: z
-        .string({ message: 'confirm password is required' })
-        .min(6, 'Password is required'),
-    role: z.string({ message: 'role is required' }),
-    image: z.instanceof(File, { message: "Image is required" }),
-}).refine((data) => data.password === data.confirm_password, {
-    message: "Password and confirm password doesn't match",
-});
+export const addEmployeeSchema = z
+    .object({
+        username: z
+            .string({ message: 'username is required' })
+            .min(1, 'Name is required'),
+        first_name: z
+            .string({ message: 'firstname is required' })
+            .min(1, 'firstname is required'),
+        last_name: z
+            .string({ message: 'lastname is required' })
+            .min(1, 'lastname is required'),
+        date_of_birth: z
+            .string({ message: 'date of birth is required' })
+            .min(1, 'date of birth is required'),
+        password: z
+            .string({ message: 'password is required' })
+            .min(6, 'Password is required'),
+        confirm_password: z
+            .string({ message: 'confirm password is required' })
+            .min(6, 'Password is required'),
+        role: z.string({ message: 'role is required' }),
+        image: z.instanceof(File, { message: 'Image is required' }),
+    })
+    .refine((data) => data.password === data.confirm_password, {
+        message: "Password and confirm password doesn't match",
+    });
 
 export type AddEmployeeValues = z.infer<typeof addEmployeeSchema>;
 

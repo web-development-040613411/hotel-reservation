@@ -6,4 +6,4 @@ import { reservationRoute } from './reservation';
 export const frontdeskRoute = new Elysia({ prefix: '/frontdesk' })
     .use(checkInRoute)
     .use(checkOutRoute)
-    .use(reservationRoute)
+    .use(reservationRoute);

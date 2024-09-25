@@ -1,7 +1,7 @@
 import Elysia from 'elysia';
 import { roomTypeRoutes } from './room-type';
-import { employeeRoutes , resetPasswordRoutes } from './employee';
-import { roomRoutes } from "./room";
+import { employeeRoutes, resetPasswordRoutes } from './employee';
+import { roomRoutes } from './room';
 
 export const adminRoutes = new Elysia({ prefix: '/admin' })
     .use(roomTypeRoutes)

@@ -25,7 +25,7 @@ CREATE TYPE current_status AS ENUM (
 
 CREATE TABLE reservations (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  customer_id UUID REFERENCES customers_detail (id) NOT NULL,
+  customer_id UUID REFERENCES customer_details (id) NOT NULL,
   room_id UUID NOT NULL,
   price FLOAT NOT NULL,
   check_in DATE NOT NULL,
@@ -90,7 +90,7 @@ CREATE table sub_districts (
 );
 
 
-CREATE TABLE customers_detail (
+CREATE TABLE customer_details (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   first_name VARCHAR NOT NULL,
   last_name VARCHAR NOT NULL,

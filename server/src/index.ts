@@ -20,6 +20,17 @@ export const app = new Elysia()
                 };
             }
         }
+    .use(swagger())
+    .onError(({ set, error, code }) => {
+        if (error instanceof postgres.PostgresError && error.code == '23505') {
+            if (error.constraint_name == 'room_number_key') {
+                set.status = 400;
+                return {
+                    status: 'error',
+                    message: 'This room number have already used.',
+                };
+            }
+        }
 
         if (code === 'NOT_FOUND') {
             return new Response('Not Found :(');

@@ -12,7 +12,7 @@ export const customerRoutes = new Elysia({ prefix: "/customers" })
           set.status = 400;
 
           return {
-              status: 400,
+              status: 'error',
               message: validation.error.errors[0].message,
           };
       }

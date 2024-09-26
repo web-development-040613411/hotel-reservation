@@ -7,26 +7,18 @@ import {
 } from '@/libs/validation';
 import { join } from 'path';
 import { unlink } from 'node:fs/promises';
-import { uploadFile } from '@/libs/uploadFile';
+import { uploadFile } from '@/libs/upload-file';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
-    .get('/', async ({ set }) => {
-        try {
-            const employees = await sql`SELECT * FROM employee`;
-            return {
-                status: 'success',
-                data: employees,
-            };
-        } catch (error) {
-            set.status = 500;
-            return {
-                status: 'error',
-                message: 'Internal server error, please try again later',
-            };
-        }
+    .get('/', async () => {
+        const employees = await sql`SELECT * FROM employees`;
+        return {
+            status: 'success',
+            data: employees,
+        };
     })
     .get('/:id', async ({ params: { id }, set }) => {
-        const employee = await sql`SELECT * FROM employee WHERE id=${id}`;
+        const employee = await sql`SELECT * FROM employees WHERE id=${id}`;
         if (employee.length === 0) {
             set.status = 404;
             return {
@@ -54,13 +46,12 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             last_name,
             date_of_birth,
             password,
-            confirm_password,
             role,
             image,
         } = validateData.data;
 
         const IsEmployeeExist =
-            await sql`SELECT * FROM employee WHERE username=${username}`;
+            await sql`SELECT * FROM employees WHERE username=${username}`;
         if (IsEmployeeExist.length > 0) {
             set.status = 400;
             return {
@@ -68,37 +59,24 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 message: 'Employee already exists',
             };
         }
-        if (!image) {
-            set.status = 400;
-            return {
-                status: 'error',
-                message: 'Image is required',
-            };
-        }
-        if (password !== confirm_password) {
-            set.status = 400;
-            return {
-                status: 'error',
-                message: 'Password and confirm password does not match',
-            };
-        }
-        const Hash_password = await Bun.password.hash(password, {
+
+        const hashedPassword = await Bun.password.hash(password, {
             algorithm: 'bcrypt',
             cost: 10,
         });
 
-        const url = await uploadFile(image);
-        if (!url) {
-            set.status = 500;
+        const uploadResult = await uploadFile(image);
+        if (uploadResult.status === 'error') {
+            set.status = 400;
             return {
                 status: 'error',
-                message: 'Internal server error, please try again later',
+                message: uploadResult.message,
             };
         }
 
-        const query_roles = await sql`SELECT enum_range(NULL::role);`;
-        const all_roles = Object.values(query_roles[0].enum_range);
-        if (!all_roles.includes(role)) {
+        const queryRoles = await sql`SELECT enum_range(NULL::role);`;
+        const allRole = Object.values(queryRoles[0].enum_range);
+        if (!allRole.includes(role)) {
             set.status = 400;
             return {
                 status: 'error',
@@ -106,14 +84,13 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        const employee =
-            await sql`INSERT INTO employee (username, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${Hash_password}, ${role} , ${url})`;
+        await sql`INSERT INTO employees (username, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role} , ${uploadResult.url})`;
+
         return {
             status: 'success',
             message: 'Employee added successfully',
         };
     })
-
     .put('/:id', async ({ params: { id }, body, set }) => {
         const validateData = updateEmployeeSchema.safeParse(body);
         if (!validateData.success) {
@@ -127,7 +104,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             validateData.data;
 
         const [existsingEmployee] =
-            await sql`SELECT * FROM employee WHERE id=${id}`;
+            await sql`SELECT * FROM employees WHERE id=${id}`;
         if (!existsingEmployee) {
             set.status = 404;
             return {
@@ -136,8 +113,17 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        let url;
+        let url = existsingEmployee.profile_picture;
         if (image) {
+            const uploadResult = await uploadFile(image);
+            if (uploadResult.status === 'error') {
+                set.status = 400;
+                return {
+                    status: 'error',
+                    message: uploadResult.message,
+                };
+            }
+
             const path = join(
                 '.',
                 process.env.UPLOAD_FOLDER!,
@@ -145,28 +131,12 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             );
             await unlink(path);
 
-            url = await uploadFile(image);
-            if (!url) {
-                set.status = 500;
-                return {
-                    status: 'error',
-                    message: 'Internal server error, please try again later',
-                };
-            }
-        } else {
-            url = existsingEmployee.profile_picture;
-        }
-        if (!url) {
-            set.status = 500;
-            return {
-                status: 'error',
-                message: 'Internal server error, please try again later',
-            };
+            url = uploadResult.url;
         }
 
-        const query_roles = await sql`SELECT enum_range(NULL::role);`;
-        const all_roles = Object.values(query_roles[0].enum_range);
-        if (!all_roles.includes(role)) {
+        const queryRoles = await sql`SELECT enum_range(NULL::role);`;
+        const allRole = Object.values(queryRoles[0].enum_range);
+        if (!allRole.includes(role)) {
             set.status = 400;
             return {
                 status: 'error',
@@ -174,8 +144,8 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        const employee =
-            await sql`UPDATE employee SET username=${username}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url} WHERE id=${id}`;
+        await sql`UPDATE employees SET username=${username}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url} WHERE id=${id}`;
+
         return {
             status: 'success',
             message: 'Employee updated successfully',
@@ -183,7 +153,8 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
     })
 
     .delete('/:id', async ({ params: { id }, set }) => {
-        const [employee] = await sql`SELECT * FROM employee WHERE id=${id}`;
+        const [employee] = await sql`SELECT * FROM employees WHERE id=${id}`;
+
         if (!employee) {
             set.status = 404;
             return {
@@ -197,9 +168,9 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             employee.profile_picture.split('/').pop()
         );
 
-        await sql`DELETE FROM employee WHERE id=${id}`;
+        await sql`DELETE FROM employees WHERE id=${id}`;
         await unlink(path);
-        set.status = 200;
+
         return {
             status: 'success',
             message: 'Employee deleted successfully',
@@ -207,7 +178,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
     });
 
 export const resetPasswordRoutes = new Elysia({
-    prefix: '/resetEmployeePassword',
+    prefix: '/reset-password',
 }).put('/:id', async ({ params: { id }, body, set }) => {
     const validateData = ResetPasswordSchema.safeParse(body);
     if (!validateData.success) {
@@ -219,7 +190,7 @@ export const resetPasswordRoutes = new Elysia({
     }
     const { password, confirm_password } = validateData.data;
 
-    const employee = await sql`SELECT * FROM employee WHERE id=${id}`;
+    const employee = await sql`SELECT * FROM employees WHERE id=${id}`;
     if (employee.length === 0) {
         set.status = 404;
         return {
@@ -234,11 +205,11 @@ export const resetPasswordRoutes = new Elysia({
             message: 'Password and confirm password does not match',
         };
     }
-    const Hash_password = await Bun.password.hash(password, {
+    const hashedPassword = await Bun.password.hash(password, {
         algorithm: 'bcrypt',
         cost: 10,
     });
-    await sql`UPDATE employee SET password=${Hash_password} WHERE id=${id}`;
+    await sql`UPDATE employees SET password=${hashedPassword} WHERE id=${id}`;
     return {
         status: 'success',
         message: 'Password updated successfully',

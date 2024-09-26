@@ -29,7 +29,7 @@ export const customerRoutes = new Elysia({ prefix: "/customers" })
           email,
       } = validation.data;
 
-      await sql`INSERT INTO customers_detail(first_name, last_name, address, sub_district_id, district_id, province_id, postal_code, phone_number, email )
+      await sql`INSERT INTO customer_details(first_name, last_name, address, sub_district_id, district_id, province_id, postal_code, phone_number, email )
         VALUES (${first_name}, ${last_name}, ${address}, ${sub_district_id}, ${district_id}, ${province_id}, ${postal_code}, ${phone_number}, ${email})`;
       return {
           status: 'success',

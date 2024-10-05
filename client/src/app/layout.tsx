@@ -15,8 +15,8 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Neom Hotel",
-    default: "Neom Hotel",
+    template: "%s | Mof Hotel",
+    default: "Mof Hotel",
   }
 };
 

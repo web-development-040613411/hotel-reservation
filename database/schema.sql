@@ -42,6 +42,7 @@ CREATE TABLE employee (
   date_of_birth DATE NOT NULL,
   password VARCHAR NOT NULL,
   role role,
+  telephone VARCHAR NOT NULL,
   session_id UUID NOT NULL
 );
 

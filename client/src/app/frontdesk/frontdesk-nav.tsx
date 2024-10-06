@@ -14,13 +14,14 @@ import { Button } from '@/components/ui/button';
 
 export default function Frontdesk_Nav() {
     return (
-        <nav className="p-3 border-b-2">
+        <nav className="p-3 shadow-md">
             <div className="flex justify-between items-center">
                 {/* Left side */}
                 <div className="flex items-center">
+                    { /* Logo 
                     <div className="relative">
                         <span className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                            {/* Search Icon */}
+                           
                             <Search />
                         </span>
                         <input
@@ -29,6 +30,8 @@ export default function Frontdesk_Nav() {
                             placeholder="Search..."
                         />
                     </div>
+                    */ }
+                    LOGO
                 </div>
 
                 {/* Right side */}
@@ -37,9 +40,9 @@ export default function Frontdesk_Nav() {
                         <DropdownMenuTrigger asChild>
                             <Button
                                 variant="outline"
-                                className="rounded-full w-11 h-11 focus:ring focus:ring-black"
+                                className="rounded-full w-10 h-10 focus:ring focus:ring-black"
                             >
-                                <Avatar className="w-11 h-11 ">
+                                <Avatar className="w-10 h-10 ">
                                     <AvatarImage
                                         src="https://github.com/shadcn.png"
                                         alt="@shadcn"

@@ -65,7 +65,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         }
 
         const res = await sql`
-                SELECT rooms.number, rooms.current_status, room_types.name, room_types.price
+                SELECT rooms.number, rooms.current_status, room_types.name, room_types.price, room_types.picture_path
                 FROM rooms
                 INNER JOIN room_types
                 ON rooms.type_id = room_types.id;`;

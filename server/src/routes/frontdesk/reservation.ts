@@ -5,7 +5,39 @@ import { reservationType } from '@/libs/type';
 export const reservationRoute = new Elysia({ prefix: '/reservations' })
     .get('/', async ({ set }) => {
         const reservations = await sql`SELECT
-                * from reservations`;
+  reservations.id AS reservations_id,
+  customer_id,
+  customer_details.first_name,
+  customer_details.last_name,
+  customer_details.address,
+  customer_details.email,
+  customer_details.phone_number,
+  customer_details.sub_district,
+  customer_details.district,
+  customer_details.province,
+  customer_details.postcode,
+  rooms."number" AS room_number,
+  reservations.price,
+  reservations.room_id,
+  check_in,
+  check_out,
+  display_color,
+  transaction_status,
+  "createAt",
+  current_status,
+  room_types."name" AS types_name,
+  room_types.capacity,
+  room_types.detail,
+  room_types.picture_path,
+  room_types.price AS price_per_night 
+FROM
+  rooms
+  LEFT JOIN reservations ON rooms."id" = reservations.room_id
+  INNER JOIN room_types ON rooms.type_id = room_types."id"
+  LEFT JOIN customer_details ON reservations.customer_id = customer_details.ID   
+  ORDER BY rooms."number" ASC
+                    
+                    `;
 
         return {
             status: 'success',

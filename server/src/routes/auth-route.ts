@@ -1,11 +1,11 @@
 import { sql } from '@/libs/db';
 import { lucia } from '@/libs/lucia';
 import { loginSchema } from '@/libs/validation';
-import Elysia from 'elysia';
+import Elysia, { t } from 'elysia';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
     .post('/login', async ({ set, cookie, body }) => {
-        const validate = loginSchema.safeParse(body);
+        const validate = loginSchema.safeParse(JSON.parse(body as string));
 
         if (!validate.success) {
             set.status = 400;

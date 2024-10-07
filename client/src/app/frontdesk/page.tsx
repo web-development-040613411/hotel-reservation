@@ -31,14 +31,14 @@ import {
 const thisYear = new Date().getFullYear();
 const thisMonthNumber = new Date().getMonth() + 1;
 // Constants for year range display
-const START_YEAR = 2023;
-const END_YEAR = thisYear + 22;
-const YEARS_PER_PAGE = 8;
+const startYear = 2023;
+const endYear = thisYear + 22;
+const YearPerPage = 8;
 
 // Array of all the years
 const arrayYear = Array.from(
-    { length: END_YEAR - START_YEAR + 1 },
-    (_, i) => START_YEAR + i
+    { length: endYear - startYear + 1 },
+    (_, i) => startYear + i
 );
 
 // Month array
@@ -90,12 +90,16 @@ export default function Page() {
     const changeSelectedMonth = (value: any) => {
         if (value === 'prev') {
             if (selectedMonth === 1) {
+                if(parseInt(selectedYear) === startYear) return;
+                setSelectedYear((parseInt(selectedYear) - 1).toString());
                 setSelectedMonth(12);
             } else {
                 setSelectedMonth(selectedMonth - 1);
             }
         } else if (value === 'next') {
             if (selectedMonth === 12) {
+                if(parseInt(selectedYear) === thisYear + 22) return;
+                setSelectedYear((parseInt(selectedYear) + 1).toString());
                 setSelectedMonth(1);
             } else {
                 setSelectedMonth(selectedMonth + 1);
@@ -108,14 +112,14 @@ export default function Page() {
     // Function to go to the previous set of years
     const prevYearSet = () => {
         if (startYearIndex > 0) {
-            setStartYearIndex(startYearIndex - YEARS_PER_PAGE);
+            setStartYearIndex(startYearIndex - YearPerPage);
         }
     };
 
     // Function to go to the next set of years
     const nextYearSet = () => {
-        if (startYearIndex + YEARS_PER_PAGE < arrayYear.length) {
-            setStartYearIndex(startYearIndex + YEARS_PER_PAGE);
+        if (startYearIndex + YearPerPage < arrayYear.length) {
+            setStartYearIndex(startYearIndex + YearPerPage);
         }
     };
 
@@ -126,13 +130,13 @@ export default function Page() {
                 <div className="flex justify-between items-center">
                     <p className="text-2xl font-bold">Front Desk</p>
 
-                    <Button className="font-bold">Add Booking</Button>
+                    <Button className="font-bold bg-blue-600 hover:bg-blue-500" >Add Booking</Button>
                 </div>
 
                 <ToggleGroup
                     variant="outline"
                     type="single"
-                    className="p-0 m-0 gap-0 mt-3"
+                    className="p-0 m-0 gap-0 mt-3 bg-blue-50"
                     value={selectedYear}
                     onValueChange={(value) => changeSelectedYear(value)}
                 >
@@ -145,12 +149,12 @@ export default function Page() {
                         {'<'}
                     </ToggleGroupItem>
                     {arrayYear
-                        .slice(startYearIndex, startYearIndex + YEARS_PER_PAGE)
+                        .slice(startYearIndex, startYearIndex + YearPerPage)
                         .map((year) => (
                             <ToggleGroupItem
                                 key={year}
                                 value={year.toString()}
-                                className="font-bold rounded-none flex-1 data-[state=on]:bg-black data-[state=on]:text-white "
+                                className="font-bold rounded-none flex-1 data-[state=on]:bg-blue-400 data-[state=on]:text-white "
                                 variant="outline"
                             >
                                 {year}
@@ -169,7 +173,7 @@ export default function Page() {
                 <ToggleGroup
                     variant="outline"
                     type="single"
-                    className="p-0 m-0 gap-0"
+                    className="p-0 m-0 gap-0 bg-blue-50"
                     value={selectedMonth.toString()}
                     onValueChange={(value) => changeSelectedMonth(value)}
                 >
@@ -184,7 +188,7 @@ export default function Page() {
                         <ToggleGroupItem
                             key={month}
                             value={(index + 1).toString()}
-                            className="font-bold flex-1 rounded-none  data-[state=on]:bg-black data-[state=on]:text-white "
+                            className="font-bold flex-1 rounded-none  data-[state=on]:bg-blue-400 data-[state=on]:text-white "
                             variant="outline"
                         >
                             {month}

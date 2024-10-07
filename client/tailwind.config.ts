@@ -55,7 +55,38 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+  		keyframes: {
+  			'accordion-down': {
+  				from: {
+  					height: '0'
+  				},
+  				to: {
+  					height: 'var(--radix-accordion-content-height)'
+  				}
+  			},
+  			'accordion-up': {
+  				from: {
+  					height: 'var(--radix-accordion-content-height)'
+  				},
+  				to: {
+  					height: '0'
+  				}
+  			}
+  		},
+  		animation: {
+  			'accordion-down': 'accordion-down 0.2s ease-out',
+  			'accordion-up': 'accordion-up 0.2s ease-out'
+  		},
+		  gridTemplateColumns: {
+			'27': 'repeat(27, minmax(0, 1fr))',
+			'28': 'repeat(28, minmax(0, 1fr))',
+			'29': 'repeat(29, minmax(0, 1fr))',
+			'30': 'repeat(30, minmax(0, 1fr))',
+			'31': 'repeat(31, minmax(0, 1fr))',
+			'32': 'repeat(32, minmax(0, 1fr))',
+			'33': 'repeat(33, minmax(0, 1fr))',
+		  },
   	}
   },
   plugins: [require("tailwindcss-animate")],

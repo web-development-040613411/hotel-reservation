@@ -1,9 +1,36 @@
 import { sql } from '@/libs/db';
 import Elysia, { t } from 'elysia';
 import { reservationType } from '@/libs/type';
+interface Reservation {
+    reservations_id: string;
+    customer_id: string | null;
+    first_name: string | null;
+    last_name: string | null;
+    room_number: string;
+    price: number;
+    room_id: string;
+    check_in: string;
+    check_out: string;
+    display_color: string | null;
+    transaction_status: string;
+    createAt: string;
+    current_status: string;
+    types_name: string;
+    capacity: number;
+    detail: string;
+    picture_path: string;
+    price_per_night: number;
+}
+
+type GroupedReservations = {
+    [key: string]: Reservation[];
+};
+
 
 export const reservationRoute = new Elysia({ prefix: '/reservations' })
     .get('/', async ({ set }) => {
+
+
         const reservations = await sql`SELECT
   reservations.id AS reservations_id,
   customer_id,
@@ -39,9 +66,28 @@ FROM
                     
                     `;
 
+                    
+        function groupReservationsByType(reservations: any[]): GroupedReservations {
+            return reservations.reduce<GroupedReservations>((acc, reservation) => {
+                const type = reservation.types_name;
+        
+                // Initialize the array if it doesn't exist
+                if (!acc[type]) {
+                    acc[type] = [];
+                }
+        
+                // Add the reservation to the corresponding type array
+                acc[type].push(reservation);
+        
+                return acc;
+            }, {});
+        }
+        
+        const groupedReservations = groupReservationsByType(reservations);
+
         return {
             status: 'success',
-            data: reservations,
+            data: groupedReservations,
         };
     })
     .get('/search', async ({ query, set }) => {

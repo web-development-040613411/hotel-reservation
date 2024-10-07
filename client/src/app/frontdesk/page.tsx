@@ -13,7 +13,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '@/components/ui/collapsible';
 import {
     Accordion,
     AccordionContent,
@@ -961,34 +965,32 @@ export default function Page() {
                     <TableBody>
                         {Object.entries(data).map(
                             ([typesName, reservations]) => (
-                                <Accordion type="single" collapsible key={typesName}>
-                                    <AccordionItem value="item-1">
-                                        <>
-                                        <TableRow>
+                                <>
+                                    <TableRow>
+                                        <TableCell className="w-28 text-center border-2 text-black">
+                                            {typesName}
+                                        </TableCell>
+                                    </TableRow>
+
+                                    {reservations.map((reservation) => (
+                                        <TableRow key={reservation.room_id}>
                                             <TableCell className="w-28 text-center border-2 text-black">
-                                                <AccordionTrigger className="font-bold">
-                                                    {typesName}
-                                                </AccordionTrigger>
+                                                {reservation.room_number}
                                             </TableCell>
-                                        </TableRow>
-                                        </>
-                                        <AccordionContent>
-                                        <>
-                                            {reservations.map((reservation) => (
-                                               
-                                                <TableRow key={reservation.reservations_id}>
-                                                    <TableCell className="w-28 text-center border-2 text-black">
-                                                        {
-                                                            reservation.room_number
-                                                        }
+                                            {Array.from({ length: 31 }).map(
+                                                (_, i) => (
+                                                    <TableCell
+                                                        key={i}
+                                                        className="w-28 text-center border-2 text-black"
+                                                    >
+                                                        
+                                                        cols {i + 1}
                                                     </TableCell>
-                                                </TableRow>
-                                               
-                                            ))}
-                                             </>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                </Accordion>
+                                                )
+                                            )}
+                                        </TableRow>
+                                    ))}
+                                </>
                             )
                         )}
                     </TableBody>

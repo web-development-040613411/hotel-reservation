@@ -1,9 +1,27 @@
 import { sql } from '@/libs/db';
 import { createAndUpdateRoomSchema } from '@/libs/validation';
+import { middleware } from '@/middleware';
 import Elysia from 'elysia';
 
 export const roomRoutes = new Elysia({ prefix: '/rooms' })
-    .post('/', async ({ set, body }) => {
+    .use(middleware)
+    .post('/', async ({ set, body, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const validation = createAndUpdateRoomSchema.safeParse(body);
 
         if (!validation.success) {
@@ -29,26 +47,59 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             room_id: res.id,
         };
     })
-    .get('/', async () => {
-        const res =
-            await sql`SELECT rooms.number, rooms.current_status, room_types.name,  room_types.price
-                              FROM rooms
-                              INNER JOIN room_types
-                              ON rooms.type_id = room_types.id;`;
+    .get('/', async ({ user, set }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
+        const res = await sql`
+                SELECT rooms.number, rooms.current_status, room_types.name, room_types.price
+                FROM rooms
+                INNER JOIN room_types
+                ON rooms.type_id = room_types.id;`;
+
         return {
             status: 'success',
             data: res,
         };
     })
-    .get('/:id', async ({ params, set }) => {
+    .get('/:id', async ({ params, set, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const { id } = params;
 
         const [res] =
             await sql`SELECT rooms.number, rooms.current_status, room_types.name, room_types.price 
-                          FROM rooms
-                          INNER JOIN room_types
-                          ON rooms.type_id = room_types.id
-                          WHERE rooms.id = ${id}`;
+                        FROM rooms
+                        INNER JOIN room_types
+                        ON rooms.type_id = room_types.id
+                        WHERE rooms.id = ${id}`;
 
         if (!res) {
             set.status = 404;
@@ -63,7 +114,23 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             data: res,
         };
     })
-    .put('/:id', async ({ params, set, body }) => {
+    .put('/:id', async ({ params, set, body, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const { id } = params;
 
         const validation = createAndUpdateRoomSchema.safeParse(body);
@@ -90,22 +157,38 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         }
 
         await sql`
-        UPDATE rooms
-        SET number=${number}, type_id=${type_id} 
-        WHERE id=${id}
-      `;
+            UPDATE rooms
+            SET number=${number}, type_id=${type_id} 
+            WHERE id=${id}
+        `;
 
         return {
             status: 'success',
             message: 'Update successfully.',
         };
     })
-    .delete('/:id', async ({ set, params }) => {
+    .delete('/:id', async ({ set, params, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const { id } = params;
 
         const reservation = await sql`SELECT * FROM reservations 
-                                  WHERE room_id=${id}
-                                  AND check_out > NOW()`;
+                                WHERE room_id=${id}
+                                AND check_out > NOW()`;
 
         if (reservation.length !== 0) {
             set.status = 400;

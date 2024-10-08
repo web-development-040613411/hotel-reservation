@@ -5,7 +5,9 @@ CREATE TABLE user_session (
 
 CREATE TYPE transaction_status AS ENUM (
   'preserve',
-  'paid'
+  'complete',
+  'open',
+  'expired'
 );
 
 CREATE TYPE role AS ENUM (

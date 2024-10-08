@@ -2,33 +2,62 @@ import { sql } from '@/libs/db';
 import Elysia, { t } from 'elysia';
 import { reservationType } from '@/libs/type';
 interface Reservation {
-    reservations_id: string;
+    reservations_id: string | null;
     customer_id: string | null;
     first_name: string | null;
     last_name: string | null;
+    address: string | null;
+    email: string | null;
+    phone_number: string | null;
+    sub_district: string | null;
+    district: string | null;
+    province: string | null;
+    postcode: string | null;
     room_number: string;
-    price: number;
-    room_id: string;
-    check_in: string;
-    check_out: string;
+    price: number | null;
+    room_id: string | null;
+    check_in: string | null;
+    check_out: string | null;
     display_color: string | null;
-    transaction_status: string;
-    createAt: string;
+    transaction_status: string | null;
+    createAt: string | null;
     current_status: string;
     types_name: string;
     capacity: number;
     detail: string;
     picture_path: string;
     price_per_night: number;
+  }
+
+interface Room {
+    room_number: string;
+    reservations: Reservation[];
 }
 
-type GroupedReservations = {
-    [key: string]: Reservation[];
-};
-
+interface TypeName {
+    typename: string;
+    rooms: Room[];
+}
 
 export const reservationRoute = new Elysia({ prefix: '/reservations' })
-    .get('/', async ({ set }) => {
+    .get('/', async ({ query,set }) => {
+        query: t.Object({
+            year: t.String(),
+            month: t.String(),
+        });
+        if (!query.year) {
+            return {
+                status: 'error',
+                message: 'Please provide a year',
+            };
+        }
+
+        if (!query.month) {
+            return {
+                status: 'error',
+                message: 'Please provide a month',
+            };
+        }
 
 
         const reservations = await sql`SELECT
@@ -59,35 +88,17 @@ export const reservationRoute = new Elysia({ prefix: '/reservations' })
   room_types.price AS price_per_night 
 FROM
   rooms
-  LEFT JOIN reservations ON rooms."id" = reservations.room_id
+  INNER JOIN reservations ON rooms."id" = reservations.room_id
   INNER JOIN room_types ON rooms.type_id = room_types."id"
-  LEFT JOIN customer_details ON reservations.customer_id = customer_details.ID   
-  ORDER BY rooms."number" ASC
-                    
+  INNER JOIN customer_details ON reservations.customer_id = customer_details.ID 
+  WHERE check_in >= ${query.year + '-' + query.month + '-01'}
+  ORDER BY rooms."number" ASC 
                     `;
 
-                    
-        function groupReservationsByType(reservations: any[]): GroupedReservations {
-            return reservations.reduce<GroupedReservations>((acc, reservation) => {
-                const type = reservation.types_name;
-        
-                // Initialize the array if it doesn't exist
-                if (!acc[type]) {
-                    acc[type] = [];
-                }
-        
-                // Add the reservation to the corresponding type array
-                acc[type].push(reservation);
-        
-                return acc;
-            }, {});
-        }
-        
-        const groupedReservations = groupReservationsByType(reservations);
 
         return {
             status: 'success',
-            data: groupedReservations,
+            data: reservations,
         };
     })
     .get('/search', async ({ query, set }) => {

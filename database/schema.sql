@@ -103,7 +103,8 @@ CREATE TABLE customer_details (
   province_id UUID NOT NULL REFERENCES provinces(id),
   postal_code VARCHAR NOT NULL,
   phone_number VARCHAR NOT NULL,
-  email VARCHAR NOT NULL
+  email VARCHAR NOT NULL,
+  special_request VARCHAR NULL,
 );
 
 ALTER TABLE room ADD FOREIGN KEY (type_id) REFERENCES room_type (id);

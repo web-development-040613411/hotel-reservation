@@ -108,7 +108,8 @@ export default function Page() {
 
    const [roomsData, setRoomData] = useState({});
    const FetchRooms = async () => {
-      const res = await fetch(`http://localhost:3001/frontdesk/all-room`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/all-room`);
+ 
       if (!res.ok) {
          throw new Error('Network response was not ok');
       }
@@ -119,7 +120,7 @@ export default function Page() {
    const [reservationData, setReservationData] = useState<Reservation>();
    const FetchReservationData = async () => {
       const res = await fetch(
-         `http://localhost:3001/frontdesk/reservations?year=2024&month=10`
+         `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/reservations?year=2024&month=10`
       );
       if (!res.ok) {
          throw new Error('Network response was not ok');

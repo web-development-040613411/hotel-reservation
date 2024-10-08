@@ -1,12 +1,12 @@
 import { sql } from "@/libs/db";
-import { Payment } from "@/libs/validation";
+import { PaymentSchema } from "@/libs/validation";
 import Elysia from "elysia";
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 export const stripeRoutes = new Elysia({prefix : '/stripe'})
   .post('/checkout', async ({body}) => {
-    const validation = Payment.safeParse(body);
+    const validation = PaymentSchema.safeParse(body);
     if (!validation.success) {
       return {
         status: 'error',

@@ -33,7 +33,8 @@ CREATE TABLE reservations (
   check_in DATE NOT NULL,
   check_out DATE NOT NULL,
   display_color VARCHAR,
-  transaction_status transaction_status
+  transaction_status transaction_status,
+  stripe_session_id UUID NULL
 );
 
 CREATE TABLE employee (

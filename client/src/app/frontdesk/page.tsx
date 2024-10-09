@@ -108,8 +108,10 @@ export default function Page() {
 
    const [roomsData, setRoomData] = useState({});
    const FetchRooms = async () => {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/all-room`);
- 
+      const res = await fetch(
+         `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/all-room`
+      );
+
       if (!res.ok) {
          throw new Error('Network response was not ok');
       }
@@ -349,43 +351,43 @@ export default function Page() {
                                              i = i + endSpan - 1;
 
                                              cells.push(
-                                                // <Dialog>
-                                                //    <DialogTrigger className="w-full">
-                                                //       <TableCell
-                                                //          className={`w-40 text-start border-2 rounded-md bg-green-500`}
-                                                //          key={i}
-                                                //          colSpan={endSpan}
-                                                //       >
-                                                //          {
-                                                //             thisReservation.first_name
-                                                //          }
-                                                //       </TableCell>
-                                                //    </DialogTrigger>
-                                                //    <DialogContent>
-                                                //       <DialogHeader>
-                                                //          <DialogTitle>
-                                                //             Are you absolutely
-                                                //             sure?
-                                                //          </DialogTitle>
-                                                //          <DialogDescription>
-                                                //             This action cannot
-                                                //             be undone. This will
-                                                //             permanently delete
-                                                //             your account and
-                                                //             remove your data
-                                                //             from our servers.
-                                                //          </DialogDescription>
-                                                //       </DialogHeader>
-                                                //    </DialogContent>
-                                                // </Dialog>
+                                                <Dialog>
+                                                   <DialogTrigger asChild>
+                                                      <TableCell
+                                                         className={`w-40 text-start border-2 rounded-md bg-green-500`}
+                                                         key={i}
+                                                         colSpan={endSpan}
+                                                      >
+                                                         {
+                                                            thisReservation.first_name
+                                                         }
+                                                      </TableCell>
+                                                   </DialogTrigger>
+                                                   <DialogContent>
+                                                      <DialogHeader>
+                                                         <DialogTitle>
+                                                            Are you absolutely
+                                                            sure?
+                                                         </DialogTitle>
+                                                         <DialogDescription>
+                                                            This action cannot
+                                                            be undone. This will
+                                                            permanently delete
+                                                            your account and
+                                                            remove your data
+                                                            from our servers.
+                                                         </DialogDescription>
+                                                      </DialogHeader>
+                                                   </DialogContent>
+                                                </Dialog>
 
-                                                <TableCell
-                                                   className={`w-40 text-start border-2 rounded-md bg-green-500`}
-                                                   key={i}
-                                                   colSpan={endSpan}
-                                                >
-                                                   {thisReservation.first_name}
-                                                </TableCell>
+                                                // <TableCell
+                                                //    className={`w-40 text-start border-2 rounded-md bg-green-500`}
+                                                //    key={i}
+                                                //    colSpan={endSpan}
+                                                // >
+                                                //    {thisReservation.first_name}
+                                                // </TableCell>
                                              );
                                           } else {
                                              cells.push(

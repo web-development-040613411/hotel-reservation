@@ -11,41 +11,35 @@ import {
    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-import {
-   Collapsible,
-   CollapsibleContent,
-   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-
 import { Input } from '@/components/ui/input';
 
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface Frontdesk_HeaderProps {
-    arrayMoth: string[];               // คาดว่าจะเป็นอาร์เรย์ของเดือน
-    selectedYear: string;              // ปีที่ถูกเลือก
-    changeSelectedYear: (year: string) => void; // ฟังก์ชันที่ใช้เปลี่ยนปี
-    prevYearSet: () => void;           // ฟังก์ชันสำหรับปีถัดไป
-    arrayYear: number[];               // อาร์เรย์ของปี
-    startYearIndex: number;            // ดัชนีเริ่มต้นของปี
-    YearPerPage: number;               // จำนวนปีที่แสดงต่อหน้า
-    nextYearSet: () => void;           // ฟังก์ชันสำหรับปีถัดไป
-    selectedMonth: number;             // เดือนที่ถูกเลือก
-    changeSelectedMonth: (month: string) => void; // ฟังก์ชันที่ใช้เปลี่ยนเดือน
-  }
-  
-  export default function Frontdesk_Header({
-    arrayMoth,
-    selectedYear,
-    changeSelectedYear,
-    prevYearSet,
-    arrayYear,
-    startYearIndex,
-    YearPerPage,
-    nextYearSet,
-    selectedMonth,
-    changeSelectedMonth,
-  }: Frontdesk_HeaderProps) {
+   arrayMoth: string[];
+   selectedYear: string;
+   changeSelectedYear: (year: string) => void;
+   prevYearSet: () => void;
+   arrayYear: number[];
+   startYearIndex: number;
+   YearPerPage: number;
+   nextYearSet: () => void;
+   selectedMonth: number;
+   changeSelectedMonth: (month: string) => void;
+}
+
+export default function Frontdesk_Header({
+   arrayMoth,
+   selectedYear,
+   changeSelectedYear,
+   prevYearSet,
+   arrayYear,
+   startYearIndex,
+   YearPerPage,
+   nextYearSet,
+   selectedMonth,
+   changeSelectedMonth,
+}: Frontdesk_HeaderProps) {
    return (
       <div>
          <div className="flex justify-between items-center">
@@ -59,13 +53,13 @@ interface Frontdesk_HeaderProps {
          <ToggleGroup
             variant="outline"
             type="single"
-            className="p-0 m-0 gap-0 mt-3 bg-blue-50 rounded-tl-xl rounded-tr-xl"
+            className="p-0 m-0 gap-0 mt-3 border-0 rounded-tl-xl rounded-tr-xl"
             value={selectedYear || ''}
             onValueChange={(value) => changeSelectedYear(value)}
          >
             <ToggleGroupItem
                value="prev"
-               className="font-bold rounded-none rounded-tl-xl"
+               className="font-bold rounded-none border  rounded-tl-xl"
                variant="outline"
                onClick={prevYearSet}
             >
@@ -77,7 +71,7 @@ interface Frontdesk_HeaderProps {
                   <ToggleGroupItem
                      key={year}
                      value={year.toString()}
-                     className="font-bold rounded-none flex-1 data-[state=on]:bg-blue-400 data-[state=on]:text-white "
+                     className="font-bold border  rounded-none flex-1 data-[state=on]:bg-blue-500 data-[state=on]:text-white "
                      variant="outline"
                   >
                      {year}
@@ -85,7 +79,7 @@ interface Frontdesk_HeaderProps {
                ))}
             <ToggleGroupItem
                value="next"
-               className="font-bold rounded-none rounded-tr-lg"
+               className="font-bold rounded-none border rounded-tr-lg"
                variant="outline"
                onClick={nextYearSet}
             >
@@ -96,13 +90,13 @@ interface Frontdesk_HeaderProps {
          <ToggleGroup
             variant="outline"
             type="single"
-            className="p-0 m-0 gap-0 bg-blue-50 rounded-bl-xl rounded-br-lg"
+            className="p-0 m-0 gap-0 border-0 rounded-bl-xl rounded-br-lg"
             value={selectedMonth.toString()}
             onValueChange={(value) => changeSelectedMonth(value)}
          >
             <ToggleGroupItem
                value="prev"
-               className="font-bold rounded-none rounded-bl-lg"
+               className="font-bold border rounded-none rounded-bl-lg"
                variant="outline"
             >
                {'<'}
@@ -111,7 +105,7 @@ interface Frontdesk_HeaderProps {
                <ToggleGroupItem
                   key={month}
                   value={(index + 1).toString()}
-                  className="font-bold flex-1 rounded-none  data-[state=on]:bg-blue-400 data-[state=on]:text-white "
+                  className="font-bold border flex-1 rounded-none  data-[state=on]:bg-blue-500 data-[state=on]:text-white "
                   variant="outline"
                >
                   {month}
@@ -119,7 +113,7 @@ interface Frontdesk_HeaderProps {
             ))}
             <ToggleGroupItem
                value="next"
-               className="font-bold rounded-none rounded-br-lg"
+               className="font-bold border rounded-none rounded-br-lg"
                variant="outline"
             >
                {'>'}
@@ -135,7 +129,7 @@ interface Frontdesk_HeaderProps {
                <Input
                   type="text"
                   placeholder="Search for customer"
-                  className="pl-10 " // Add additional styling as needed
+                  className="pl-10 "
                   value=""
                />
             </div>
@@ -145,7 +139,8 @@ interface Frontdesk_HeaderProps {
                <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                      <Button variant="outline">
-                        Roomtypes <ChevronDown />
+                        Roomtypes &nbsp;
+                        <ChevronDown />
                      </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-56">

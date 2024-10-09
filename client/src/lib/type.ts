@@ -10,3 +10,12 @@ export type Room = {
   price: number;
   picture_path: string;
 };
+
+export type RoomType = {
+  id: string;
+  name: string;
+  capacity: number;
+  detail: string;
+  picture_path: string;
+  price: number;
+}

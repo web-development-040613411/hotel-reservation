@@ -30,6 +30,7 @@ import {
 import { ChevronDown, MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import AddRoomModal from "./AddRoomModal";
 
 interface RoomTableProps {
   room: Room[];
@@ -85,7 +86,7 @@ export default function RoomTable({ room }: RoomTableProps) {
             <div className="flex items-center gap-2">
               <Image
                 src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/file/${picture}`}
-                alt={roomNumber}
+                alt={`room-number-${roomNumber}`}
                 width={0}
                 height={0}
                 sizes="100vw"
@@ -167,7 +168,7 @@ export default function RoomTable({ room }: RoomTableProps) {
           <Input placeholder="room number" />
         </div>
         <div className="flex gap-2">
-          <Button>Add Room</Button>
+          <AddRoomModal />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">

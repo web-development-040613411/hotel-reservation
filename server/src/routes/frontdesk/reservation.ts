@@ -27,7 +27,7 @@ interface Reservation {
     detail: string;
     picture_path: string;
     price_per_night: number;
-  }
+}
 
 interface Room {
     room_number: string;
@@ -40,7 +40,7 @@ interface TypeName {
 }
 
 export const reservationRoute = new Elysia({ prefix: '/reservations' })
-    .get('/', async ({ query,set }) => {
+    .get('/', async ({ query, set }) => {
         query: t.Object({
             year: t.String(),
             month: t.String(),
@@ -59,7 +59,6 @@ export const reservationRoute = new Elysia({ prefix: '/reservations' })
             };
         }
 
-
         const reservations = await sql`SELECT
   reservations.id AS reservations_id,
   customer_id,
@@ -75,6 +74,7 @@ export const reservationRoute = new Elysia({ prefix: '/reservations' })
   rooms."number" AS room_number,
   reservations.price,
   reservations.room_id,
+   customer_details.special_request  AS special_request,
   check_in,
   check_out,
   display_color,
@@ -85,16 +85,17 @@ export const reservationRoute = new Elysia({ prefix: '/reservations' })
   room_types.capacity,
   room_types.detail,
   room_types.picture_path,
-  room_types.price AS price_per_night 
+  room_types.price AS price_per_night  
 FROM
   rooms
   INNER JOIN reservations ON rooms."id" = reservations.room_id
   INNER JOIN room_types ON rooms.type_id = room_types."id"
   INNER JOIN customer_details ON reservations.customer_id = customer_details.ID 
-  WHERE check_in >= ${query.year + '-' + query.month + '-01'}
+  WHERE check_in >= ${query.year + '-' + query.month + '-01'} OR check_out <= ${
+            query.year + '-' + query.month + '-31'
+        }
   ORDER BY rooms."number" ASC 
                     `;
-
 
         return {
             status: 'success',

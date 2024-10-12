@@ -1,31 +1,10 @@
 'use client';
 import Frontdesk_Nav from '../../components/frontdesk/nav';
-import { useState, Fragment, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
-import {
-   Collapsible,
-   CollapsibleContent,
-   CollapsibleTrigger,
-} from '@/components/ui/collapsible';
-import {
-   Dialog,
-   DialogContent,
-   DialogDescription,
-   DialogHeader,
-   DialogTitle,
-   DialogTrigger,
-} from '@/components/ui/dialog';
-
-import {
-   Table,
-   TableBody,
-   TableCaption,
-   TableCell,
-   TableHead,
-   TableHeader,
-   TableRow,
-} from '@/components/ui/table';
 import Frontdesk_Header from '@/components/frontdesk/header';
+import { Reservation } from '@/components/frontdesk/reservation-table';
+import ReservationTable from '@/components/frontdesk/reservation-table';
 
 const thisYear = new Date().getFullYear();
 const thisMonthNumber = new Date().getMonth() + 1;
@@ -50,34 +29,6 @@ const arrayMoth = [
    'November',
    'December',
 ];
-
-type Reservation = {
-   reservations_id: string;
-   customer_id: string;
-   first_name: string;
-   last_name: string;
-   address: string;
-   email: string;
-   phone_number: string;
-   sub_district: string | null; // Nullable fields can be represented as union types
-   district: string | null;
-   province: string | null;
-   postcode: string | null;
-   room_number: string;
-   price: number;
-   room_id: string;
-   check_in: Date; // ISO date string, consider using Date type if you parse it
-   check_out: Date; // ISO date string, consider using Date type if you parse it
-   display_color: string;
-   transaction_status: 'complete' | 'pending' | 'canceled'; // Specify allowed statuses if known
-   createAt: string; // ISO date string, consider using Date type if you parse it
-   current_status: 'vacant' | 'occupied'; // Specify allowed statuses if known
-   types_name: string;
-   capacity: number;
-   detail: string;
-   picture_path: string;
-   price_per_night: number;
-}[];
 
 export default function Page() {
    const [selectedYear, setSelectedYear] = useState(thisYear.toString());
@@ -119,10 +70,10 @@ export default function Page() {
       setRoomData(data.data);
    };
 
-   const [reservationData, setReservationData] = useState<Reservation>();
+   const [reservationData, setReservationData] = useState<Reservation[]>();
    const FetchReservationData = async () => {
       const res = await fetch(
-         `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/reservations?year=2024&month=10`
+         `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/reservations?year=${selectedYear}&month=${selectedMonth}`
       );
       if (!res.ok) {
          throw new Error('Network response was not ok');
@@ -215,222 +166,13 @@ export default function Page() {
                selectedYear={selectedYear}
                startYearIndex={startYearIndex}
             />
-            {/* {reservationData.map((e) => (
-               <div>
-                  {e.room_number +
-                     ' ' +
-                     new Date(e.check_in).toDateString() +
-                     ' ' +
-                     e.first_name}
-               </div>
-            ))} */}
-
-            <Table className="table-fixed mt-3 w-full">
-               <TableHeader className="border ">
-                  <TableRow>
-                     <TableHead className="w-28 text-center border text-white bg-blue-500">
-                        <b>Rooms Types</b>
-                     </TableHead>
-
-                     {daysArray.map((date, index) => (
-                        <TableHead
-                           key={index}
-                           className="text-center border text-black w-10"
-                        >
-                           <b>{date}</b>
-                           <br />{' '}
-                           {index + 1 < 10 ? (
-                              <>{'0' + (index + 1)}</>
-                           ) : (
-                              <> {index + 1}</>
-                           )}
-                        </TableHead>
-                     ))}
-                  </TableRow>
-               </TableHeader>
-               <Collapsible asChild>
-                  <TableBody>
-                     {Object.entries(roomsData).map(
-                        ([roomTypes, rooms]: [string, any], index) => (
-                           <>
-                              <CollapsibleTrigger asChild>
-                                 <TableRow key={index}>
-                                    <TableCell
-                                       key={index}
-                                       className="w-28 text-center border text-black font-bold"
-                                    >
-                                       {roomTypes}
-                                    </TableCell>
-
-                                    {Array.from({
-                                       length: daysArray.length,
-                                    }).map((_, i) => (
-                                       <TableCell
-                                          key={i}
-                                          className="text-center border text-black"
-                                       >
-                                          <p className="bg-blue-700 text-white py-2 rounded-md">
-                                             {0}
-                                          </p>
-                                       </TableCell>
-                                    ))}
-                                 </TableRow>
-                              </CollapsibleTrigger>
-
-                              {rooms.map((room: any, index: any) => {
-                                 const thisRoomReservations =
-                                    reservationData.filter(
-                                       (reservation) =>
-                                          reservation.room_id === room.id
-                                    );
-                                 let foundReservation = 0;
-
-                                 return (
-                                    <CollapsibleContent asChild>
-                                       <TableRow key={index}>
-                                          <TableCell
-                                             key={index}
-                                             className="w-28 text-start border text-black"
-                                          >
-                                             <div className="flex items-center">
-                                                <p className="p-2 bg-green-800 mr-2 rounded-md"></p>
-                                                <span>{' ' + room.number}</span>
-                                             </div>
-                                          </TableCell>
-
-                                          {(() => {
-                                             const cells = [];
-                                             for (
-                                                let i = 0;
-                                                i < daysArray.length;
-                                                i++
-                                             ) {
-                                                const thisColDays = i + 1;
-                                                const thisColDate = new Date(
-                                                   `${selectedYear}-${String(
-                                                      selectedMonth
-                                                   ).padStart(2, '0')}-${String(
-                                                      thisColDays
-                                                   ).padStart(2, '0')}`
-                                                );
-
-                                                const thisReservation =
-                                                   thisRoomReservations.find(
-                                                      (reservation) =>
-                                                         new Date(
-                                                            reservation.check_in
-                                                         ).toDateString() ===
-                                                         thisColDate.toDateString()
-                                                   );
-
-                                                if (thisReservation) {
-                                                   console.log(
-                                                      thisReservation.room_number
-                                                   );
-
-                                                   // คำนวณ endSpan เพื่อหาว่าจองกี่วัน
-                                                   let endSpan = 1;
-                                                   const checkInDate = new Date(
-                                                      thisReservation.check_in
-                                                   );
-                                                   const checkOutDate =
-                                                      new Date(
-                                                         thisReservation.check_out
-                                                      );
-
-                                                   if (
-                                                      checkOutDate >=
-                                                      thisColDate
-                                                   ) {
-                                                      // คำนวณจำนวนวันที่ครอบคลุม
-                                                      const timeDiff =
-                                                         checkOutDate.getTime() -
-                                                         thisColDate.getTime();
-                                                      const dayDiff = Math.ceil(
-                                                         timeDiff /
-                                                            (1000 * 3600 * 24)
-                                                      ); // แปลงเป็นวัน
-                                                      endSpan = Math.min(
-                                                         dayDiff,
-                                                         daysArray.length - i
-                                                      ); // ตรวจสอบไม่ให้เกินจำนวนวันทั้งหมดในเดือน
-                                                   }
-
-                                                   // ข้ามวันตาม endSpan ที่คำนวณได้
-                                                   i = i + endSpan - 1;
-
-                                                   cells.push(
-                                                      <Dialog>
-                                                         <DialogTrigger asChild>
-                                                            <TableCell
-                                                               className={
-                                                                  'w-40 text-start border rounded-md text-white'
-                                                               }
-                                                               style={{
-                                                                  backgroundColor: `${thisReservation.display_color}`,
-                                                               }}
-                                                               key={i}
-                                                               colSpan={endSpan}
-                                                            >
-                                                               {
-                                                                  thisReservation.first_name
-                                                               }
-                                                            </TableCell>
-                                                         </DialogTrigger>
-                                                         <DialogContent>
-                                                            <DialogHeader>
-                                                               <DialogTitle>
-                                                                  Are you
-                                                                  absolutely
-                                                                  sure?
-                                                               </DialogTitle>
-                                                               <DialogDescription>
-                                                                  This action
-                                                                  cannot be
-                                                                  undone. This
-                                                                  will
-                                                                  permanently
-                                                                  delete your
-                                                                  account and
-                                                                  remove your
-                                                                  data from our
-                                                                  servers.
-                                                               </DialogDescription>
-                                                            </DialogHeader>
-                                                         </DialogContent>
-                                                      </Dialog>
-
-                                                      // <TableCell
-                                                      //    className={`w-40 text-start border rounded-md bg-green-500`}
-                                                      //    key={i}
-                                                      //    colSpan={endSpan}
-                                                      // >
-                                                      //    {thisReservation.first_name}
-                                                      // </TableCell>
-                                                   );
-                                                } else {
-                                                   cells.push(
-                                                      <TableCell
-                                                         className="w-40 text-start border "
-                                                         key={i}
-                                                      >
-                                                         {' '}
-                                                      </TableCell>
-                                                   );
-                                                }
-                                             }
-                                             return cells;
-                                          })()}
-                                       </TableRow>
-                                    </CollapsibleContent>
-                                 );
-                              })}
-                           </>
-                        )
-                     )}
-                  </TableBody>
-               </Collapsible>
-            </Table>
+            <ReservationTable
+               reservationData={reservationData}
+               daysArray={daysArray}
+               roomsData={roomsData}
+               selectedMonth={selectedMonth}
+               selectedYear={selectedYear}
+            />
          </main>
       </div>
    );

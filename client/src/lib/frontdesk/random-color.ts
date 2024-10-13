@@ -22,6 +22,7 @@ export const arrayColor: any = {
    rose: ['#fecdd3', '#9f1239'],
 };
 
+//mok can call this function to get random color
 export function getRandomColorToDB() {
    const keys = Object.keys(arrayColor);
    const randomIndex = Math.floor(Math.random() * keys.length);

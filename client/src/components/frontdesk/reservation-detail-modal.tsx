@@ -54,12 +54,16 @@ export default function Reservation_detail_modal({
          <DialogContent className="max-w-lg p-4">
             <DialogHeader>
                <DialogTitle>Reservation Details</DialogTitle>
+
                <DialogDescription>
                   Information about the reservation of{' '}
                   {thisReservation.first_name} {thisReservation.last_name}.
                </DialogDescription>
             </DialogHeader>
-
+            <img
+               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${thisReservation.picture_path}`}
+               alt="room"
+            />
             <div className="mt-0">
                <p>
                   <strong>Name : </strong> {thisReservation.first_name}{' '}

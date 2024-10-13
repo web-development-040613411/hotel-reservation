@@ -3,7 +3,12 @@ import Frontdesk_Nav from '../../components/frontdesk/nav';
 import { useState, useEffect } from 'react';
 
 import Frontdesk_Header from '@/components/frontdesk/header';
-import { Reservation } from '@/components/frontdesk/reservation-table';
+import {
+   Reservation,
+   allRooms,
+   Room,
+   vacantRoomOfDay,
+} from '@/components/frontdesk/reservation-table';
 import ReservationTable from '@/components/frontdesk/reservation-table';
 import {
    thisYear,
@@ -45,9 +50,10 @@ export default function Page() {
          return dayNames[date.getDay()];
       })
    );
-   const [roomDataFilter, setRoomDataFilter] = useState({});
-   const [roomDataNormal, setRoomDataNormal] = useState({});
-   const [roomsData, setRoomData] = useState({});
+   const [vacanRoomOfDay, setVacantRoomOfDay] = useState<vacantRoomOfDay>({});
+   const [roomDataFilter, setRoomDataFilter] = useState<allRooms>();
+   const [roomDataNormal, setRoomDataNormal] = useState<allRooms>();
+   const [roomsData, setRoomData] = useState<allRooms>();
    const FetchRooms = async () => {
       const res = await fetch(
          `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/all-room`
@@ -156,15 +162,15 @@ export default function Page() {
 
    useEffect(() => {
       if (searchCustomer !== '') {
-         const roomTypeFilter = Object.entries(roomDataFilter).map(
-            ([key, value]: [any, any]) => {
+         const roomTypeFilter = Object.entries(roomDataFilter as allRooms).map(
+            ([key, value]: [string, Room[]]) => {
                if (
                   reservationData?.some(
                      (reservation) => reservation.types_name === key
                   )
                ) {
                   return {
-                     [key]: value.filter((room: any) => {
+                     [key]: value.filter((room: Room) => {
                         return reservationData?.some(
                            (reservation) => reservation.room_id === room.id
                         );
@@ -191,7 +197,7 @@ export default function Page() {
       if (roomType === 'all') {
          setRoomData(roomDataNormal);
       } else {
-         const filteredRoom = Object.entries(roomDataNormal).filter(
+         const filteredRoom = Object.entries(roomDataNormal as allRooms).filter(
             ([key]) => key === roomType
          );
          setRoomData(Object.fromEntries(filteredRoom));
@@ -273,6 +279,8 @@ export default function Page() {
                selectedYear={selectedYear}
                check_in={Check_in}
                check_out={Check_out}
+               vacanRoomOfDay={vacanRoomOfDay}
+               setVacantRoomOfDay={setVacantRoomOfDay}
             />
          </main>
       </div>

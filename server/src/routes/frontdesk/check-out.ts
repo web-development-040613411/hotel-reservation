@@ -25,8 +25,9 @@ export const checkOutRoute = new Elysia({ prefix: '/check-out' }).patch(
             };
         }
 
-        const currentDate = new Date().toDateString();
-        const checkOutDate = new Date(thisReservation.check_out).toDateString();
+        const currentDate = new Date();
+
+        const checkOutDate = new Date(thisReservation.check_out);
 
         if (currentDate > checkOutDate) {
             set.status = 400;
@@ -42,9 +43,16 @@ export const checkOutRoute = new Elysia({ prefix: '/check-out' }).patch(
             WHERE id=${thisReservation.room_id}
         `;
 
+        const now =
+            currentDate.getFullYear() +
+            '-' +
+            (currentDate.getMonth() + 1) +
+            '-' +
+            currentDate.getDate();
+
         const updateReservation = await sql`
             UPDATE reservations
-            SET check_out = ${currentDate}
+            SET check_out = ${now}
             WHERE id=${thisReservation.id};`;
 
         return {

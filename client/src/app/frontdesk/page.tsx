@@ -5,32 +5,21 @@ import { useState, useEffect } from 'react';
 import Frontdesk_Header from '@/components/frontdesk/header';
 import { Reservation } from '@/components/frontdesk/reservation-table';
 import ReservationTable from '@/components/frontdesk/reservation-table';
-
-const thisYear = new Date().getFullYear();
-const thisMonthNumber = new Date().getMonth() + 1;
-const startYear = 2023;
-const endYear = thisYear + 22;
-const YearPerPage = 8;
-const arrayYear = Array.from(
-   { length: endYear - startYear + 1 },
-   (_, i) => startYear + i
-);
-const arrayMoth = [
-   'January',
-   'February',
-   'March',
-   'April',
-   'May',
-   'June',
-   'July',
-   'August',
-   'September',
-   'October',
-   'November',
-   'December',
-];
+import {
+   thisYear,
+   thisMonthNumber,
+   arrayMoth,
+   arrayYear,
+   YearPerPage,
+   startYear,
+} from '@/lib/frontdesk/all-date-function';
+import { toast } from 'sonner';
 
 export default function Page() {
+   const [roomType, setRoomType] = useState('all');
+   const [roomTypeArray, setRoomTypeArray] = useState<string[]>([]);
+   const [StateShowAll, setStateShowAll] = useState(false);
+   const [searchCustomer, setSearchCustomer] = useState('');
    const [selectedYear, setSelectedYear] = useState(thisYear.toString());
    const [selectedMonth, setSelectedMonth] = useState(thisMonthNumber);
    const [startYearIndex, setStartYearIndex] = useState(0);
@@ -56,7 +45,8 @@ export default function Page() {
          return dayNames[date.getDay()];
       })
    );
-
+   const [roomDataFilter, setRoomDataFilter] = useState({});
+   const [roomDataNormal, setRoomDataNormal] = useState({});
    const [roomsData, setRoomData] = useState({});
    const FetchRooms = async () => {
       const res = await fetch(
@@ -68,18 +58,76 @@ export default function Page() {
       }
       const data = await res.json();
       setRoomData(data.data);
+      setRoomDataFilter(data.data);
+      setRoomDataNormal(data.data);
+      setRoomTypeArray(Object.keys(data.data));
    };
 
    const [reservationData, setReservationData] = useState<Reservation[]>();
    const FetchReservationData = async () => {
-      const res = await fetch(
-         `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/reservations?year=${selectedYear}&month=${selectedMonth}`
-      );
-      if (!res.ok) {
-         throw new Error('Network response was not ok');
+      if (searchCustomer === '') {
+         setStateShowAll(false);
+         const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/reservations?year=${selectedYear}&month=${selectedMonth}`
+         );
+         if (!res.ok) {
+            throw new Error('Network response was not ok');
+         }
+         const data = await res.json();
+         setReservationData(data.data);
+      } else {
+         setStateShowAll(true);
+         const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/reservations?year=${selectedYear}&month=${selectedMonth}&fullname=${searchCustomer}`
+         );
+         if (!res.ok) {
+            throw new Error('Network response was not ok');
+         }
+         const data = await res.json();
+         setReservationData(data.data);
       }
+   };
+
+   const Check_in = async (id: string) => {
+      const res = await fetch(
+         `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/check-in/${id}`,
+         {
+            method: 'PATCH',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         }
+      );
       const data = await res.json();
-      setReservationData(data.data);
+
+      if (!res.ok) {
+         toast.error(data.message);
+         return;
+      }
+
+      toast.success(data.message);
+      FetchReservationData();
+   };
+
+   const Check_out = async (id: string) => {
+      const res = await fetch(
+         `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/check-out/${id}`,
+         {
+            method: 'PATCH',
+            headers: {
+               'Content-Type': 'application/json',
+            },
+         }
+      );
+      const data = await res.json();
+
+      if (!res.ok) {
+         toast.error(data.message);
+         return;
+      }
+
+      toast.success(data.message);
+      FetchReservationData();
    };
 
    useEffect(() => {
@@ -105,6 +153,50 @@ export default function Page() {
       FetchRooms();
       FetchReservationData();
    }, [selectedYear, selectedMonth]);
+
+   useEffect(() => {
+      if (searchCustomer !== '') {
+         const roomTypeFilter = Object.entries(roomDataFilter).map(
+            ([key, value]: [any, any]) => {
+               if (
+                  reservationData?.some(
+                     (reservation) => reservation.types_name === key
+                  )
+               ) {
+                  return {
+                     [key]: value.filter((room: any) => {
+                        return reservationData?.some(
+                           (reservation) => reservation.room_id === room.id
+                        );
+                     }),
+                  };
+               }
+            }
+         );
+
+         const filteredRoom = roomTypeFilter.reduce(
+            (acc, cur) => ({ ...acc, ...cur }),
+            {}
+         );
+
+         if (filteredRoom) {
+            setRoomData(filteredRoom);
+         }
+      } else {
+         setRoomData(roomDataNormal);
+      }
+   }, [reservationData]);
+
+   useEffect(() => {
+      if (roomType === 'all') {
+         setRoomData(roomDataNormal);
+      } else {
+         const filteredRoom = Object.entries(roomDataNormal).filter(
+            ([key]) => key === roomType
+         );
+         setRoomData(Object.fromEntries(filteredRoom));
+      }
+   }, [roomType]);
 
    const changeSelectedYear = (value: any) => {
       if (value === 'prev' || value === 'next') return;
@@ -145,8 +237,8 @@ export default function Page() {
       }
    };
 
-   if (!reservationData) {
-      return;
+   if (!reservationData || !roomsData) {
+      return <div>Loading...</div>;
    }
 
    return (
@@ -165,6 +257,13 @@ export default function Page() {
                selectedMonth={selectedMonth}
                selectedYear={selectedYear}
                startYearIndex={startYearIndex}
+               searchCustomer={searchCustomer}
+               setSeachCustomer={setSearchCustomer}
+               FetchReservationData={FetchReservationData}
+               stateShowAll={StateShowAll}
+               roomType={roomType}
+               setRoomType={setRoomType}
+               roomTypeArray={roomTypeArray}
             />
             <ReservationTable
                reservationData={reservationData}
@@ -172,6 +271,8 @@ export default function Page() {
                roomsData={roomsData}
                selectedMonth={selectedMonth}
                selectedYear={selectedYear}
+               check_in={Check_in}
+               check_out={Check_out}
             />
          </main>
       </div>

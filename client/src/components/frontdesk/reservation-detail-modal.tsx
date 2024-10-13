@@ -3,21 +3,29 @@ import {
    Dialog,
    DialogContent,
    DialogDescription,
-   DialogFooter,
    DialogFooterStart,
    DialogHeader,
    DialogTitle,
    DialogTrigger,
 } from '@/components/ui/dialog';
+
 import { Button } from '@/components/ui/button';
-import { getDarkenColorClass, getLightenColorClass } from '@/lib/random-color';
+import {
+   getDarkenColorClass,
+   getLightenColorClass,
+} from '@/lib/frontdesk/random-color';
 import { Reservation } from '@/components/frontdesk/reservation-table';
+import { Badge } from '../ui/badge';
 interface Reservation_detail_modalProps {
    thisReservation: Reservation;
+   check_in: (id: string) => void;
+   check_out: (id: string) => void;
 }
 
 export default function Reservation_detail_modal({
    thisReservation,
+   check_in,
+   check_out,
 }: Reservation_detail_modalProps) {
    return (
       <Dialog>
@@ -60,72 +68,136 @@ export default function Reservation_detail_modal({
                   {thisReservation.first_name} {thisReservation.last_name}.
                </DialogDescription>
             </DialogHeader>
-            <img
-               src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${thisReservation.picture_path}`}
-               alt="room"
-            />
-            <div className="mt-0">
-               <p>
-                  <strong>Name : </strong> {thisReservation.first_name}{' '}
-                  {thisReservation.last_name}
-               </p>
-               <p>
-                  <strong>Tel : </strong>
-                  {thisReservation.phone_number}
-               </p>
-               <p>
-                  <strong>Email : </strong>
-                  {thisReservation.email}
-               </p>
-               <p>
-                  <strong>Address : </strong>
-                  {thisReservation.address}
-               </p>
-               <p>
-                  <strong>Room Number :</strong> {thisReservation.room_number}
-               </p>
-               <p>
-                  <strong>Room Type: </strong> {thisReservation.types_name}
-               </p>
-               <p>
-                  <strong>Capacity :</strong> {thisReservation.capacity}
-               </p>
-               <p>
-                  <strong>Check-in :</strong>{' '}
-                  {new Date(thisReservation.check_in).toLocaleDateString()}
-               </p>
-               <p>
-                  <strong>Check-out :</strong>{' '}
-                  {new Date(thisReservation.check_out).toLocaleDateString()}
-               </p>
-               <p>
-                  <strong>Special Request :</strong>{' '}
-                  {thisReservation?.special_request?.length > 0
-                     ? thisReservation.special_request
-                     : '-'}
-               </p>
+            <div className="flex justify-center">
+               <img
+                  src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${thisReservation.picture_path}`}
+                  alt="room"
+                  className="w-7/12 object-cover h-48 rounded-lg shadow-md"
+               />
+            </div>
+
+            <div className="mt-0 grid grid-cols-2 gap-4">
+               <div>
+                  {' '}
+                  <p>
+                     <strong>Name : </strong> {thisReservation.first_name}{' '}
+                     {thisReservation.last_name}
+                  </p>
+                  <p>
+                     <strong>Tel : </strong>
+                     {thisReservation.phone_number}
+                  </p>
+                  <p>
+                     <strong>Email : </strong>
+                     {thisReservation.email}
+                  </p>
+                  <p>
+                     <strong>Address : </strong>
+                  </p>
+                  <p>
+                     {thisReservation.address +
+                        ', ' +
+                        thisReservation.sub_district +
+                        ', ' +
+                        thisReservation.district +
+                        ', ' +
+                        thisReservation.province +
+                        ', ' +
+                        thisReservation.postcode}
+                  </p>
+                  <p>
+                     <strong>Check-in :</strong>{' '}
+                     {new Date(thisReservation.check_in).toLocaleDateString()}
+                  </p>
+                  <p>
+                     <strong>Check-out :</strong>{' '}
+                     {new Date(thisReservation.check_out).toLocaleDateString()}
+                  </p>
+                  <p>
+                     <strong>Special Request :</strong>{' '}
+                     {thisReservation?.special_request?.length > 0
+                        ? thisReservation.special_request
+                        : '-'}
+                  </p>
+               </div>
+               <div>
+                  <p>
+                     <strong>Room Number :</strong>{' '}
+                     {thisReservation.room_number}
+                  </p>
+                  <p>
+                     <strong>Room Type: </strong> {thisReservation.types_name}
+                  </p>
+                  <p>
+                     <strong>Capacity :</strong> {thisReservation.capacity}
+                  </p>
+                  <div className="flex align-middle text-center">
+                     <p>
+                        <strong>Status :&nbsp;</strong>
+                     </p>
+                     {thisReservation.current_status === 'occupied' ? (
+                        <Badge className="bg-amber-600 hover:bg-amber-700 font-bold text-sm">
+                           occupied
+                        </Badge>
+                     ) : (
+                        <></>
+                     )}
+                     {thisReservation.current_status === 'vacant' ? (
+                        <Badge className="bg-green-600 hover:bg-green-700 font-bold text-sm">
+                           vacant
+                        </Badge>
+                     ) : (
+                        <></>
+                     )}
+                     {thisReservation.transaction_status === 'departing' ? (
+                        <Badge className="bg-sky-600 hover:bg-sky-700 font-bold text-sm">
+                           departing
+                        </Badge>
+                     ) : (
+                        <></>
+                     )}
+                     {thisReservation.transaction_status === 'maintenance' ? (
+                        <Badge className="bg-gray-600 hover:bg-gray-700 font-bold text-sm">
+                           maintenance
+                        </Badge>
+                     ) : (
+                        <></>
+                     )}
+                     {thisReservation.transaction_status === 'off_market' ? (
+                        <Badge className="bg-gray-600 hover:bg-gray-700 font-bold text-sm">
+                           off market
+                        </Badge>
+                     ) : (
+                        <></>
+                     )}
+                  </div>
+               </div>
             </div>
 
             <DialogFooterStart className="flex justify-start mt-4">
                <Button
                   variant="default"
                   className="
-                bg-green-500 text-white hover:bg-green-600
+                bg-green-500 text-white hover:bg-green-600 font-bold
             "
+                  disabled={thisReservation.current_status === 'occupied'}
+                  onClick={() => check_in(thisReservation.reservations_id)}
                >
                   Check-in
                </Button>
                <Button
                   variant="default"
-                  className="bg-red-500 text-white hover:bg-red-600"
+                  className="bg-red-500 text-white hover:bg-red-600 font-bold"
+                  onClick={() => check_out(thisReservation.reservations_id)}
+                  disabled={thisReservation.current_status === 'vacant'}
                >
                   Check-out
                </Button>
                <Button
                   variant="default"
-                  className="bg-yellow-500 text-white hover:bg-yellow-600"
+                  className="bg-yellow-500 text-white hover:bg-yellow-600 font-bold"
                >
-                  Postpone
+                  Post-pone
                </Button>
             </DialogFooterStart>
          </DialogContent>

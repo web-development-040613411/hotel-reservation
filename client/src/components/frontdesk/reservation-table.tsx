@@ -27,9 +27,9 @@ export type Reservation = {
    check_in: Date;
    check_out: Date;
    display_color: string;
-   transaction_status: 'complete' | 'pending' | 'canceled';
+   transaction_status: string;
    createAt: string;
-   current_status: 'vacant' | 'occupied';
+   current_status: string;
    types_name: string;
    capacity: number;
    detail: string;
@@ -44,6 +44,8 @@ interface ReservationTableProps {
    roomsData: any;
    reservationData: Reservation[];
    daysArray: string[];
+   check_in: (id: string) => void;
+   check_out: (id: string) => void;
 }
 
 export default function ReservationTable({
@@ -52,12 +54,14 @@ export default function ReservationTable({
    roomsData,
    reservationData,
    daysArray,
+   check_in,
+   check_out,
 }: ReservationTableProps) {
    return (
       <TableSticky className="table-fixed mt-3 w-full relative">
          <TableHeader className="sticky top-0 bg-white border">
             <TableRow className="border">
-               <TableHead className="w-28 text-center border-b text-white bg-blue-500">
+               <TableHead className="w-28 text-center border-b text-white bg-blue-600">
                   <b>Rooms Types</b>
                </TableHead>
 
@@ -94,7 +98,7 @@ export default function ReservationTable({
                               key={`room-type-${roomTypes}-${i}`}
                               className="text-center border text-black"
                            >
-                              <p className="bg-blue-700 text-white py-2 rounded-md">
+                              <p className="bg-blue-700 text-white py-1 rounded-md">
                                  {0}
                               </p>
                            </TableCell>
@@ -111,10 +115,27 @@ export default function ReservationTable({
                                  key={`room-cell-${room.id}`}
                                  className="w-28 text-start border text-black"
                               >
-                                 <div className="flex items-center">
-                                    <p className="p-2 bg-green-800 mr-2 rounded-md"></p>
-                                    <span>{' ' + room.number}</span>
-                                 </div>
+                                 {room.current_status === 'vacant' ? (
+                                    <div className="flex items-center">
+                                       <p className="p-2 bg-green-500 mr-2 rounded-md"></p>
+                                       <span>{' ' + room.number}</span>
+                                    </div>
+                                 ) : room.current_status === 'occupied' ? (
+                                    <div className="flex items-center">
+                                       <p className="p-2 bg-amber-500 mr-2 rounded-md"></p>
+                                       <span>{' ' + room.number}</span>
+                                    </div>
+                                 ) : room.current_status === 'departing' ? (
+                                    <div className="flex items-center">
+                                       <p className="p-2 bg-sky-500 mr-2 rounded-md"></p>
+                                       <span>{' ' + room.number}</span>
+                                    </div>
+                                 ) : (
+                                    <div className="flex items-center">
+                                       <p className="p-2 bg-gray-500 mr-2 rounded-md"></p>
+                                       <span>{' ' + room.number}</span>
+                                    </div>
+                                 )}
                               </TableCell>
                               {(() => {
                                  const cells = [];
@@ -166,6 +187,8 @@ export default function ReservationTable({
                                                 thisReservation={
                                                    thisReservation
                                                 }
+                                                check_in={check_in}
+                                                check_out={check_out}
                                              />
                                           </TableCell>
                                        );

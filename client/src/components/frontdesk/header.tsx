@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Bold, ChevronDown, Italic, LogOut, Search } from 'lucide-react';
-import { useState, Fragment, useEffect } from 'react';
+import { ChevronDown, Search } from 'lucide-react';
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -10,9 +9,7 @@ import {
    DropdownMenuSeparator,
    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-
 import { Input } from '@/components/ui/input';
-
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 interface Frontdesk_HeaderProps {
@@ -26,6 +23,13 @@ interface Frontdesk_HeaderProps {
    nextYearSet: () => void;
    selectedMonth: number;
    changeSelectedMonth: (month: string) => void;
+   searchCustomer: string;
+   setSeachCustomer: (value: string) => void;
+   FetchReservationData: () => void;
+   stateShowAll: boolean;
+   roomType: string;
+   setRoomType: (value: string) => void;
+   roomTypeArray: string[];
 }
 
 export default function Frontdesk_Header({
@@ -39,13 +43,19 @@ export default function Frontdesk_Header({
    nextYearSet,
    selectedMonth,
    changeSelectedMonth,
+   searchCustomer,
+   setSeachCustomer,
+   FetchReservationData,
+   stateShowAll,
+   roomType,
+   setRoomType,
+   roomTypeArray,
 }: Frontdesk_HeaderProps) {
    return (
       <div>
          <div className="flex justify-between items-center">
             <p className="text-2xl font-bold">Front Desk</p>
-
-            <Button className="font-bold bg-blue-600 hover:bg-blue-500">
+            <Button className="font-bold bg-blue-800 hover:bg-blue-900">
                Add Booking
             </Button>
          </div>
@@ -55,7 +65,9 @@ export default function Frontdesk_Header({
             type="single"
             className="p-0 m-0 gap-0 mt-3 border-0 rounded-tl-xl rounded-tr-xl"
             value={selectedYear || ''}
-            onValueChange={(value) => changeSelectedYear(value)}
+            onValueChange={(value) => {
+               changeSelectedYear(value);
+            }}
          >
             <ToggleGroupItem
                value="prev"
@@ -71,8 +83,9 @@ export default function Frontdesk_Header({
                   <ToggleGroupItem
                      key={year}
                      value={year.toString()}
-                     className="font-bold border  rounded-none flex-1 data-[state=on]:bg-blue-500 data-[state=on]:text-white "
+                     className="font-bold border  rounded-none flex-1 data-[state=on]:bg-blue-600 data-[state=on]:text-white data-[disabled]:bg-blue-600 data-[disabled]:text-white data-[disabled]:opacity-100"
                      variant="outline"
+                     disabled={selectedYear === year.toString()}
                   >
                      {year}
                   </ToggleGroupItem>
@@ -92,7 +105,9 @@ export default function Frontdesk_Header({
             type="single"
             className="p-0 m-0 gap-0 border-0 rounded-bl-xl rounded-br-lg"
             value={selectedMonth.toString()}
-            onValueChange={(value) => changeSelectedMonth(value)}
+            onValueChange={(value) => {
+               changeSelectedMonth(value);
+            }}
          >
             <ToggleGroupItem
                value="prev"
@@ -105,8 +120,9 @@ export default function Frontdesk_Header({
                <ToggleGroupItem
                   key={month}
                   value={(index + 1).toString()}
-                  className="font-bold border flex-1 rounded-none  data-[state=on]:bg-blue-500 data-[state=on]:text-white "
+                  className="font-bold border  rounded-none flex-1 data-[state=on]:bg-blue-600 data-[state=on]:text-white data-[disabled]:bg-blue-600 data-[disabled]:text-white data-[disabled]:opacity-100"
                   variant="outline"
+                  disabled={selectedMonth === index + 1}
                >
                   {month}
                </ToggleGroupItem>
@@ -120,19 +136,45 @@ export default function Frontdesk_Header({
             </ToggleGroupItem>
          </ToggleGroup>
 
-         {/* Year tabs */}
-
          <div className="flex justify-between items-center mt-3">
-            {/* Left side */}
-            <div className="relative flex items-center">
-               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" />
-               <Input
-                  type="text"
-                  placeholder="Search for customer"
-                  className="pl-10 "
-                  value=""
-               />
-            </div>
+            <form
+               onSubmit={(e) => {
+                  e.preventDefault();
+                  FetchReservationData();
+               }}
+            >
+               <div className="relative flex items-center">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 z-10" />
+                  <Input
+                     type="text"
+                     placeholder="Search for customer"
+                     className="pl-10 "
+                     value={searchCustomer}
+                     onChange={(e) => {
+                        setSeachCustomer(e.target.value);
+                     }}
+                  />
+                  <Button
+                     variant="outline"
+                     className="ml-2 text-white bg-blue-800 hover:bg-blue-900 hover:text-white"
+                     type="submit"
+                  >
+                     Search
+                  </Button>
+                  {stateShowAll && (
+                     <Button
+                        variant="outline"
+                        className="ml-2 text-white bg-blue-800 hover:bg-blue-900 hover:text-white"
+                        onClick={() => {
+                           setSeachCustomer('');
+                           FetchReservationData();
+                        }}
+                     >
+                        Show All
+                     </Button>
+                  )}
+               </div>
+            </form>
 
             {/* Right side */}
             <div className="relative flex items-center">
@@ -147,21 +189,21 @@ export default function Frontdesk_Header({
                      <DropdownMenuLabel>Roomtypes</DropdownMenuLabel>
                      <DropdownMenuSeparator />
                      <DropdownMenuRadioGroup
-                     // value={position}
-                     // onValueChange={setPosition}
+                        value={roomType}
+                        onValueChange={(value) => setRoomType(value)}
                      >
-                        <DropdownMenuRadioItem value="top">
-                           All
+                        <DropdownMenuRadioItem value="all">
+                           <div className="flex items-center justify-between">
+                              <div>All</div>
+                           </div>
                         </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="top">
-                           Top
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="bottom">
-                           Bottom
-                        </DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="right">
-                           Right
-                        </DropdownMenuRadioItem>
+                        {roomTypeArray.map((type) => (
+                           <DropdownMenuRadioItem key={type} value={type}>
+                              <div className="flex items-center justify-between">
+                                 <div>{type}</div>
+                              </div>
+                           </DropdownMenuRadioItem>
+                        ))}
                      </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
                </DropdownMenu>

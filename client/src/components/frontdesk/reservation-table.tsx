@@ -64,8 +64,6 @@ interface ReservationTableProps {
    daysArray: string[];
    check_in: (id: string) => void;
    check_out: (id: string) => void;
-   vacanRoomOfDay: any;
-   setVacantRoomOfDay: (value: any) => void;
 }
 
 export default function ReservationTable({
@@ -76,9 +74,29 @@ export default function ReservationTable({
    daysArray,
    check_in,
    check_out,
-   vacanRoomOfDay,
-   setVacantRoomOfDay,
 }: ReservationTableProps) {
+   const checkAvailableRooms = (day: number, roomType: string) => {
+      const thisColDate = new Date(
+         `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(
+            day
+         ).padStart(2, '0')}`
+      );
+      const ThisTypeReservation = reservationData.filter(
+         (reservation) =>
+            reservation.types_name === roomType &&
+            new Date(reservation.check_in) <= thisColDate &&
+            new Date(reservation.check_out) >= thisColDate
+      );
+
+      const ThisTypeRoom = roomsData[roomType].filter(
+         (room: Room) =>
+            room.current_status === 'vacant' ||
+            room.current_status === 'occupied' ||
+            room.current_status === 'departing'
+      );
+      const availableRooms = ThisTypeRoom.length - ThisTypeReservation.length;
+      return availableRooms;
+   };
    return (
       <TableSticky className="table-fixed mt-3 w-full relative">
          <TableHeader className="sticky top-0 bg-white border">
@@ -106,10 +124,6 @@ export default function ReservationTable({
          <TableBody>
             {Object.entries(roomsData as allRooms).map(
                ([roomTypes, rooms]: [string, Room[]], index) => {
-                  const avaliableRoomsOfDays = [];
-
-                  if (!rooms || rooms.length === 0) return null;
-
                   return (
                      <React.Fragment key={`roomTypes-${index}`}>
                         <TableRow key={`room-type-row-${roomTypes}`}>
@@ -121,11 +135,27 @@ export default function ReservationTable({
                               (_, i) => (
                                  <TableCell
                                     key={`room-type-${roomTypes}-${i}`}
-                                    className="text-center border text-black"
+                                    className="text-center border"
                                  >
-                                    <p className="bg-blue-700 text-white py-1 rounded-md">
-                                       {0}
-                                    </p>
+                                    {checkAvailableRooms(i + 1, roomTypes) ===
+                                    0 ? (
+                                       <p
+                                          className="bg-gray-600
+                                        text-white py-1 rounded-md text-center"
+                                       >
+                                          {checkAvailableRooms(
+                                             i + 1,
+                                             roomTypes
+                                          )}
+                                       </p>
+                                    ) : (
+                                       <p className="bg-green-600 text-white py-1 rounded-md text-center">
+                                          {checkAvailableRooms(
+                                             i + 1,
+                                             roomTypes
+                                          )}
+                                       </p>
+                                    )}
                                  </TableCell>
                               )
                            )}

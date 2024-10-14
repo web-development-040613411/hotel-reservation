@@ -50,7 +50,7 @@ export default function Page() {
          return dayNames[date.getDay()];
       })
    );
-   const [vacanRoomOfDay, setVacantRoomOfDay] = useState<vacantRoomOfDay>({});
+
    const [roomDataFilter, setRoomDataFilter] = useState<allRooms>();
    const [roomDataNormal, setRoomDataNormal] = useState<allRooms>();
    const [roomsData, setRoomData] = useState<allRooms>();
@@ -279,8 +279,6 @@ export default function Page() {
                selectedYear={selectedYear}
                check_in={Check_in}
                check_out={Check_out}
-               vacanRoomOfDay={vacanRoomOfDay}
-               setVacantRoomOfDay={setVacantRoomOfDay}
             />
          </main>
       </div>

@@ -1,69 +1,79 @@
 'use client';
-import { LogOut, Search } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+   DropdownMenu,
+   DropdownMenuContent,
+   DropdownMenuGroup,
+   DropdownMenuItem,
+   DropdownMenuLabel,
+   DropdownMenuSeparator,
+   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import Logo from '@/assets/logo.png';
 
 export default function Frontdesk_Nav() {
-    return (
-        <nav className="p-3 shadow-md">
-            <div className="flex justify-between items-center">
-                {/* Left side */}
-                <div className="flex items-center">
-                    { /* Logo 
-                    <div className="relative">
-                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center">
-                           
-                            <Search />
-                        </span>
-                        <input
-                            className="bg-green-100 focus:bg-green-100 rounded-full py-2 pl-10 pr-4"
-                            type="text"
-                            placeholder="Search..."
-                        />
-                    </div>
-                    */ }
-                    LOGO
-                </div>
+   const Logout = async () => {
+      console.log('Logout');
+   };
+   return (
+      <nav className="p-1 shadow-md">
+         <div className="flex justify-between items-center">
+            {/* Left side */}
+            <div className="flex items-center">
+               <a className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <Image
+                     src={Logo}
+                     width={60}
+                     quality={100}
+                     alt="logo"
+                     unoptimized
+                  />
 
-                {/* Right side */}
-                <div className="relative flex items-center">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="outline"
-                                className="rounded-full w-10 h-10 focus:ring focus:ring-black"
-                            >
-                                <Avatar className="w-10 h-10 ">
-                                    <AvatarImage
-                                        src="https://github.com/shadcn.png"
-                                        alt="@shadcn"
-                                    />
-                                    <AvatarFallback>FD</AvatarFallback>
-                                </Avatar>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent className="w-56">
-                            <DropdownMenuLabel>Front Desk</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuGroup>
-                                <DropdownMenuItem className="cursor-pointer">
-                                    <LogOut className="mr-2 h-4 w-4 text-red-600" />
-                                    <span className="text-red-600">Logout</span>
-                                </DropdownMenuItem>
-                            </DropdownMenuGroup>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                </div>
+                  <span className="self-center whitespace-nowrap">
+                     <p className="text-2xl font-bold">Mof Hotel</p>
+                     <p className="text-md font-bold text-gray-500">
+                        Frontdesk dashboard
+                     </p>
+                  </span>
+               </a>
             </div>
-        </nav>
-    );
+
+            {/* Right side */}
+            <div className="relative flex items-center">
+               <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                     <Button
+                        variant="outline"
+                        className="rounded-full w-14 h-14 focus:ring focus:ring-black"
+                     >
+                        <Avatar className="w-14 h-14">
+                           <AvatarImage
+                              src="https://github.com/shadcn.png"
+                              alt="Front Desk"
+                           />
+                           <AvatarFallback>FD</AvatarFallback>
+                        </Avatar>
+                     </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56">
+                     <DropdownMenuLabel>Front Desk</DropdownMenuLabel>
+                     <DropdownMenuSeparator />
+                     <DropdownMenuGroup>
+                        <DropdownMenuItem
+                           className="cursor-pointer"
+                           onClick={Logout}
+                        >
+                           <LogOut className="mr-2 h-4 w-4 text-red-600" />
+                           <span className="text-red-600">Logout</span>
+                        </DropdownMenuItem>
+                     </DropdownMenuGroup>
+                  </DropdownMenuContent>
+               </DropdownMenu>
+            </div>
+         </div>
+      </nav>
+   );
 }

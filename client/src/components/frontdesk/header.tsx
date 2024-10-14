@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { useState } from 'react';
 
 interface Frontdesk_HeaderProps {
    arrayMoth: string[];
@@ -177,37 +178,39 @@ export default function Frontdesk_Header({
             </form>
 
             {/* Right side */}
-            <div className="relative flex items-center">
-               <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                     <Button variant="outline">
-                        Roomtypes &nbsp;
-                        <ChevronDown />
-                     </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56">
-                     <DropdownMenuLabel>Roomtypes</DropdownMenuLabel>
-                     <DropdownMenuSeparator />
-                     <DropdownMenuRadioGroup
-                        value={roomType}
-                        onValueChange={(value) => setRoomType(value)}
-                     >
-                        <DropdownMenuRadioItem value="all">
+            <div className="relative flex items-center"></div>
+            <DropdownMenu modal={false}>
+               <DropdownMenuTrigger asChild>
+                  <Button variant="outline">
+                     Roomtypes &nbsp;
+                     <ChevronDown />
+                  </Button>
+               </DropdownMenuTrigger>
+               <DropdownMenuContent
+                  className="w-56 right-10 left-9"
+                  align="start"
+               >
+                  <DropdownMenuLabel>Roomtypes</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuRadioGroup
+                     value={roomType}
+                     onValueChange={(value) => setRoomType(value)}
+                  >
+                     <DropdownMenuRadioItem value="all">
+                        <div className="flex items-center justify-between">
+                           <div>All</div>
+                        </div>
+                     </DropdownMenuRadioItem>
+                     {roomTypeArray.map((type) => (
+                        <DropdownMenuRadioItem key={type} value={type}>
                            <div className="flex items-center justify-between">
-                              <div>All</div>
+                              <div>{type}</div>
                            </div>
                         </DropdownMenuRadioItem>
-                        {roomTypeArray.map((type) => (
-                           <DropdownMenuRadioItem key={type} value={type}>
-                              <div className="flex items-center justify-between">
-                                 <div>{type}</div>
-                              </div>
-                           </DropdownMenuRadioItem>
-                        ))}
-                     </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-               </DropdownMenu>
-            </div>
+                     ))}
+                  </DropdownMenuRadioGroup>
+               </DropdownMenuContent>
+            </DropdownMenu>
          </div>
       </div>
    );

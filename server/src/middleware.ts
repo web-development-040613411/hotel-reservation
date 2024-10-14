@@ -13,7 +13,7 @@ export const middleware = new Elysia().derive(
         session: Session | null;
     }> => {
         // CSRF check
-        if (context.request.method !== 'GET') {
+        if (context.request.method !== 'GET' && process.env.NODE_ENV === 'production') {
             const originHeader = context.request.headers.get('Origin');
             // NOTE: You may need to use `X-Forwarded-Host` instead
             const hostHeader = context.request.headers.get('X-Forwarded-Host');
@@ -28,7 +28,6 @@ export const middleware = new Elysia().derive(
                 };
             }
         }
-
         // use headers instead of Cookie API to prevent type coercion
         const cookieHeader = context.request.headers.get('Cookie') ?? '';
         const sessionId = lucia.readSessionCookie(cookieHeader);

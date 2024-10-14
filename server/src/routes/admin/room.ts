@@ -47,28 +47,45 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             room_id: res.id,
         };
     })
-    .get('/', async ({ user, set }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+    .get('/', async ({ user, set, query }) => {
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
+        const q = query.q || '';
+        const status = query.status || '';
 
-        const res = await sql`
-                SELECT rooms.number, rooms.current_status, room_types.name, room_types.price, room_types.picture_path
-                FROM rooms
-                INNER JOIN room_types
-                ON rooms.type_id = room_types.id;`;
+        const [currentStatus] =
+            await sql`SELECT enum_range(null::current_status);`;
+
+        let res;
+        if (!currentStatus.enum_range.includes(status)) {
+            res = await sql`
+            SELECT rooms.number, rooms.current_status, room_types.name, room_types.price, room_types.picture_path
+            FROM rooms
+            INNER JOIN room_types
+            ON rooms.type_id = room_types.id
+            WHERE rooms.number LIKE ${'%' + q + '%'}`;
+        } else {
+            res = await sql`
+            SELECT rooms.number, rooms.current_status, room_types.name, room_types.price, room_types.picture_path
+            FROM rooms
+            INNER JOIN room_types
+            ON rooms.type_id = room_types.id
+            WHERE rooms.number LIKE ${'%' + q + '%'}
+            AND rooms.current_status = ${status}`;
+        }
 
         return {
             status: 'success',

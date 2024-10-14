@@ -69,6 +69,7 @@ export default function FilteringSection() {
               <DropdownMenuCheckboxItem
                 onClick={() => handleFilterStatus(status)}
                 key={idx}
+                checked={searchParams.has("status") && searchParams.get("status") === status}
               >
                 {status}
               </DropdownMenuCheckboxItem>

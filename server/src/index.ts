@@ -7,6 +7,7 @@ import { reservationRoute } from './routes/reservation';
 import { swagger } from '@elysiajs/swagger';
 import postgres from 'postgres';
 import { guestRoutes } from './routes/guest';
+import { stripeRoutes } from './routes/stripe';
 
 export const app = new Elysia()
     .use(swagger())
@@ -47,6 +48,7 @@ export const app = new Elysia()
     .use(fileRoute)
     .use(guestRoutes)
     .use(reservationRoute)
+    .use(stripeRoutes)
     .use(cors())
     .listen(3001);
 

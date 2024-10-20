@@ -92,9 +92,16 @@ export const loginSchema = z.object({
 });
 
 export const GetVacantRoomsSchema = z.object({
-    check_in: z.string({ message: 'Check in date is required' }).date(),
-    check_out: z.string({ message: 'Check out date is required' }).date(),
+    check_in: z.string({ message: 'Check in date is required' }),
+    check_out: z.string({ message: 'Check out date is required' }),
     type_id: z.string({ message: 'type_id is required' }).uuid()
+});
+
+export const ChangeRoomSchema = z.object({
+    check_in: z.string({ message: 'Check in date is required' }),
+    check_out: z.string({ message: 'Check out date is required' }),
+    type_id: z.string({ message: 'type_id is required' }).uuid(),
+    reservation_id: z.string({ message: 'Reservation ID is required' }).uuid(),
 });
 
 export const PaymentSchema = z.object({

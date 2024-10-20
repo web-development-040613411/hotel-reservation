@@ -22,7 +22,6 @@ export const app = new Elysia()
             }
         }
     })
-    .use(swagger())
     .onError(({ set, error, code }) => {
         if (error instanceof postgres.PostgresError && error.code == '23505') {
             if (error.constraint_name == 'room_number_key') {

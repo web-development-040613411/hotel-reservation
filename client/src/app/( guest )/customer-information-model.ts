@@ -24,6 +24,14 @@ export const formInputs = [
     key: "address"
   },
   {
+    label: "Province",
+    type: "text",
+    id: "province",
+    name: "province",
+    required: true,
+    key: "province"
+  },
+  {
     label: "District",
     type: "text",
     id: "district",
@@ -38,6 +46,14 @@ export const formInputs = [
     name: "sub-district",
     required: true,
     key: "subDistrict"
+  },
+  {
+    label: "Postcode",
+    type: "text",
+    id: "postcode",
+    name: "postcode",
+    required: true,
+    key: "postcode"
   },
   {
     label: "Phone Number",

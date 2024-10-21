@@ -25,17 +25,14 @@ const FormSchema = z.object({
   }),
 });
 
-type Props = {
-  setState: ( state : number ) => void;
-}
 
-export default function FormBooking( props : Props ) {
+export default function FormBooking( ) {
   const [dateRange, setDateRange] = useState<DateRange>({
     from: new Date(),
     to: new Date(),
   });
 
-  const { addInformation } = useContext(ReservationContext);
+  const { addInformation, setState } = useContext(ReservationContext);
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
@@ -43,8 +40,13 @@ export default function FormBooking( props : Props ) {
 
   function onSubmit(e: any) {
     e.preventDefault();
-    addInformation({  dateRange });
-    props.setState(2);
+
+    const stayNight = new Date(dateRange.to!).getDate() - new Date(dateRange.from!).getDate();
+    
+    addInformation({ dateRange });
+    addInformation({ stayNight });
+
+    setState(2);
   }
 
   function displayCheckInCheckOut() {
@@ -94,7 +96,7 @@ export default function FormBooking( props : Props ) {
                         selected={dateRange}
                         onSelect={setDateRange as SelectRangeEventHandler}
                         disabled={(date) =>
-                          date > new Date() || date < new Date("1900-01-01")
+                          date < new Date() || date < new Date("1900-01-01")
                         }
                         initialFocus
                       />
@@ -109,6 +111,7 @@ export default function FormBooking( props : Props ) {
                                md:h-20 md:text-xl 
                                rounded-t-none rounded-b-xl"
                 type="submit"
+                disabled={ dateRange.to?.getDate() === dateRange.from?.getDate() }
               >
                 Booking
               </Button>

@@ -94,7 +94,7 @@ export const loginSchema = z.object({
 export const GetVacantRoomsSchema = z.object({
     check_in: z.string({ message: 'Check in date is required' }),
     check_out: z.string({ message: 'Check out date is required' }),
-    type_id: z.string({ message: 'type_id is required' }).uuid()
+    type_id: z.string({ message: 'type_id is required' }).uuid(),
 });
 
 export const ChangeRoomSchema = z.object({
@@ -105,19 +105,42 @@ export const ChangeRoomSchema = z.object({
 });
 
 export const PaymentSchema = z.object({
-    customer_detail: z.object({
-        first_name: z.string({ message: 'Name is required' }).min(1, 'Name is required'),
-        last_name: z.string({ message: 'Name is required' }).min(1, 'Name is required'),
-        address: z.string({ message: 'Address is required' }).min(1, 'Address is required'),
-        phone_number: z.string({ message: 'Phone number is required' }).min(1, 'Phone number is required'),
-        email: z.string({ message: 'Email is required' }).email({ message: 'Email is required' }).min(1, 'Email is required'),
-        sub_district: z.string({ message: 'Sub district is required' }).min(1, 'Sub district is required'),
-        district: z.string({ message: 'District is required' }).min(1, 'District is required'),
-        province: z.string({ message: 'Province is required' }).min(1, 'Province is required'),
-        postcode: z.string({ message: 'Postal code is required' }).length(5, 'Postal code is required'),
-        special_request: z.string({ message: 'Special request is required' }).optional(),
+    personalInformation: z.object({
+        firstName: z
+            .string({ message: 'Name is required' })
+            .min(1, 'Name is required'),
+        lastName: z
+            .string({ message: 'Name is required' })
+            .min(1, 'Name is required'),
+        address: z
+            .string({ message: 'Address is required' })
+            .min(1, 'Address is required'),
+        phoneNumber: z
+            .string({ message: 'Phone number is required' })
+            .min(1, 'Phone number is required'),
+        email: z
+            .string({ message: 'Email is required' })
+            .email({ message: 'Email is required' })
+            .min(1, 'Email is required'),
+        subDistrict: z
+            .string({ message: 'Sub district is required' })
+            .min(1, 'Sub district is required'),
+        district: z
+            .string({ message: 'District is required' })
+            .min(1, 'District is required'),
+        province: z
+            .string({ message: 'Province is required' })
+            .min(1, 'Province is required'),
+        postcode: z
+            .string({ message: 'Postal code is required' })
+            .length(5, 'Postal code is required'),
+        specialRequest: z
+            .string({ message: 'Special request is required' })
+            .optional(),
     }),
-    price: z.number({ message: 'Price is required' }).min(1, 'Price is required'),
-    reservation_id: z.string({ message: 'Reservation ID is required' }).uuid(),
-    room_type_id : z.string({ message: 'Type ID is required' }).uuid(),
+    totalPrice: z
+        .number({ message: 'Price is required' })
+        .min(1, 'Price is required'),
+    reservationId: z.string({ message: 'Reservation ID is required' }).uuid(),
+    roomTypeId: z.string({ message: 'Type ID is required' }).uuid(),
 });

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,25 +14,23 @@ import { Textarea } from "@/components/ui/textarea";
 import { ReservationContext } from "@/components/context/ReservationContext";
 import { formInputs } from "@/app/( guest )/customer-information-model";
 import RoomCard from "./room-card";
+import { loadStripe } from '@stripe/stripe-js';
+import ConclusionBar from "./conclusion-bar";
+import PersonalInformationForm from "./personal-information-form";
+import StepHeader from "./header";
 
-type Props = {
-  setState: (state: number) => void;
-};
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
-export default function Step4({ setState }: Props) {
-  const { addInformation, information } = useContext(ReservationContext);
-  const type = {
-    id : information.id,
-    type_name : information.type_name,
-    detail : information.detail,
-    price : information.price,
-    picture_path : information.picture_path,
-    person : information.person
-  }
+export default function Step4() {
+  const { addInformation, information, state, setState } = useContext(ReservationContext);
+  const [isChange, setIsChange] = useState(false);
+  const title = "Review";
+  const step = 4;
 
-  console.log( information );
+  const { roomType, personalInformation, reservationId } = information;
+  const { type_id : roomTypeId } = roomType;
 
-  const onSubmitHandler = (e : any) => {
+  const onSubmitHandler = (e: any) => {
     e.preventDefault();
 
     const personalInformation = {
@@ -47,90 +45,62 @@ export default function Step4({ setState }: Props) {
     };
 
     addInformation(personalInformation);
+  };
 
+  const  checkOut = async () => {
+    const stripe = await stripePromise;
+    const totalPrice = roomType.total_price;
+    
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/stripe/checkout`, {
+      method: 'POST',
+      headers : {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        roomTypeId,
+        totalPrice,
+        personalInformation,
+        reservationId,
+      })
+    });
+
+    const data = await response.json();
+    const sessionId = data.data.session_id;
+
+    stripe!.redirectToCheckout({ sessionId });
   }
 
   const clickHandler = () => {
     setState(2);
-  }
+  };
 
   return (
     <>
-      <div className="fixed bottom-0 bg-white
-                      w-full h-28 border-t-2 border-gray-400 flex items-center p-4 justify-around">
-        <div className="w-1/2">
-          <p className="font-bold">King Size:
-            <span className="text-2xl font-black text-primary"> 5 nights</span>
-          </p>
-          <p className="font-bold">Total:
-            <span className="text-2xl font-black text-primary"> 500 Bath</span>
-          </p>
-        </div>
-        
-        <Button
-              className=" bg-primary rounded-lg  hover:bg-gray-800 active:bg-gray-800
-                          py-6 hover:bg-primary-hover 
-                          font-bold text-white"
-              type="submit"
-            >
-              Change room type
-        </Button>
-      </div>
+      <ConclusionBar/>
 
-      <div className="flex justify-center mt-5 mb-5">
+      <div className="flex justify-center my-4">
         <Card className="w-11/12 shadow-md border-primary shadow-primary m-0 p-8">
-          <CardHeader className="p-0">
-            <CardDescription className="text-lg">Step 4</CardDescription>
-            <CardTitle className="text-primary text-3xl font-black">
-              Review
-            </CardTitle>
-          </CardHeader>
+          <StepHeader title={title} step={step}/>
 
-          <form action="" className="my-4 flex flex-col gap-4"
-                onSubmit={(e) => onSubmitHandler(e)}>
-            {formInputs.map((input, index) => (
-              <div
-                key={index}
-                className="grid w-full max-w-sm items-center gap-1.5"
-              >
-                <Label htmlFor={input.id}>
-                  {input.label} <span className="text-red-500"> *</span>
-                </Label>
-                <Input
-                  type={input.type}
-                  id={input.id}
-                  placeholder=""
-                  name={input.name}
-                  className="my-2"
-                  required={input.required}
-                  value={information[input.key]}
-                />
-              </div>
-            ))}
-
-            <div>
-              <Label htmlFor="email">Special Requests</Label>
-              <Textarea placeholder="Type your message here." className="my-2" 
-                        value={information.specialRequests}/>
-            </div>
-
-            <Button
-              className=" bg-primary w-full rounded-lg  hover:bg-gray-800 active:bg-gray-800
-                                  p-4 hover:bg-primary-hover 
-                                  font-bold text-white"
-              type="submit"
-            >
-              Confirm Edit
-            </Button>
-          </form>
+          <PersonalInformationForm/>
         </Card>
       </div>
 
-      <RoomCard type={type} clickHandler={clickHandler}></RoomCard>
-
-      <div className="h-28">
-      
+      <div className="p-8">
+        <RoomCard type={roomType} clickHandler={clickHandler} state={state} />
+        <Button
+          className=" bg-primary w-full rounded-lg  hover:bg-gray-800 active:bg-gray-800
+                                    hover:bg-primary
+                                    my-4
+                                    font-bold text-white"
+          type="button"
+          onClick={() => checkOut() }
+        >
+          Make Payment
+        </Button>
       </div>
+
+      <div className="h-28"></div>
     </>
   );
 }

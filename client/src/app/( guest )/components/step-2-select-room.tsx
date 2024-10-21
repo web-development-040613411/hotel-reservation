@@ -2,84 +2,132 @@
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-import { useContext } from "react";
-import logo from '@/assets/logo.png';
+import { useContext, useEffect, useState } from "react";
 import { ReservationContext } from "@/components/context/ReservationContext";
 import RoomCard from "./room-card";
+import { format } from "date-fns";
+import { RoomType } from "@/components/interface/RoomType";
+import StepHeader from "./header";
 
-//mockup data
-const room_type = [
-  {
-    id: "1",
-    type_name: "Queen Room",
-    detail:
-      "Room with two queen beds, table with chairs, microwave, and a miniature refrigerator.",
-    capacity: 2,
-    price: 230.5,
-    picture_path: logo,
-    person : 2
-  },
-  {
-    id: "2",
-    type_name: "King Room",
-    detail:
-      "Room with one king bed, table with chairs, microwave, and a miniature refrigerator.",
-    capacity: 4,
-    price: 250.5,
-    picture_path: logo,
-    person : 3
-  },
-  {
-    id: "3",
-    type_name: "Suite Room",
-    detail:
-      "Room with one king bed, sofa bed, table with chairs, microwave, and a miniature refrigerator.",
-    capacity: 1,
+export default function Step2() {
+  const { addInformation, information, state, setState } = useContext(ReservationContext);
+  const [roomTypes, setRoomTypes] = useState([] as RoomType[]);
+  const [isError, setIsError] = useState(false);
+  const { dateRange } = information;
+  const title = "Choose Room";
+  const step = 2;
 
-    price: 300.5,
-    picture_path: logo,
-    person : 4
-  },
-];
+  //for preserve room and change room type.
+  const clickHandler = async (type: any) => {
+    const formData = new FormData();
+    formData.append("type_id", type.type_id);
+    formData.append("check_in", dateRange.from);
+    formData.append("check_out", dateRange.to);
 
-type Props = {
-  setState: ( state : number ) => void;
-}
+    if (!information.reservationId) {
 
-export default function Step2( prop : Props ) {
-  // const [room_type_data, set_room_type_data] = useState(room_type);
-  // const [selected_room, set_selected_room] = useState(" ");
-  // const [number_reservation_date, set_number_reservation_date] = useState(3);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/preserve`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-  const { addInformation } = useContext(ReservationContext);
-  
-  const clickHandler = ( type : any ) => {
-    addInformation(type);
-    prop.setState(3);
-  }
+      const reservationId = await response.json().then((data) => data.reservationId);
+
+      addInformation({ reservationId });
+    } else {
+      formData.append("reservation_id", information.reservationId);
+
+      await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/change-type`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+    }
+
+    addInformation({ roomType: type});
+
+    setState(3);
+  };
+
+  useEffect(() => {
+    // for retrieve data
+    const getData = async () => {
+      try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/vacant-rooms?check_in=${dateRange.from}&check_out=${dateRange.to}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
+          const data = await response.json();
+    
+          if ( data.status != 'success' || data.data.length == 0 ) {
+            setIsError(true);
+            return;
+          }
+          setRoomTypes(data.data);
+        } catch (error) {
+            setIsError(true);
+        }
+      }
+
+    if (state === 2) {
+      getData();
+    }
+  },[]);
 
   return (
-    <div className="flex justify-center mt-5 mb-5">
-      <Card className="w-11/12 shadow-md border-primary shadow-primary m-0 p-0">
-        <CardHeader className="p-4">
-          <CardDescription className="text-lg">Step 2</CardDescription>
-          <CardTitle className="text-primary text-3xl font-black">
-            Choose Room Type
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent className="flex justify-center m-0 pb-1">
-          <div className="">
-            {room_type.map((type) => (
-              <RoomCard key={type.id} type={type} clickHandler={clickHandler}/>
-            ))}
+    <>
+      { !isError && <div className="flex justify-center mt-5 mb-5">
+        <Card className="w-11/12 shadow-md border-primary shadow-primary m-0 p-0">
+          <div className="p-8">
+            <StepHeader title={title} step={step}/>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+
+          <CardContent className="flex justify-center m-0 pb-1">
+            <div className="">
+              {roomTypes.map((type) => (
+                <RoomCard
+                  key={type.type_id}
+                  type={type}
+                  clickHandler={clickHandler}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div> }
+
+      {
+        isError && 
+      <div className="absolute top-1/2 -translate-y-1/2
+                      p-4 
+                      flex flex-col gap-4">
+        <p className="text-center text-2xl">Sorry, there is no available room left from
+            <br />
+            <span className="text-primary font-bold"> { format(new Date(dateRange.from), 'PPP') }</span> to 
+            <span className="text-primary font-bold"> {  format(new Date(dateRange.to), 'PPP') }</span>
+        </p>
+
+        <button
+          onClick={() => setState(1)}
+          className=" bg-primary w-full rounded-lg  hover:bg-gray-800 active:bg-gray-800
+                      p-4 hover:bg-primary-hover 
+                      font-bold text-white
+                      border-2 border-gray-400"
+        > Back to Step 1 </button>
+      </div>
+
+      }
+    </>
   );
 }

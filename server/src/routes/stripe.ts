@@ -3,8 +3,10 @@ import { PaymentSchema } from '@/libs/validation';
 import Elysia from 'elysia';
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
-export const stripeRoutes = new Elysia({ prefix: '/stripe' }).post(
+export const stripeRoutes = new Elysia({ prefix: '/stripe' })
+.post(
     '/checkout',
     async ({ body, set }) => {
         const validation = PaymentSchema.safeParse(body);
@@ -79,4 +81,38 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' }).post(
             },
         };
     }
-);
+)
+.onParse(async ({ request, headers }) => {
+    if (headers["content-type"] === "application/json; charset=utf-8") {
+      const arrayBuffer = await Bun.readableStreamToArrayBuffer(request.body!);
+      const rawBody = Buffer.from(arrayBuffer);
+      return rawBody
+    }
+  })
+.post('/webhook', async ( { body, headers, request } ) => {
+    const signature = headers['stripe-signature'];
+    
+    try {
+        const event = await stripe.webhooks.constructEventAsync(
+            body,
+            signature,
+            endpointSecret
+        );
+
+        switch (event.type) {
+            case 'checkout.session.completed':
+                const { id: sessionID, status } = event.data.object;
+                await sql`UPDATE reservations SET transaction_status = ${status} WHERE stripe_session_id = ${sessionID}`;
+        }
+    } catch(error) {
+        console.log(error);
+        return {
+            status: 'error',
+            message: 'Webhook Error',
+        };
+    }
+
+      return {
+        status: 'success',
+      };
+});

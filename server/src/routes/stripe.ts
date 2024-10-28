@@ -1,9 +1,20 @@
 import { sql } from '@/libs/db';
 import { PaymentSchema } from '@/libs/validation';
 import Elysia from 'elysia';
+import { Resend } from 'resend';
+
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+const resendKey = process.env.RESEND_KEY;
+const resend = new Resend(resendKey);
+resend.domains.create({name: 'mokmaard.space'})
+
+const email1 = 'n.09305y@gmail.com';
+const email2 = 's6504062663141@email.kmutnb.ac.th';
+const email3 = 's6504062620159@email.kmutnb.ac.th'
+const email4 = 'ohmmy569@gmail.com'
+// const email1 = 'mokmaard646@gmail.com'
 
 export const stripeRoutes = new Elysia({ prefix: '/stripe' })
 .post(
@@ -103,6 +114,7 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' })
             case 'checkout.session.completed':
                 const { id: sessionID, status } = event.data.object;
                 await sql`UPDATE reservations SET transaction_status = ${status} WHERE stripe_session_id = ${sessionID}`;
+
         }
     } catch(error) {
         console.log(error);
@@ -115,4 +127,18 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' })
       return {
         status: 'success',
       };
-});
+})
+// .post('/notify', async () => {
+//         const { data, error } = await resend.emails.send({
+//           from: 'Acme <no-reply@mokmaard.space>',
+//           to: [email4],
+//           subject: 'Hello I Hia Ohm',
+//         });
+      
+//         if (error) {
+//           return console.error({ error });
+//         }
+      
+//         console.log({ data });
+// });
+

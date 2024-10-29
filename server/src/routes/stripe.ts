@@ -1,25 +1,13 @@
 import { sql } from '@/libs/db';
+import { EmailInformation, sendEmail } from '@/libs/email';
 import { PaymentSchema } from '@/libs/validation';
 import Elysia from 'elysia';
-import { Resend } from 'resend';
-
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
-const resendKey = process.env.RESEND_KEY;
-const resend = new Resend(resendKey);
-resend.domains.create({name: 'mokmaard.space'})
-
-const email1 = 'n.09305y@gmail.com';
-const email2 = 's6504062663141@email.kmutnb.ac.th';
-const email3 = 's6504062620159@email.kmutnb.ac.th'
-const email4 = 'ohmmy569@gmail.com'
-// const email1 = 'mokmaard646@gmail.com'
 
 export const stripeRoutes = new Elysia({ prefix: '/stripe' })
-.post(
-    '/checkout',
-    async ({ body, set }) => {
+    .post('/checkout', async ({ body, set }) => {
         const validation = PaymentSchema.safeParse(body);
         if (!validation.success) {
             set.status = 400;
@@ -73,7 +61,9 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' })
 
         const [customerID] = await sql`
       INSERT INTO customer_details (first_name, last_name, address, phone_number, email, sub_district, district, province, postcode, special_request)
-      VALUES (${firstName}, ${lastName}, ${address}, ${phoneNumber}, ${email}, ${subDistrict}, ${district}, ${province}, ${postcode}, ${specialRequest || null})
+      VALUES (${firstName}, ${lastName}, ${address}, ${phoneNumber}, ${email}, ${subDistrict}, ${district}, ${province}, ${postcode}, ${
+            specialRequest || null
+        })
       RETURNING id;
     `;
 
@@ -91,54 +81,89 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' })
                 session_id: session.id,
             },
         };
-    }
-)
-.onParse(async ({ request, headers }) => {
-    if (headers["content-type"] === "application/json; charset=utf-8") {
-      const arrayBuffer = await Bun.readableStreamToArrayBuffer(request.body!);
-      const rawBody = Buffer.from(arrayBuffer);
-      return rawBody
-    }
-  })
-.post('/webhook', async ( { body, headers, request } ) => {
-    const signature = headers['stripe-signature'];
-    
-    try {
-        const event = await stripe.webhooks.constructEventAsync(
-            body,
-            signature,
-            endpointSecret
-        );
-
-        switch (event.type) {
-            case 'checkout.session.completed':
-                const { id: sessionID, status } = event.data.object;
-                await sql`UPDATE reservations SET transaction_status = ${status} WHERE stripe_session_id = ${sessionID}`;
-
+    })
+    .onParse(async ({ request, headers }) => {
+        if (headers['content-type'] === 'application/json; charset=utf-8') {
+            const arrayBuffer = await Bun.readableStreamToArrayBuffer(
+                request.body!
+            );
+            const rawBody = Buffer.from(arrayBuffer);
+            return rawBody;
         }
-    } catch(error) {
-        console.log(error);
+    })
+    .post('/webhook', async ({ body, headers, request }) => {
+        const signature = headers['stripe-signature'];
+
+        try {
+            const event = await stripe.webhooks.constructEventAsync(
+                body,
+                signature,
+                endpointSecret
+            );
+
+            switch (event.type) {
+                case 'checkout.session.completed':
+                    const {
+                        id: sessionID,
+                        status,
+                        payment_method_types: paymentMethod,
+                        amount_total: cost,
+                    } = event.data.object;
+
+                    await sql`UPDATE reservations SET transaction_status = ${status} WHERE stripe_session_id = ${sessionID}`;
+
+                    const [{ checkIn, checkOut, roomType, email, name }] =
+                        await sql` SELECT
+                        reservations.check_in AS "checkIn",
+                        reservations.check_out AS "checkOut", 
+                        room_types.NAME AS "roomType",
+                        customer_details.email AS "email",
+                        customer_details.first_name || ' ' || customer_details.last_name AS name
+                    FROM
+                        reservations 
+                        INNER JOIN
+                        customer_details
+                        ON
+                        customer_details."id" = reservations."customer_id"
+                        INNER JOIN
+                        rooms
+                        ON
+                        reservations."room_id" = rooms."id"
+                        INNER JOIN
+                        room_types
+                        ON 
+                        room_types."id" = rooms."type_id"
+                    WHERE
+                        reservations.stripe_session_id = ${sessionID}`;
+
+                    const nights =
+                        new Date(checkOut).getDate() -
+                        new Date(checkIn).getDate();
+
+                    const thbCost = `${cost / 100} bath`;
+
+                    const emailInformation: EmailInformation = {
+                        name,
+                        checkIn : new Date(checkIn).toDateString(),
+                        checkOut: new Date(checkOut).toDateString(),
+                        nights,
+                        roomType,
+                        cost : thbCost,
+                        paymentMethod,
+                        email,
+                    };
+
+                    sendEmail(emailInformation);
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                status: 'error',
+                message: 'Webhook Error',
+            };
+        }
+
         return {
-            status: 'error',
-            message: 'Webhook Error',
+            status: 'success',
         };
-    }
-
-      return {
-        status: 'success',
-      };
-})
-// .post('/notify', async () => {
-//         const { data, error } = await resend.emails.send({
-//           from: 'Acme <no-reply@mokmaard.space>',
-//           to: [email4],
-//           subject: 'Hello I Hia Ohm',
-//         });
-      
-//         if (error) {
-//           return console.error({ error });
-//         }
-      
-//         console.log({ data });
-// });
-
+    });

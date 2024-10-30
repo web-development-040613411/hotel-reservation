@@ -1,5 +1,6 @@
 import { sql } from '@/libs/db';
 import { EmailInformation, sendEmail } from '@/libs/email';
+import { getDiffDate } from '@/libs/get-diff-date';
 import { PaymentSchema } from '@/libs/validation';
 import Elysia from 'elysia';
 
@@ -136,9 +137,7 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' })
                     WHERE
                         reservations.stripe_session_id = ${sessionID}`;
 
-                    const nights =
-                        new Date(checkOut).getDate() -
-                        new Date(checkIn).getDate();
+                    const nights = getDiffDate(checkIn, checkOut);
 
                     const thbCost = `${cost / 100} bath`;
 

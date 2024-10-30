@@ -1,4 +1,5 @@
 import { sql } from '@/libs/db';
+import { getDiffDate } from '@/libs/getDiffDate';
 import { ChangeRoomSchema, GetVacantRoomsSchema } from '@/libs/validation';
 import Elysia, { t } from 'elysia';
 import { z } from 'zod';
@@ -11,8 +12,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             const uniqueRooms = [];
 
             const { check_in, check_out } = query;
-            const diffDate =
-                new Date(check_out).getDate() - new Date(check_in).getDate();
+            const diffDate = getDiffDate(new Date(check_in), new Date(check_out));
 
             for (const roomType of roomTypes) {
                 const res = await sql`
@@ -73,8 +73,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
 
         const { check_in, check_out, type_id } = validation.data;
 
-        const diffDate =
-            new Date(check_out).getDate() - new Date(check_in).getDate();
+        const diffDate = getDiffDate(new Date(check_in), new Date(check_out));
 
         const [room] = await sql`
                                 SELECT

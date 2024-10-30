@@ -36,6 +36,7 @@ function Child() {
     return response;
   }
   
+  // 5 minutes
   const timer = 5 * 60 * 1000;
 
   var userTimeout = setTimeout(() => {

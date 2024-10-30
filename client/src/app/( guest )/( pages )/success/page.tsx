@@ -9,8 +9,6 @@ import { useContext } from "react";
 export default function Page() {
   const { information } = useContext(ReservationContext);
 
-  console.log(information);
-
   return (
     <>
       <div

@@ -17,7 +17,7 @@ export type EmailInformation = {
 
 export async function sendEmail({ name, checkIn, checkOut, nights, roomType, cost, paymentMethod, email} : EmailInformation ) {
   const { data, error } = await resend.emails.send({
-    from: 'Acme <no-reply@mokmaard.space>',
+    from: '[Mof Hotel] <no-reply@mokmaard.space>',
     to: [email],
     subject: '[Mof Hotel] Your receipt has been Issued.',
     html: `

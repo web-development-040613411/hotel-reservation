@@ -1,13 +1,9 @@
 "use client";
 
-import { ReservationContext } from "@/components/context/ReservationContext";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-import { useContext } from "react";
-
 export default function Page() {
-  const { information } = useContext(ReservationContext);
 
   return (
     <>

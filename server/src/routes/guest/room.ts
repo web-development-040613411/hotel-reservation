@@ -1,5 +1,6 @@
 import { sql } from '@/libs/db';
 import { getDiffDate } from '@/libs/get-diff-date';
+import { getRandomColorToDB } from '@/libs/random-color';
 import { ChangeRoomSchema, GetVacantRoomsSchema } from '@/libs/validation';
 import Elysia, { t } from 'elysia';
 import { z } from 'zod';
@@ -110,11 +111,11 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             };
         }
 
-        const colors = ['#496989', '#58A399', '#A8CD9F', '#E2F4C5'];
+        const randomColor = getRandomColorToDB();
 
         const [reservationId] = await sql`
             INSERT INTO reservations (room_id, check_in, check_out, price, display_color)
-            VALUES (${room.room_id}, ${check_in}, ${check_out}, ${room.price}, ${colors[Math.floor(Math.random() * colors.length)]})
+            VALUES (${room.room_id}, ${check_in}, ${check_out}, ${room.price}, ${randomColor})
             RETURNING id;
         `;
 

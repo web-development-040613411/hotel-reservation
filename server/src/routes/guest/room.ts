@@ -1,5 +1,5 @@
 import { sql } from '@/libs/db';
-import { getDiffDate } from '@/libs/getDiffDate';
+import { getDiffDate } from '@/libs/get-diff-date';
 import { ChangeRoomSchema, GetVacantRoomsSchema } from '@/libs/validation';
 import Elysia, { t } from 'elysia';
 import { z } from 'zod';

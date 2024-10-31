@@ -4,6 +4,7 @@ import { useContext, useEffect, useState } from "react";
 import { ReservationContext } from "@/context/ReservationContext";
 import RoomCard from "./room-card";
 import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton"
 import { RoomType } from "@/components/interface/RoomType";
 import StepHeader from "./header";
 
@@ -12,6 +13,7 @@ export default function Step2() {
     useContext(ReservationContext);
   const [roomTypes, setRoomTypes] = useState([] as RoomType[]);
   const [isError, setIsError] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { dateRange } = information;
   const title = "Choose Room";
   const step = 2;
@@ -74,6 +76,7 @@ export default function Step2() {
           return;
         }
         setRoomTypes(data.data);
+        setIsLoading(false);
       } catch (error) {
         setIsError(true);
       }
@@ -87,21 +90,30 @@ export default function Step2() {
   return (
     <>
       {!isError && (
-        <div className="flex justify-center mt-5 mb-5">
+        <div className="flex justify-center mt-5 mb-5 w-full">
           <Card className="w-11/12 shadow-md border-primary shadow-primary m-0 md:p-8">
             <div className="p-8">
               <StepHeader title={title} step={step} />
             </div>
 
-            <CardContent className="flex justify-center m-0 pb-1">
-              <div className="md:grid md:grid-cols-2 md:gap-4">
-                {roomTypes.map((type) => (
-                  <RoomCard
-                    key={type.type_id}
-                    type={type}
-                    clickHandler={clickHandler}
-                  />
-                ))}
+            <CardContent className="flex justify-center m-0 pb-1 w-full">
+              <div className="md:grid md:grid-cols-2 md:gap-4 w-full">
+                {
+                  !isLoading ? 
+                    roomTypes.map((type) => (
+                    <RoomCard
+                      key={type.type_id}
+                      type={type}
+                      clickHandler={clickHandler}
+                    />
+                    ))
+                  :
+                  Array.from({ length: 4 }).map((_, index) => (
+                    <div>
+                      <Skeleton key={index} className="w-full h-64 bg-gray-100"/>
+                    </div>
+                ))
+              }
               </div>
             </CardContent>
           </Card>

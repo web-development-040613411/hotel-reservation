@@ -94,8 +94,7 @@ function Child() {
 
         {
           state == 2 && 
-          <div id="page2" className='w-dvh h-dvh 
-                                     md:flex md:flex-col md:justify-center md:items-center'>
+          <div id="page2" className='w-dvh h-dvh '>
             <Step2/>
           </div>
         }

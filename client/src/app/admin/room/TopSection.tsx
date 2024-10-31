@@ -12,6 +12,7 @@ import { ChevronDown } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import AddRoomModal from "./AddRoomModal";
+import AddRoomTypeModal from "./AddRoomTypeModal";
 
 const roomStatus = [
   "vacant",
@@ -116,7 +117,7 @@ export function RoomTypeTopSection() {
         <Button type="submit">Search</Button>
       </form>
       <div className="flex gap-2">
-        
+        <AddRoomTypeModal />
       </div>
     </div>
   );

@@ -77,12 +77,13 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
           return (
             <div className="flex items-center gap-2">
               <Image
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/file/${picture}`}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${picture}`}
                 alt={`room-number-${roomNumber}`}
                 width={0}
                 height={0}
                 sizes="100vw"
-                className="w-32"
+                className="w-32 aspect-video"
+                priority
               />
               <span>{roomNumber}</span>
             </div>

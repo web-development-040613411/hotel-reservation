@@ -51,7 +51,7 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
   });
 
   const [roomType, setRoomType] = useState<{ id: string; name: string }[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
   const handleEditRoom = async (values: z.infer<typeof AddRoomSchema>) => {
@@ -71,6 +71,7 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
 
     if (data.status === "success") {
       router.refresh();
+      setIsModalOpen(false);
     }
   };
 
@@ -95,7 +96,7 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
 
   return (
     <>
-      <Dialog onOpenChange={setIsOpen} open={isOpen}>
+      <Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
         </DialogTrigger>
@@ -134,7 +135,7 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="text-wrap break-all">
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
@@ -156,7 +157,7 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
                 </Button>
               </form>
             </Form>
-            <Button className="w-full mt-2" variant="outline">
+            <Button className="w-full mt-2" variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
           </div>

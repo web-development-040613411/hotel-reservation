@@ -33,21 +33,21 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         };
     })
     .post('/', async ({ body, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const validateData = addRoomTypeSchema.safeParse(body);
 
@@ -60,8 +60,9 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         }
 
         const { name, detail, capacity, price, image } = validateData.data;
+        console.log(validateData.data)
 
-        if (!image) {
+        if (!image || image.size === 0) {
             set.status = 400;
             return {
                 status: 'error',

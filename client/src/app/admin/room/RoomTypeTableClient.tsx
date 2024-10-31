@@ -52,17 +52,19 @@ export default function RoomTypeTableClient({
         accessorKey: "name",
         cell: ({ row }) => {
           const name = row.original.name;
-
+          const picture = row.original.picture_path;
           return (
             <div className="flex items-center gap-2">
               <Image
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}/file/${row.original.picture_path}`}
+                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${picture}`}
                 alt={`${name}`}
-                width={200}
-                height={200}
-                className="rounded-md"
+                width={0}
+                height={0}
+                sizes="100vw"
+                className="w-48 aspect-video"
+                priority
               />
-              <span>{name}</span>
+              <span className="break-all">{name}</span>
             </div>
           );
         }
@@ -70,6 +72,11 @@ export default function RoomTypeTableClient({
       {
         header: "Detail",
         accessorKey: "detail",
+        cell: ({ row }) => {
+          const detail = row.original.detail;
+
+          return <span className="break-all">{detail}</span>;
+        }
       },
       {
         header: "Price",
@@ -77,7 +84,7 @@ export default function RoomTypeTableClient({
         cell: ({ row }) => {
           const price = row.original.price;
 
-          return <span>price: ${price} / night</span>;
+          return <span>${price} / night</span>;
         },
       },
       {

@@ -44,7 +44,7 @@ export default function AddRoomModal() {
   });
 
   const [roomType, setRoomType] = useState<{ id: string; name: string }[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setModalIsOpen] = useState(false);
   const router = useRouter();
 
   const handleAddRoom = async (values: z.infer<typeof AddRoomSchema>) => {
@@ -66,7 +66,7 @@ export default function AddRoomModal() {
       router.refresh();
       form.setValue("number", "");
       form.setValue("type_id", "");
-      setIsOpen(false);
+      setModalIsOpen(false);
     }
   };
 
@@ -90,7 +90,7 @@ export default function AddRoomModal() {
 
   return (
     <>
-      <Dialog onOpenChange={setIsOpen} open={isOpen}>
+      <Dialog onOpenChange={setModalIsOpen} open={isModalOpen}>
         <DialogTrigger asChild>
           <Button>Add Room</Button>
         </DialogTrigger>
@@ -129,7 +129,7 @@ export default function AddRoomModal() {
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="text-wrap break-all">
                             <SelectValue />
                           </SelectTrigger>
                         </FormControl>
@@ -151,7 +151,7 @@ export default function AddRoomModal() {
                 </Button>
               </form>
             </Form>
-            <Button className="w-full mt-2" variant="outline">
+            <Button className="w-full mt-2" variant="outline" onClick={() => setModalIsOpen(false)}>
               Cancel
             </Button>
           </div>

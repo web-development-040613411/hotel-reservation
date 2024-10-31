@@ -9,6 +9,7 @@ import { RoomType } from "@/lib/type";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
+import DeleteRoomTypeModal from "./DeleteRoomTypeModal";
 
 interface RoomTypeTableClientProps {
   roomTypes: RoomType[];
@@ -94,7 +95,8 @@ export default function RoomTypeTableClient({
       {
         id: "action",
         enableHiding: false,
-        cell: () => {
+        cell: ({ row }) => {
+          const roomTypeId = row.original.id;
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -105,7 +107,7 @@ export default function RoomTypeTableClient({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem>Edit</DropdownMenuItem>
-                <DropdownMenuItem>Delete</DropdownMenuItem>
+                <DeleteRoomTypeModal roomTypeId={roomTypeId} />
               </DropdownMenuContent>
             </DropdownMenu>
           );

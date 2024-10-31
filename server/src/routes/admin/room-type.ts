@@ -9,21 +9,21 @@ import { middleware } from '@/middleware';
 export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
     .use(middleware)
     .get('/', async ({ user, set }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const roomTypes = await sql`SELECT * FROM room_types`;
 

@@ -21,11 +21,12 @@ const roomStatus = [
   "departing",
 ];
 
-export default function FilteringSection() {
-  const [query, setQuery] = useState<string>("");
+export function RoomTopSection() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
+
+  const [query, setQuery] = useState<string>(searchParams.get("q") || "");
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -52,7 +53,8 @@ export default function FilteringSection() {
       <form onSubmit={handleSearch} className="flex gap-2">
         <Input
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="room number"
+          value={query}
+          placeholder="Room number"
         />
         <Button type="submit">Search</Button>
       </form>
@@ -69,13 +71,52 @@ export default function FilteringSection() {
               <DropdownMenuCheckboxItem
                 onClick={() => handleFilterStatus(status)}
                 key={idx}
-                checked={searchParams.has("status") && searchParams.get("status") === status}
+                checked={
+                  searchParams.has("status") &&
+                  searchParams.get("status") === status
+                }
               >
                 {status}
               </DropdownMenuCheckboxItem>
             ))}
           </DropdownMenuContent>
         </DropdownMenu>
+      </div>
+    </div>
+  );
+}
+
+export function RoomTypeTopSection() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const [query, setQuery] = useState<string>(searchParams.get("q") || "");
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const params = new URLSearchParams(searchParams);
+    if (query) {
+      params.set("q", query);
+    } else {
+      params.delete("q");
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  return (
+    <div className="flex justify-between">
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <Input
+          onChange={(e) => setQuery(e.target.value)}
+          value={query}
+          placeholder="Room type"
+        />
+        <Button type="submit">Search</Button>
+      </form>
+      <div className="flex gap-2">
+        
       </div>
     </div>
   );

@@ -30,11 +30,11 @@ interface RoomTableProps {
 }
 
 export default async function RoomTable({ query, status }: RoomTableProps) {
-  const data = await getRooms(query, status);
+  const result = await getRooms(query, status);
 
-  if (data.status === "success") {
-    return <RoomTableClient rooms={data.data} />;
+  if (result.status === "success") {
+    return <RoomTableClient rooms={result.data} />;
   } else {
-    return <div>{data.message}</div>;
+    return <div>{result.message}</div>;
   }
 }

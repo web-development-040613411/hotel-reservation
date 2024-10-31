@@ -3,16 +3,9 @@
 import { useContext, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+  Card
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ReservationContext } from "@/context/ReservationContext";
-import { formInputs } from "@/app/( guest )/customer-information-model";
 import RoomCard from "./room-card";
 import { loadStripe } from '@stripe/stripe-js';
 import ConclusionBar from "./conclusion-bar";

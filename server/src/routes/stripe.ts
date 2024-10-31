@@ -92,7 +92,7 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' })
             return rawBody;
         }
     })
-    .post('/webhook', async ({ body, headers, request }) => {
+    .post('/webhook', async ({ body, headers }) => {
         const signature = headers['stripe-signature'];
 
         try {

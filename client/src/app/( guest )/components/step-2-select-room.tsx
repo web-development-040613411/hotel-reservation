@@ -109,9 +109,7 @@ export default function Step2() {
                     ))
                   :
                   Array.from({ length: 4 }).map((_, index) => (
-                    <div>
-                      <Skeleton key={index} className="w-full h-64 bg-gray-100"/>
-                    </div>
+                    <Skeleton key={index} className="w-full h-64 bg-gray-100"/>
                 ))
               }
               </div>

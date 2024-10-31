@@ -5,8 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
 import {
   Table,
@@ -28,6 +27,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import DeleteRoomModal from "./DeleteRoomModal";
 import EditRoomModal from "./EditRoomModal";
 
 interface RoomTableProps {
@@ -138,7 +138,7 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <EditRoomModal roomId={row.original.id}  roomNumber={row.original.number} roomTypeName={row.original.room_type} />
-                <DropdownMenuItem>Delete</DropdownMenuItem>
+                <DeleteRoomModal roomId={row.original.id} />
               </DropdownMenuContent>
             </DropdownMenu>
           );

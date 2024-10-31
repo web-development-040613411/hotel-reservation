@@ -1,4 +1,5 @@
 export type Room = {
+  id: string;
   number: string;
   current_status:
     | "vacant"
@@ -6,7 +7,7 @@ export type Room = {
     | "maintenance"
     | "off_market"
     | "departing";
-  name: string;
+  room_type: string;
   price: number;
   picture_path: string;
 };

@@ -48,21 +48,21 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         };
     })
     .get('/', async ({ user, set, query }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
         
         const q = query.q || '';
         const status = query.status || '';
@@ -73,19 +73,21 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         let res;
         if (!currentStatus.enum_range.includes(status)) {
             res = await sql`
-            SELECT rooms.number, rooms.current_status, room_types.name, room_types.price, room_types.picture_path
-            FROM rooms
-            INNER JOIN room_types
-            ON rooms.type_id = room_types.id
-            WHERE rooms.number LIKE ${'%' + q + '%'}`;
-        } else {
-            res = await sql`
-            SELECT rooms.number, rooms.current_status, room_types.name, room_types.price, room_types.picture_path
+            SELECT rooms.id, rooms.number, rooms.current_status, room_types.name AS room_type, room_types.price, room_types.picture_path
             FROM rooms
             INNER JOIN room_types
             ON rooms.type_id = room_types.id
             WHERE rooms.number LIKE ${'%' + q + '%'}
-            AND rooms.current_status = ${status}`;
+            ORDER BY rooms.number ASC`;
+        } else {
+            res = await sql`
+            SELECT rooms.id, rooms.number, rooms.current_status, room_types.name AS room_type, room_types.price, room_types.picture_path
+            FROM rooms
+            INNER JOIN room_types
+            ON rooms.type_id = room_types.id
+            WHERE rooms.number LIKE ${'%' + q + '%'}
+            AND rooms.current_status = ${status}
+            ORDER BY rooms.number ASC`;
         }
 
         return {
@@ -113,7 +115,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         const { id } = params;
 
         const [res] =
-            await sql`SELECT rooms.number, rooms.current_status, room_types.name, room_types.price 
+            await sql`SELECT rooms.number, rooms.current_status, room_types.name AS room_type, room_types.price 
                         FROM rooms
                         INNER JOIN room_types
                         ON rooms.type_id = room_types.id

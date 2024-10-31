@@ -6,7 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Table,
@@ -28,6 +28,7 @@ import {
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import { useState } from "react";
+import EditRoomModal from "./EditRoomModal";
 
 interface RoomTableProps {
   rooms: Room[];
@@ -90,7 +91,7 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
       },
       {
         header: "Room Type",
-        accessorKey: "name",
+        accessorKey: "room_type",
       },
       {
         header: "Price",
@@ -126,7 +127,7 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
       {
         id: "action",
         enableHiding: false,
-        cell: () => {
+        cell: ({ row }) => {
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -136,7 +137,7 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Edit</DropdownMenuItem>
+                <EditRoomModal roomId={row.original.id}  roomNumber={row.original.number} roomTypeName={row.original.room_type} />
                 <DropdownMenuItem>Delete</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

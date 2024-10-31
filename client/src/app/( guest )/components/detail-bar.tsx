@@ -1,4 +1,4 @@
-import { ReservationContext } from "@/components/context/ReservationContext";
+import { ReservationContext } from "@/context/ReservationContext";
 import { Button } from "@/components/ui/button";
 import { useContext } from "react"
 

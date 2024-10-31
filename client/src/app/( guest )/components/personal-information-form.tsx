@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { formInputs } from "@/app/( guest )/customer-information-model";
-import { ReservationContext } from "@/components/context/ReservationContext";
+import { ReservationContext } from "@/context/ReservationContext";
 import { useContext, useState } from "react";
 
 export default function PersonalInformationForm() {

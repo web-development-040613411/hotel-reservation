@@ -1,12 +1,12 @@
 "use client";
 
-import { ReservationProvider} from "@/components/context/ReservationContext";
+import { ReservationProvider} from "@/context/ReservationContext";
 
 import Step1 from "./components/step-1-select-date"
 import Step2 from "./components/step-2-select-room";
 import Step3 from "./components/step-3-input-customer-detail";
 import Step4 from "./components/step-4-confimation";
-import { ReservationContext} from "@/components/context/ReservationContext";
+import { ReservationContext} from "@/context/ReservationContext";
 import {useContext, useEffect } from "react";
 
 export default function Page() {
@@ -94,7 +94,8 @@ function Child() {
 
         {
           state == 2 && 
-          <div id="page2" className='w-dvh h-dvh'>
+          <div id="page2" className='w-dvh h-dvh 
+                                     md:flex md:flex-col md:justify-center md:items-center'>
             <Step2/>
           </div>
         }

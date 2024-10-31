@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { DateRange, SelectRangeEventHandler } from "react-day-picker";
 import {  useContext, useState } from "react";
-import { ReservationContext } from "@/components/context/ReservationContext";
+import { ReservationContext } from "@/context/ReservationContext";
 
 const FormSchema = z.object({
   dob: z.date({

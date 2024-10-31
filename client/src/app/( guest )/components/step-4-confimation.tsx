@@ -11,7 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { ReservationContext } from "@/components/context/ReservationContext";
+import { ReservationContext } from "@/context/ReservationContext";
 import { formInputs } from "@/app/( guest )/customer-information-model";
 import RoomCard from "./room-card";
 import { loadStripe } from '@stripe/stripe-js';

@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   Form,
   FormControl,
@@ -19,6 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { RoomType } from "@/lib/type";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -34,31 +36,35 @@ const AddRoomTypeSchema = z.object({
   image: z.instanceof(File).optional(),
 });
 
-export default function AddRoomTypeModal() {
+interface EditRoomTypeModalProps {
+  roomType: RoomType;
+}
+
+export default function EditRoomTypeModal({ roomType }: EditRoomTypeModalProps) {
   const form = useForm({
     resolver: zodResolver(AddRoomTypeSchema),
     defaultValues: {
-      name: "",
-      price: 0,
-      capacity: 0,
-      detail: "",
+      name: roomType.name,
+      price: roomType.price,
+      capacity: roomType.capacity,
+      detail: roomType.detail,
       image: undefined,
     },
   });
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(`${process.env.NEXT_PUBLIC_BACKEND_URL}${roomType.picture_path}`);
   const formRef = useRef<HTMLFormElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
-  const handleAddRoomType = async () => {
+  const handleEditRoomType = async () => {
     if (!formRef.current) return;
 
     const form = new FormData(formRef.current);
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/room-types`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/room-types/${roomType.id}`,
       {
-        method: "POST",
+        method: "PUT",
         credentials: "include",
         body: form,
       }
@@ -76,18 +82,18 @@ export default function AddRoomTypeModal() {
     <>
       <Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
         <DialogTrigger asChild>
-          <Button>Add Room Type</Button>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
         </DialogTrigger>
         <DialogContent className="w-full max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Add Room Type</DialogTitle>
-            <DialogDescription>Add a new room type</DialogDescription>
+            <DialogTitle>Edit Room Type</DialogTitle>
+            <DialogDescription>Edit {roomType.name}</DialogDescription>
           </DialogHeader>
           <div>
             <Form {...form}>
               <form
                 ref={formRef}
-                onSubmit={form.handleSubmit(() => handleAddRoomType())}
+                onSubmit={form.handleSubmit(() => handleEditRoomType())}
                 className="grid grid-cols-2 gap-4"
               >
                 <div className="space-y-4">
@@ -97,7 +103,9 @@ export default function AddRoomTypeModal() {
                     alt="Room type image"
                     width={0}
                     height={0}
-                    className="w-full max-h-80 h-full"
+                    sizes="100vw"
+                    className="w-full aspect-video"
+                    priority
                   />
                   <FormField
                     control={form.control}
@@ -181,7 +189,7 @@ export default function AddRoomTypeModal() {
                     )}
                   />
                   <Button type="submit" className="w-full">
-                    Add
+                    Edit
                   </Button>
                   <Button
                     type="button"

@@ -1,15 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RoomType } from "@/lib/type";
 import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import DeleteRoomTypeModal from "./DeleteRoomTypeModal";
+import EditRoomTypeModal from "./EditRoomTypeModal";
 
 interface RoomTypeTableClientProps {
   roomTypes: RoomType[];
@@ -106,7 +106,7 @@ export default function RoomTypeTableClient({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem>Edit</DropdownMenuItem>
+                <EditRoomTypeModal roomType={row.original}/>
                 <DeleteRoomTypeModal roomTypeId={roomTypeId} />
               </DropdownMenuContent>
             </DropdownMenu>

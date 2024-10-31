@@ -150,7 +150,7 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         }
 
         let url = roomType.picture_path;
-        if (image) {
+        if (image && image.size !== 0) {
             const uploadResult = await uploadFile(image);
 
             if (uploadResult.status === 'error') {

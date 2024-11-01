@@ -1,18 +1,19 @@
 import { RoomType } from "@/components/interface/RoomType";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { ReservationContext } from "@/context/ReservationContext";
+import { useContext } from "react";
 
 type Props = {
   type: RoomType;
-  clickHandler: (type: RoomType) => void;
-  state?: number;
+  clickHandler?: (type: RoomType) => void;
 };
 
-export default function RoomCard({ type, clickHandler, state }: Props) {
+export default function RoomCard({ type, clickHandler }: Props) {
+  const { state } = useContext(ReservationContext);
   return (
     <Card
-      className="shadow-md mb-3 rounded-3xl h-fit overflow-hidden text-sm 
-                     md:h-full"
+      className="shadow-md mb-3 rounded-3xl h-fit overflow-hidden text-sm md:h-full"
     >
       <CardContent
         className="p-0 
@@ -21,7 +22,7 @@ export default function RoomCard({ type, clickHandler, state }: Props) {
         <div className="flex h-full">
           <div
             className="relative bg-black
-                          w-1/2 md:h-full"
+                          w-1/2 "
           >
             {/* <Image
                         src={type.picture_path ? type.picture_path : ""}
@@ -41,7 +42,7 @@ export default function RoomCard({ type, clickHandler, state }: Props) {
 
             <p className="text-start indent-8">{type.detail}</p>
 
-            {state != 4 && (
+            {clickHandler && state != 4 && (
               <div>
                 <div className="my-4">
                   <p className="text-start font-bold">

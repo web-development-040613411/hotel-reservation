@@ -4,24 +4,31 @@ import {
   Card
 } from "@/components/ui/card";
 
-import ConclusionBar from "./conclusion-bar";
 import PersonalInformationForm from "./personal-information-form";
 import StepHeader from "./header";
+import RoomCard from "./room-card";
+import { ReservationContext } from "@/context/ReservationContext";
+import { useContext } from "react";
 
 export default function Step3() {
   const title = "Personal Information";
+  const { information } = useContext(ReservationContext);
+  const roomType = information.roomType;
+
   const step = 3;
 
   return (
     <>
-      <ConclusionBar/>
-      
-      <div className="flex justify-center mt-5 mb-5">
-        <Card className="w-11/12 shadow-md border-primary shadow-primary m-0 p-8">
+      <div className="w-full flex justify-center mt-5 mb-5">
+        <Card className="w-full shadow-md border-primary shadow-primary m-0 p-8">
           <StepHeader title={title} step={step}/>
 
           <PersonalInformationForm/>
         </Card>
+      </div>
+
+      <div className="opacity-0 h-1 overflow-hidden">
+        <RoomCard type={roomType} />
       </div>
 
       <div className="h-28">

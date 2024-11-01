@@ -9,6 +9,7 @@ import Step4 from "./components/step-4-confimation";
 import { ReservationContext } from "@/context/ReservationContext";
 import { useContext, useEffect } from "react";
 import ConclusionBar from "./components/conclusion-bar";
+import { removeReserveRecord } from "@/lib/delete-reserve";
 
 export default function Page() {
   return (
@@ -22,28 +23,15 @@ export default function Page() {
 
 function Child() {
   const { information, state, setState } = useContext(ReservationContext);
-
-  const removePreserveReservation = async () => {
-    const formData = new FormData();
-    formData.append("reservation_id", information.reservationId);
-
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/preserve`,
-      {
-        method: "DELETE",
-        body: formData,
-      }
-    );
-    return response;
-  };
+  const { reservationId } = information;
 
   // 5 minutes
   const timer = 5 * 60 * 1000;
 
   var userTimeout = setTimeout(() => {
     setState(1);
-    if (information.reservationId) {
-      removePreserveReservation();
+    if (reservationId) {
+      removeReserveRecord(reservationId);
     }
   }, timer);
 
@@ -52,8 +40,8 @@ function Child() {
 
     userTimeout = setTimeout(() => {
       setState(1);
-      if (information.reservationId) {
-        removePreserveReservation();
+      if (reservationId) {
+        removeReserveRecord(reservationId);
       }
     }, timer);
   };
@@ -72,7 +60,6 @@ function Child() {
 
   return (
     <>
-      <div className="w-dvh h-dvh">
         {/* <Image
             src="/room.jpg"
             width={500}
@@ -114,7 +101,6 @@ function Child() {
         {
           state == 3 || state == 4 ? <ConclusionBar /> : ""
         }
-      </div>
     </>
   );
 }

@@ -13,14 +13,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useState } from "react";
 import AddRoomModal from "./AddRoomModal";
 import AddRoomTypeModal from "./AddRoomTypeModal";
-
-const roomStatus = [
-  "vacant",
-  "occupied",
-  "maintenance",
-  "off market",
-  "departing",
-];
+import { roomStatus } from "@/lib/utils";
 
 export function RoomTopSection() {
   const searchParams = useSearchParams();

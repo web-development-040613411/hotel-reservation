@@ -1,7 +1,7 @@
 import { sql } from '@/libs/db';
 import { createAndUpdateRoomSchema } from '@/libs/validation';
 import { middleware } from '@/middleware';
-import Elysia from 'elysia';
+import Elysia, { t } from 'elysia';
 
 export const roomRoutes = new Elysia({ prefix: '/rooms' })
     .use(middleware)
@@ -236,4 +236,45 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             message: 'Your room have been removed.',
         };
     })
-    .patch('/status', async ({ set, body }) => {});
+    .patch('/status', async ({ set, body }) => {
+        const { id } = body;
+
+        const status = body.status.replace(' ', '_');
+
+        const [currentStatus] =
+            await sql`SELECT enum_range(null::current_status);`;
+
+        if(!currentStatus.enum_range.includes(status)) {
+            set.status = 400;
+            return {
+                status: 'error',
+                message: 'Invalid status.',
+            };
+        }
+
+        const [res] = await sql`SELECT * FROM rooms WHERE id=${id}`;
+
+        if (!res) {
+            set.status = 404;
+            return {
+                status: 'error',
+                message: 'Room not found.',
+            };
+        }
+
+        await sql`
+            UPDATE rooms
+            SET current_status=${status}
+            WHERE id=${id}
+        `;
+
+        return {
+            status: 'success',
+            message: 'Update successfully.',
+        };
+    }, {
+        body: t.Object({
+            id: t.String(),
+            status: t.String(),
+        })
+    });

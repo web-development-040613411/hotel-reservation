@@ -5,7 +5,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuTrigger
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
   Table,
@@ -16,7 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Room } from "@/lib/type";
-import { cn } from "@/lib/utils";
+import { cn, roomStatus } from "@/lib/utils";
 import {
   ColumnFiltersState,
   flexRender,
@@ -29,6 +30,7 @@ import Image from "next/image";
 import { useState } from "react";
 import DeleteRoomModal from "./DeleteRoomModal";
 import EditRoomModal from "./EditRoomModal";
+import { useRouter } from "next/navigation";
 
 interface RoomTableProps {
   rooms: Room[];
@@ -36,6 +38,7 @@ interface RoomTableProps {
 
 export default function RoomTableClient({ rooms }: RoomTableProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const router = useRouter();
 
   const table = useReactTable({
     data: rooms,
@@ -109,19 +112,35 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
         accessorKey: "current_status",
         cell: ({ row }) => {
           const status = row.original.current_status;
+          const roomId = row.original.id;
 
           return (
-            <span
-              className={cn("px-2 py-1 rounded-full text-xs", {
-                "bg-green-400 text-green-800": status === "vacant",
-                "bg-red-400 text-red-800": status === "occupied",
-                "bg-blue-400 text-blue-800": status === "maintenance",
-                "bg-slate-400 text-slate-800": status === "off_market",
-                "bg-yellow-400 text-yellow-800": status === "departing",
-              })}
-            >
-              {status}
-            </span>
+            <div className="inline-flex items-center">
+              <span
+                className={cn("px-2 py-1 rounded-full text-xs", {
+                  "bg-green-400 text-green-800": status === "vacant",
+                  "bg-red-400 text-red-800": status === "occupied",
+                  "bg-blue-400 text-blue-800": status === "maintenance",
+                  "bg-slate-400 text-slate-800": status === "off_market",
+                  "bg-yellow-400 text-yellow-800": status === "departing",
+                })}
+              >
+                {status.replace("_", " ")}
+              </span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="size-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  {roomStatus.map((status, idx) => (
+                    <DropdownMenuItem onClick={() => handleChangeStatus(status, roomId)} key={idx}>{status}</DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
           );
         },
       },
@@ -138,7 +157,11 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <EditRoomModal roomId={row.original.id}  roomNumber={row.original.number} roomTypeName={row.original.room_type} />
+                <EditRoomModal
+                  roomId={row.original.id}
+                  roomNumber={row.original.number}
+                  roomTypeName={row.original.room_type}
+                />
                 <DeleteRoomModal roomId={row.original.id} />
               </DropdownMenuContent>
             </DropdownMenu>
@@ -153,6 +176,24 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
   });
+
+  const handleChangeStatus = async (status: string, roomId: string) => {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/rooms/status`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status: status, id: roomId }),
+    })
+
+    const data = await res.json();
+
+    console.log(data);
+
+    if(data.status === "success") {
+      router.refresh();
+    }
+  }
 
   return (
     <>

@@ -5,7 +5,11 @@ export const formInputs = [
     id: "first-name",
     name: "first-name",
     required: true,
-    key: "firstName"
+    key: "firstName",
+    pattern: "^[A-Za-zก-๑]{1,35}$",
+    max: 35,
+    placeHolder: "only alphabet characters are allowed.",
+    errorMessage: "Only A-Z, a-z, ก-๑"
   },
   {
     label: "Last Name",
@@ -13,7 +17,11 @@ export const formInputs = [
     id: "last-name",
     name: "last-name",
     required: true,
-    key: "lastName"
+    key: "lastName",
+    pattern: "^[A-Za-zก-๑]{1,35}$",
+    max: 35,
+    placeHolder: "only alphabet characters are allowed.",
+    errorMessage: "Only A-Z, a-z, ก-๑"
   },
   {
     label: "Address",
@@ -21,7 +29,10 @@ export const formInputs = [
     id: "address",
     name: "address",
     required: true,
-    key: "address"
+    key: "address",
+    pattern: "^[A-Za-zก-๏/0-9.'\\-\\#\\& ]{1,35}$",
+    max: 35,
+    errorMessage: "Only A-Z, a-z, ก-๏, -, #, &, 1-9"
   },
   {
     label: "Province",
@@ -29,7 +40,10 @@ export const formInputs = [
     id: "province",
     name: "province",
     required: true,
-    key: "province"
+    key: "province",
+    pattern: "^[A-Za-zก-๏]{1,35}$",
+    max: 35,
+    errorMessage: "Only A-Z, a-z, ก-๏"
   },
   {
     label: "District",
@@ -37,7 +51,10 @@ export const formInputs = [
     id: "district",
     name: "district",
     required: true,
-    key: "district"
+    key: "district",
+    pattern: "^[A-Za-zก-๏]{1,35}$",
+    max: 35,
+    errorMessage: "Only A-Z, a-z, ก-๏"
   },
   {
     label: "Sub-District",
@@ -45,7 +62,10 @@ export const formInputs = [
     id: "sub-district",
     name: "sub-district",
     required: true,
-    key: "subDistrict"
+    key: "subDistrict",
+    pattern: "^[A-Za-zก-๏]{1,35}$",
+    max: 35,
+    errorMessage: "Only A-Z, a-z, ก-๏"
   },
   {
     label: "Postcode",
@@ -53,7 +73,10 @@ export const formInputs = [
     id: "postcode",
     name: "postcode",
     required: true,
-    key: "postcode"
+    key: "postcode",
+    pattern: "^[\\#0-9A-Z]{1,10}$", //UK postcode contain A-Z
+    max: 10,
+    errorMessage: "Only #, 0-9, A-Z"
   },
   {
     label: "Phone Number",
@@ -61,7 +84,11 @@ export const formInputs = [
     id: "phone-number",
     name: "phone-number",
     required: true,
-    key: "phoneNumber"
+    key: "phoneNumber",
+    pattern: "^[0-9]{0,10}$",
+    max: 10,
+    placeHolder: "only numeric characters are allowed.",
+    errorMessage: "Only 0-9"
   },
   {
     label: "Email",
@@ -69,6 +96,7 @@ export const formInputs = [
     id: "email",
     name: "email",
     required: true,
-    key: "email"
+    key: "email",
+    max: 35,
   },
 ];

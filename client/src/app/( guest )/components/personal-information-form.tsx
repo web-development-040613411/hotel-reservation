@@ -4,13 +4,29 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { formInputs } from "@/app/( guest )/model/customer-information";
 import { ReservationContext } from "@/context/ReservationContext";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+
+class InvalidPatternInfo {
+  errorMessage = "";
+  isInvalidPattern = false;
+
+  setIsInvalidPattern( status : boolean ) {
+    this.isInvalidPattern = status;
+  }
+
+  setErrorMessage( message : string ) {
+    this.errorMessage = message;
+  }
+}
 
 export default function PersonalInformationForm() {
   const { addInformation, information, setState, state } =
     useContext(ReservationContext);
   const { personalInformation } = information;
   const [isChange, setIsChange] = useState(false);
+  const [invalidPatternInfos, setInvalidPatternInfos] = useState<InvalidPatternInfo[]>( Array.from({ length: formInputs.length },
+    () => new InvalidPatternInfo()
+  ));
   const btnClass = `bg-primary w-full rounded-lg  hover:bg-gray-800 active:bg-gray-800
                     p-4 my-4 hover:bg-primary-hover 
                     font-bold text-white`
@@ -40,54 +56,104 @@ export default function PersonalInformationForm() {
     }
   };
 
+  const checkPattern = ( pattern: string, value: string , errorMessage: string, index: number) => {
+    const regex = new RegExp(pattern);
+    if (!regex.test(value)) {
+      const newInvalidPatternInfos = [...invalidPatternInfos];
+      
+      newInvalidPatternInfos[index].setIsInvalidPattern(true);
+      newInvalidPatternInfos[index].setErrorMessage(errorMessage);
+
+      setInvalidPatternInfos(
+        newInvalidPatternInfos
+      );
+    } else {
+      const newInvalidPatternInfos = [...invalidPatternInfos];
+      
+      newInvalidPatternInfos[index].setIsInvalidPattern(false);
+
+      setInvalidPatternInfos(
+        newInvalidPatternInfos
+      );
+    }
+  }
+
+  useEffect( () => {
+    console.log( invalidPatternInfos )
+  }, [invalidPatternInfos] )
+
   return (
     <form
       className="my-4 flex flex-col
                  md:flex-row md:w-full md:gap-10"
       onSubmit={(e) => onSubmitHandler(e)}
     >
-      <div className="md:w-1/2 md:flex md:flex-col md:gap-2">
+      <div className="md:w-1/2 flex flex-col gap-2 ">
         {formInputs.slice(0, 6).map((input, index) => (
           <div key={index}>
-            <Label htmlFor={input.id}>
-              {input.label} <span className="text-red-500"> *</span>
-            </Label>
+            <div className="flex items-center justify-between px-2">
+              <Label htmlFor={input.id}>
+                {input.label} <span className="text-red-500"> *</span>
+              </Label>
+
+              {
+                invalidPatternInfos[index].isInvalidPattern && <h1 className="text-red-500 text-xs font-bold">{invalidPatternInfos[index].errorMessage}</h1>
+              }
+              
+            </div>
             <Input
               type={input.type}
               id={input.id}
-              placeholder=""
+              placeholder={input.placeHolder}
               name={input.name}
               className="my-2"
               required={input.required}
-              onChange={() => setIsChange(true)}
+              onChange={(e) => {
+                setIsChange(true)
+                checkPattern(input.pattern!, e.target.value,  input.errorMessage!, index )
+              }}
               defaultValue={
                 personalInformation ? personalInformation[input.key] : ""
               }
+              maxLength={input.max}
+              pattern={input.pattern}
             />
           </div>
         ))}
       </div>
 
-      <div className="md:w-1/2 md:flex-grow md:flex md:flex-col md:gap-2">
-        {formInputs.slice(6).map((input, index) => (
-          <div key={index}>
-            <Label htmlFor={input.id}>
-              {input.label} <span className="text-red-500"> *</span>
-            </Label>
+      <div className="md:w-1/2 flex-grow flex flex-col gap-2">
+        {formInputs.slice(6).map((input, index) => {
+          const newIndex = index+6;
+          return (<div key={newIndex}>
+            <div className="flex items-center justify-between px-2">
+                <Label htmlFor={input.id}>
+                  {input.label} <span className="text-red-500"> *</span>
+                </Label>
+
+                {
+                  invalidPatternInfos[newIndex].isInvalidPattern && <h1 className="text-red-500 text-xs font-bold">{invalidPatternInfos[newIndex].errorMessage}</h1>
+                }
+                
+              </div>
             <Input
               type={input.type}
               id={input.id}
-              placeholder=""
+              placeholder={input.placeHolder}
               name={input.name}
               className="my-2"
               required={input.required}
-              onChange={() => setIsChange(true)}
+              onChange={(e) => {
+                setIsChange(true)
+                checkPattern(input.pattern!, e.target.value,  input.errorMessage!, newIndex )
+              }}
               defaultValue={
                 personalInformation ? personalInformation[input.key] : ""
               }
+              maxLength={input.max}
             />
-          </div>
-        ))}
+          </div>)
+        })}
         <div className="md:flex-grow md:flex md:flex-col md:my-2 md:gap-2">
           <Label htmlFor="email">Special Requests</Label>
           <Textarea

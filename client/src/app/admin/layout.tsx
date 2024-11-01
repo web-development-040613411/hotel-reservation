@@ -21,7 +21,7 @@ export default function AdminLayout({
         </div>
       </div>
       <div className="grow flex flex-col">
-        <header className="bg-background text-foreground h-24 sticky top-0 border-b flex items-center px-12">
+        <header className="bg-background text-foreground h-24 sticky top-0 border-b flex items-center px-12 z-50">
           <AdminHeader />
         </header>
         <main className="p-12 overflow-hidden">{children}</main>

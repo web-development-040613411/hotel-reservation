@@ -16,7 +16,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Phone } from "lucide-react";
 import Image from "next/image";
 import EditAccountModal from "./EditAccountModal";
 
@@ -66,7 +66,7 @@ export default function EmployeeTableClient({
         header: "Contact",
         cell: ({ row }) => {
           const employee = row.original;
-          return <div></div>;
+          return <div className="inline-flex gap-2"><Phone /> {employee.phone_number}</div>;
         },
       },
       {

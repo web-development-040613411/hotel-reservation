@@ -2,7 +2,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { formInputs } from "@/app/( guest )/customer-information-model";
+import { formInputs } from "@/app/( guest )/model/customer-information";
 import { ReservationContext } from "@/context/ReservationContext";
 import { useContext, useState } from "react";
 

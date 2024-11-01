@@ -18,8 +18,7 @@ export default function ConclusionBar() {
           </p>
         </div>
         
-        <Button
-              className=" bg-primary rounded-lg  hover:bg-gray-800 active:bg-gray-800
+        <Button className=" bg-primary rounded-lg  hover:bg-gray-800 active:bg-gray-800
                           py-6 hover:bg-primary-hover 
                           font-bold text-white"
               type="submit"

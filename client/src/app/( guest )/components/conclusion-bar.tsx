@@ -8,7 +8,7 @@ export default function ConclusionBar() {
   return (
     <div className="fixed bottom-0 bg-white
                       w-full h-28 border-t-2 border-gray-400 flex items-center p-4 justify-around
-                      z-50">
+                      z-40">
         <div className="w-1/2">
           <p className="font-bold">{ roomType.name }:
             <span className="text-xl font-black text-primary"> { stayNight } nights</span>

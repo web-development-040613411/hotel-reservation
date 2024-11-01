@@ -15,12 +15,14 @@ import {
 } from "@radix-ui/react-collapsible";
 import { ArrowDown } from "lucide-react";
 import { ArrowUp } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 export default function Step4() {
   const { information} = useContext(ReservationContext);
   const [open, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const title = "Review";
   const step = 4;
 
@@ -28,6 +30,8 @@ export default function Step4() {
   const { type_id: roomTypeId } = roomType;
 
   const checkOut = async () => {
+    setIsLoading(true);
+
     const stripe = await stripePromise;
     const totalPrice = roomType.total_price;
 
@@ -55,6 +59,7 @@ export default function Step4() {
 
   return (
     <>
+
       <div className="flex flex-col gap-8">
   
         <Card
@@ -92,7 +97,13 @@ export default function Step4() {
           type="button"
           onClick={() => checkOut()}
         >
-          Make Payment
+          {
+            isLoading ? 
+            <div className="flex items-center gap-4">
+              <LoaderCircle className="animate-spin" /> 
+              Redirect to payment.
+            </div>: "Make Payment"
+          }
         </Button>
 </div>
 

@@ -17,14 +17,8 @@ export const ReservationContext = createContext<ReservationContextType>({
 });
 
 export const ReservationProvider = ({ children }: { children: any }) => {
-  const [information, setInformation] = useState({
-    dateRange: {
-      from: "Thu Oct 31 2024 18:42:01 GMT+0700 (Indochina Time)",
-      to: "Sun Nov 03 2024 00:00:00 GMT+0700 (Indochina Time)",
-    },
-    stayNight: 2,
-  });
-  const [state, setState] = useState(2);
+  const [information, setInformation] = useState({});
+  const [state, setState] = useState(1);
 
   const addInformation = (data: any) => {
     setInformation((prev) => {

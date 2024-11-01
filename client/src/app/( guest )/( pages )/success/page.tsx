@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function Page() {
+  const urlParam = new URLSearchParams(window.location.search);
+  const email = urlParam.get("email");
 
   return (
     <>
@@ -28,7 +30,7 @@ export default function Page() {
 
         <div className="text-center">
           <h1 className="text-xl font-bold">You are all set.</h1>
-          <p>The reservation has send to your email,</p>
+          <p>The reservation has send to your email address name <span className="font-black text-primary">{email}</span>,</p>
           <p>please check your email for more details.</p>
         </div>
       </div>
@@ -42,7 +44,7 @@ export default function Page() {
                       absolute bottom-20 left-1/2 -translate-x-1/2"
           type="button"
         >
-          Continue
+          Back to booking
         </Button>
       </Link>
     </>

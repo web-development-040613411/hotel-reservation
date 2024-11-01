@@ -30,7 +30,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         // }
 
         const employees =
-            await sql`SELECT id, username, first_name, last_name, date_of_birth, role, profile_picture FROM employees`;
+            await sql`SELECT id, username, first_name, last_name, date_of_birth, role, profile_picture, phone_number FROM employees`;
         return {
             status: 'success',
             data: employees,
@@ -98,6 +98,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             date_of_birth,
             password,
             role,
+            phone_number,
             image,
         } = validateData.data;
 
@@ -136,8 +137,8 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         }
 
         await sql`INSERT INTO employees 
-        (username, first_name, last_name, date_of_birth, password, role , profile_picture) 
-        VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role}, ${uploadResult.url})`;
+        (username, first_name, last_name, date_of_birth, password, role , profile_picture, phone_number) 
+        VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role}, ${uploadResult.url}, ${phone_number})`;
 
         return {
             status: 'success',
@@ -145,21 +146,21 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
     .put('/:id', async ({ params: { id }, body, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const validateData = updateEmployeeSchema.safeParse(body);
         if (!validateData.success) {
@@ -169,7 +170,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 message: validateData.error.errors[0].message,
             };
         }
-        const { username, first_name, last_name, date_of_birth, role, image } =
+        const { username, first_name, last_name, date_of_birth, role, image, phone_number } =
             validateData.data;
 
         const [existsingEmployee] =
@@ -183,7 +184,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         }
 
         let url = existsingEmployee.profile_picture;
-        if (image) {
+        if (image && image.size > 0) {
             const uploadResult = await uploadFile(image);
             if (uploadResult.status === 'error') {
                 set.status = 400;
@@ -213,14 +214,13 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        await sql`UPDATE employees SET username=${username}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url} WHERE id=${id}`;
+        await sql`UPDATE employees SET username=${username}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url}, phone_number=${phone_number} WHERE id=${id}`;
 
         return {
             status: 'success',
             message: 'Employee updated successfully',
         };
     })
-
     .delete('/:id', async ({ params: { id }, set, user }) => {
         if (!user) {
             set.status = 401;

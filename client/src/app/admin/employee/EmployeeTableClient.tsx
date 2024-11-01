@@ -18,6 +18,7 @@ import {
 } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
+import EditAccountModal from "./EditAccountModal";
 
 interface EmployeeTableClientProps {
   employees: Employee[];
@@ -71,7 +72,8 @@ export default function EmployeeTableClient({
       {
         id: "action",
         enableHiding: false,
-        cell: () => {
+        cell: ({ row }) => {
+          const employee = row.original;
           return (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -81,6 +83,7 @@ export default function EmployeeTableClient({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <EditAccountModal employee={employee}/>
               </DropdownMenuContent>
             </DropdownMenu>
           );

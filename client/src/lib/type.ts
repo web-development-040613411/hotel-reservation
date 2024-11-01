@@ -12,7 +12,8 @@ export type Employee = {
   username: string;
   first_name: string;
   last_name: string;
-  date_of_birth: Date;
+  date_of_birth: string;
+  phone_number: string;
   role: EmployeeRole;
   profile_picture: string | null;
 }

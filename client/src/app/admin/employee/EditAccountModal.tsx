@@ -8,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import {
   Form,
   FormControl,
@@ -24,7 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { employeeRole } from "@/lib/type";
+import { Employee, employeeRole } from "@/lib/type";
+import { formatDate } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -32,7 +34,7 @@ import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const CreateAccountEmployeeSchema = z
+const EditAccountEmployeeSchema = z
   .object({
     username: z
       .string({ message: "username is required" })
@@ -43,35 +45,29 @@ const CreateAccountEmployeeSchema = z
     last_name: z
       .string({ message: "lastname is required" })
       .min(1, "lastname is required"),
+    phone_number: z.string().min(1, "phone number is required"),
     date_of_birth: z
-      .string({ message: "date of birth is required" })
+      .string()
+      .date("date of birth is required")
       .min(1, "date of birth is required"),
-    phone_number: z.string().min(10, "phone number is required").max(10),
-    password: z
-      .string({ message: "password is required" })
-      .min(6, "Password is required"),
-    confirm_password: z
-      .string({ message: "confirm password is required" })
-      .min(6, "Confirm password is required"),
     role: z.enum(employeeRole),
     image: z.instanceof(File, { message: "Image is required" }).optional(),
-  })
-  .refine((data) => data.password === data.confirm_password, {
-    message: "Password and confirm password doesn't match",
   });
 
-export default function CreateAccountModal() {
+interface EditAccountModalprops {
+  employee: Employee;
+}
+
+export default function EditAccountModal({ employee }: EditAccountModalprops) {
   const form = useForm({
-    resolver: zodResolver(CreateAccountEmployeeSchema),
+    resolver: zodResolver(EditAccountEmployeeSchema),
     defaultValues: {
-      username: "",
-      first_name: "",
-      last_name: "",
-      date_of_birth: "",
-      password: "",
-      confirm_password: "",
-      role: "frontdesk",
-      phone_number: "",
+      username: employee.username,
+      first_name: employee.first_name,
+      last_name: employee.last_name,
+      phone_number: employee.phone_number,
+      date_of_birth: formatDate(employee.date_of_birth),
+      role: employee.role,
       image: undefined,
     },
   });
@@ -79,7 +75,9 @@ export default function CreateAccountModal() {
   const formRef = useRef<HTMLFormElement | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [previewImage, setPreviewImage] = useState<string>(
+    `${process.env.NEXT_PUBLIC_BACKEND_URL}${employee.profile_picture}`
+  );
 
   const handleCreateAccount = async () => {
     if (!formRef.current) return;
@@ -88,9 +86,9 @@ export default function CreateAccountModal() {
     formData.append("role", form.getValues("role"));
 
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees`,
+      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees/${employee.id}`,
       {
-        method: "POST",
+        method: "PUT",
         credentials: "include",
         body: formData,
       }
@@ -108,13 +106,13 @@ export default function CreateAccountModal() {
     <>
       <Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
         <DialogTrigger asChild>
-          <Button>Create Account</Button>
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Edit</DropdownMenuItem>
         </DialogTrigger>
         <DialogContent className="w-full max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Create Account</DialogTitle>
+            <DialogTitle>Edit Account</DialogTitle>
             <DialogDescription>
-              Create a new account for the employee.
+              Edit the account for the employee.
             </DialogDescription>
           </DialogHeader>
           <div>
@@ -127,7 +125,7 @@ export default function CreateAccountModal() {
                 <div className="space-y-4">
                   <Label>{`Employee's Picture`}</Label>
                   <Image
-                    src={previewImage || ImagePlaceholder}
+                    src={employee.profile_picture ? previewImage : ImagePlaceholder}
                     alt="Room type image"
                     width={0}
                     height={0}
@@ -171,32 +169,6 @@ export default function CreateAccountModal() {
                         <Label>Username</Label>
                         <FormControl>
                           <Input {...field} />
-                        </FormControl>
-                        <FormMessage/>
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <Label>Password</Label>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="confirm_password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <Label>Confirm Password</Label>
-                        <FormControl>
-                          <Input type="password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -260,7 +232,10 @@ export default function CreateAccountModal() {
                     render={({ field }) => (
                       <FormItem>
                         <Label>Role</Label>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue {...field} />
@@ -279,9 +254,11 @@ export default function CreateAccountModal() {
                     )}
                   />
                   <Button className="w-full" type="submit">
-                    Create Account
+                    Edit
                   </Button>
-                  <Button variant="outline" className="w-full">Cancel</Button>
+                  <Button variant="outline" className="w-full">
+                    Cancel
+                  </Button>
                 </div>
               </form>
             </Form>

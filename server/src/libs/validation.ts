@@ -37,6 +37,7 @@ export const addEmployeeSchema = z
         date_of_birth: z
             .string({ message: 'date of birth is required' })
             .min(1, 'date of birth is required'),
+        phone_number: z.string().min(10, 'phone number is required').max(10, "phone number is too long"),
         password: z
             .string({ message: 'password is required' })
             .min(6, 'Password is required'),
@@ -62,6 +63,7 @@ export const updateEmployeeSchema = z.object({
     last_name: z
         .string({ message: 'lastname is required' })
         .min(1, 'lastname is required'),
+    phone_number: z.string().min(10, 'phone number is required').max(10, "phone number is too long"),
     date_of_birth: z
         .string({ message: 'date of birth is required' })
         .min(1, 'date of birth is required'),

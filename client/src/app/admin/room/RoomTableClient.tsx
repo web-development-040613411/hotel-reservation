@@ -40,33 +40,33 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
   const table = useReactTable({
     data: rooms,
     columns: [
-      {
-        id: "select",
-        header: ({ table }) => (
-          <div className="flex justify-center">
-            <Checkbox
-              checked={
-                table.getIsAllRowsSelected() ||
-                (table.getIsSomePageRowsSelected() && "indeterminate")
-              }
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-              aria-label="Select all"
-            />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="flex justify-center">
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              aria-label="Select row"
-            />
-          </div>
-        ),
-        enableHiding: false,
-      },
+      // {
+      //   id: "select",
+      //   header: ({ table }) => (
+      //     <div className="flex justify-center">
+      //       <Checkbox
+      //         checked={
+      //           table.getIsAllRowsSelected() ||
+      //           (table.getIsSomePageRowsSelected() && "indeterminate")
+      //         }
+      //         onCheckedChange={(value) =>
+      //           table.toggleAllPageRowsSelected(!!value)
+      //         }
+      //         aria-label="Select all"
+      //       />
+      //     </div>
+      //   ),
+      //   cell: ({ row }) => (
+      //     <div className="flex justify-center">
+      //       <Checkbox
+      //         checked={row.getIsSelected()}
+      //         onCheckedChange={(value) => row.toggleSelected(!!value)}
+      //         aria-label="Select row"
+      //       />
+      //     </div>
+      //   ),
+      //   enableHiding: false,
+      // },
       {
         header: "Room Number",
         accessorKey: "number",
@@ -186,6 +186,7 @@ export default function RoomTableClient({ rooms }: RoomTableProps) {
           ))}
         </TableBody>
       </Table>
+      <p>Entires {table.getRowModel().rows.length} rooms</p>
     </>
   );
 }

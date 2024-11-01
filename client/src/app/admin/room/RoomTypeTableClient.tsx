@@ -21,33 +21,33 @@ export default function RoomTypeTableClient({
   const table = useReactTable({
     data: roomTypes,
     columns: [
-      {
-        id: "select",
-        header: ({ table }) => (
-          <div className="flex justify-center">
-            <Checkbox
-              checked={
-                table.getIsAllRowsSelected() ||
-                (table.getIsSomePageRowsSelected() && "indeterminate")
-              }
-              onCheckedChange={(value) =>
-                table.toggleAllPageRowsSelected(!!value)
-              }
-              aria-label="Select all"
-            />
-          </div>
-        ),
-        cell: ({ row }) => (
-          <div className="flex justify-center">
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              aria-label="Select row"
-            />
-          </div>
-        ),
-        enableHiding: false,
-      },
+      // {
+      //   id: "select",
+      //   header: ({ table }) => (
+      //     <div className="flex justify-center">
+      //       <Checkbox
+      //         checked={
+      //           table.getIsAllRowsSelected() ||
+      //           (table.getIsSomePageRowsSelected() && "indeterminate")
+      //         }
+      //         onCheckedChange={(value) =>
+      //           table.toggleAllPageRowsSelected(!!value)
+      //         }
+      //         aria-label="Select all"
+      //       />
+      //     </div>
+      //   ),
+      //   cell: ({ row }) => (
+      //     <div className="flex justify-center">
+      //       <Checkbox
+      //         checked={row.getIsSelected()}
+      //         onCheckedChange={(value) => row.toggleSelected(!!value)}
+      //         aria-label="Select row"
+      //       />
+      //     </div>
+      //   ),
+      //   enableHiding: false,
+      // },
       {
         header: "Room Type",
         accessorKey: "name",
@@ -149,6 +149,7 @@ export default function RoomTypeTableClient({
           ))}
         </TableBody>
       </Table>
+      <p>entires {table.getRowModel().rows.length} types</p>
     </>
   );
 }

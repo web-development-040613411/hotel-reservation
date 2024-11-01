@@ -13,23 +13,24 @@ import { middleware } from '@/middleware';
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .use(middleware)
     .get('/', async ({ user, set }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
-        const employees = await sql`SELECT * FROM employees`;
+        const employees =
+            await sql`SELECT id, username, first_name, last_name, date_of_birth, role, profile_picture FROM employees`;
         return {
             status: 'success',
             data: employees,
@@ -66,21 +67,21 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
     .post('/', async ({ body, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const validateData = addEmployeeSchema.safeParse(body);
         if (!validateData.success) {
@@ -134,7 +135,9 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        await sql`INSERT INTO employees (username, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role} , ${uploadResult.url})`;
+        await sql`INSERT INTO employees 
+        (username, first_name, last_name, date_of_birth, password, role , profile_picture) 
+        VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role}, ${uploadResult.url})`;
 
         return {
             status: 'success',
@@ -271,8 +274,8 @@ export const resetPasswordRoutes = new Elysia({
                 message: 'Unauthorized',
             };
         }
-        
-        if(user.role !== 'administrator' && user.id !== id) {
+
+        if (user.role !== 'administrator' && user.id !== id) {
             set.status = 403;
             return {
                 status: 'error',

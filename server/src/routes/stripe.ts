@@ -58,7 +58,7 @@ export const stripeRoutes = new Elysia({ prefix: '/stripe' })
             ],
             mode: 'payment',
             success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}&email=${email}`,
-            cancel_url: `${process.env.CLIENT_URL}/cancel`,
+            cancel_url: `${process.env.CLIENT_URL}/cancel?reservationId=${reservationId}`,
         });
 
         const [customerID] = await sql`

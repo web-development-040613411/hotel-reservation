@@ -58,6 +58,7 @@ const CreateAccountEmployeeSchema = z
   })
   .refine((data) => data.password === data.confirm_password, {
     message: "Password and confirm password doesn't match",
+    path: ["confirm_password"],
   });
 
 export default function CreateAccountModal() {

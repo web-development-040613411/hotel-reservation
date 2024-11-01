@@ -266,22 +266,22 @@ export const resetPasswordRoutes = new Elysia({
     prefix: '/reset-password',
 })
     .use(middleware)
-    .put('/:id', async ({ params: { id }, body, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+    .patch('/:id', async ({ params: { id }, body, set, user }) => {
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator' && user.id !== id) {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator' && user.id !== id) {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const validateData = ResetPasswordSchema.safeParse(body);
         if (!validateData.success) {

@@ -222,21 +222,21 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
     .delete('/:id', async ({ params: { id }, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const [employee] = await sql`SELECT * FROM employees WHERE id=${id}`;
 

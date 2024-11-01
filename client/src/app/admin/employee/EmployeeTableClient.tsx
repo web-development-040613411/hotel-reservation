@@ -19,6 +19,7 @@ import {
 import { MoreHorizontal, Phone } from "lucide-react";
 import Image from "next/image";
 import EditAccountModal from "./EditAccountModal";
+import DeleteEmployeeModal from "./DeleteEmployeeModal";
 
 interface EmployeeTableClientProps {
   employees: Employee[];
@@ -84,6 +85,7 @@ export default function EmployeeTableClient({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <EditAccountModal employee={employee}/>
+                <DeleteEmployeeModal employeeId={employee.id}/>
               </DropdownMenuContent>
             </DropdownMenu>
           );

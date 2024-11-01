@@ -46,7 +46,8 @@ CREATE TABLE employee (
   password VARCHAR NOT NULL,
   role role,
   telephone VARCHAR NOT NULL,
-  session_id UUID NOT NULL
+  session_id UUID NOT NULL,
+  phone_number VARCHAR NOT NULL,
 );
 
 CREATE TABLE website_config (

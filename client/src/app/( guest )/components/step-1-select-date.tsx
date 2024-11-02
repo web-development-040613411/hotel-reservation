@@ -41,14 +41,12 @@ export default function FormBooking( ) {
   function onSubmit(e: any) {
     e.preventDefault();
 
-    const getDateInUnixTime = (date : Date ) => {
-      return Math.floor(date.valueOf() / (1000 * 60 * 60 * 24));
-    }
 
     const getDiffDate = ( from: Date, to: Date ) => {
-      const checkIn = getDateInUnixTime( new Date(dateRange.from!));
-      const checkOut = getDateInUnixTime( new Date(dateRange.to!));
-      return checkOut - checkIn;
+      const diffTime = Math.abs( from.setHours(0,0,0).valueOf() - to.valueOf());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      return diffDays;
     }
 
     const stayNight =  getDiffDate( new Date(dateRange.from!), new Date(dateRange.to!) );

@@ -1,9 +1,6 @@
-function getDateInUnixTime(date : Date ){
-  return Math.floor(date.valueOf() / (1000 * 60 * 60 * 24));
-}
-
 export function getDiffDate(from: Date, to: Date) {
-  const checkIn = getDateInUnixTime(from);
-  const checkOut = getDateInUnixTime(to);
-  return checkOut - checkIn;
+  const diffTime = Math.abs( from.setHours(0,0,0).valueOf() - to.valueOf());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+  return diffDays;
 }

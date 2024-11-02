@@ -1,4 +1,4 @@
-import { allRooms, Reservation, Room } from '@/lib/frontdesk/type';
+import { allRooms, Room } from '@/lib/frontdesk/type';
 import {
    thisYear,
    thisMonthNumber,
@@ -9,8 +9,13 @@ import {
    dayNames,
    endYear,
 } from '@/lib/frontdesk/all-date-function';
-import { createContext, useEffect, useRef, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import {
+   UseAllRoom,
+   UseAllType,
+   UseReservation,
+} from '@/hooks/frontdesk/use-reservation';
 
 export const FrontDesk = createContext({} as any);
 
@@ -19,16 +24,12 @@ export default function FrontDeskContextProvide({
 }: {
    children: React.ReactNode;
 }) {
-   const [roomsDataFetch, setRoomsDataFetch] = useState<allRooms>();
    const [roomsDataSearch, setRoomsDataSearch] = useState<allRooms>();
    const [roomsDataFilter, setRoomsDataFilter] = useState<allRooms>();
 
-   const [roomsTypeDataFetch, setRoomsTypeDataFetch] = useState([]);
-   const [reservationDataFetch, setReservationDataFetch] =
-      useState<Reservation[]>();
-
    const [stateShowAll, setStateShowAll] = useState(false);
    const [searchCustomer, setSearchCustomer] = useState('');
+   const [searchInput, setSearchInput] = useState('');
    const [roomType, setRoomType] = useState('all');
 
    const [selectedYear, setSelectedYear] = useState(thisYear.toString());
@@ -55,6 +56,25 @@ export default function FrontDeskContextProvide({
          return dayNames[date.getDay()];
       })
    );
+
+   // Fetch data
+   const {
+      data: roomsData,
+      isLoading: roomsLoading,
+      isError: roomsError,
+   } = UseAllRoom();
+
+   const {
+      data: roomsTypeData,
+      isLoading: roomsTypeLoading,
+      isError: roomsTypeError,
+   } = UseAllType();
+
+   const {
+      data: reservationData,
+      isLoading: reservationLoading,
+      isError: reservationError,
+   } = UseReservation(selectedYear, selectedMonth.toString(), searchCustomer);
 
    const changeSelectedYear = (value: any) => {
       if (value === 'prev' || value === 'next') return;
@@ -120,26 +140,33 @@ export default function FrontDeskContextProvide({
    const queryClient = useQueryClient();
 
    useEffect(() => {
-      if (searchCustomer === '') {
+      if (searchInput === '') {
+         setSearchCustomer('');
          queryClient.invalidateQueries({
             queryKey: ['reservations'],
          });
          setStateShowAll(false);
       }
-   }, [searchCustomer]);
+   }, [searchInput]);
 
    const onSearch = () => {
-      queryClient.invalidateQueries({ queryKey: ['reservations'] });
-      const roomTypeFilter = Object.entries(roomsDataFetch as allRooms).map(
+      queryClient.invalidateQueries({
+         queryKey: ['reservations'],
+      });
+   };
+
+   useEffect(() => {
+      if (!reservationData || !roomsData) return;
+      const roomTypeFilter = Object.entries(roomsData as allRooms).map(
          ([key, value]: [string, Room[]]) => {
             if (
-               reservationDataFetch?.some(
+               reservationData?.some(
                   (reservation) => reservation.types_name === key
                )
             ) {
                return {
                   [key]: value.filter((room: Room) => {
-                     return reservationDataFetch?.some(
+                     return reservationData?.some(
                         (reservation) => reservation.room_id === room.id
                      );
                   }),
@@ -154,13 +181,16 @@ export default function FrontDeskContextProvide({
          {}
       );
       setRoomsDataSearch(filteredRoom);
-   };
+      if (searchCustomer !== '') {
+         setStateShowAll(true);
+      }
+   }, [reservationData]);
 
    useEffect(() => {
       if (stateShowAll) {
          setRoomsDataFilter(roomsDataSearch);
       } else {
-         setRoomsDataFilter(roomsDataFetch);
+         setRoomsDataFilter(roomsData);
       }
    });
 
@@ -169,8 +199,6 @@ export default function FrontDeskContextProvide({
          value={{
             roomType,
             setRoomType,
-            setRoomsDataFetch,
-            roomsDataFetch,
             roomsDataSearch,
             selectedYear,
             setSelectedYear,
@@ -184,17 +212,16 @@ export default function FrontDeskContextProvide({
             setNumberOfDays,
             daysArray,
             setDayArray,
-            roomsTypeDataFetch,
-            setRoomsTypeDataFetch,
+
             changeSelectedYear,
             changeSelectedMonth,
             prevYearSet,
             nextYearSet,
             arrayMonth,
             arrayYear,
-            setReservationDataFetch,
+
             YearPerPage,
-            reservationDataFetch,
+
             searchCustomer,
             setSearchCustomer,
             stateShowAll,
@@ -202,6 +229,18 @@ export default function FrontDeskContextProvide({
             onSearch,
             roomsDataFilter,
             setRoomsDataFilter,
+            setSearchInput,
+            searchInput,
+            setRoomsDataSearch,
+            roomsData,
+            roomsLoading,
+            roomsError,
+            roomsTypeData,
+            roomsTypeLoading,
+            roomsTypeError,
+            reservationData,
+            reservationLoading,
+            reservationError,
          }}
       >
          {children}

@@ -13,13 +13,12 @@ import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useContext } from 'react';
 import { FrontDesk } from '@/context/front-desk';
-import { useQueryClient } from '@tanstack/react-query';
 
 export default function Frontdesk_Header() {
    const {
       roomType,
       setRoomType,
-      roomsTypeDataFetch,
+      roomsTypeData,
       changeSelectedYear,
       changeSelectedMonth,
       prevYearSet,
@@ -31,14 +30,15 @@ export default function Frontdesk_Header() {
       startYearIndex,
       YearPerPage,
       setSearchCustomer,
-      searchCustomer,
       stateShowAll,
       setStateShowAll,
       onSearch,
+      setSearchInput,
+      searchInput,
    }: {
       roomType: string;
       setRoomType: (value: string) => void;
-      roomsTypeDataFetch: any;
+      roomsTypeData: string[];
       changeSelectedYear: (value: string) => void;
       changeSelectedMonth: (value: string) => void;
       prevYearSet: () => void;
@@ -50,12 +50,12 @@ export default function Frontdesk_Header() {
       startYearIndex: number;
       YearPerPage: number;
       setSearchCustomer: (value: string) => void;
-      searchCustomer: string;
       stateShowAll: boolean;
       setStateShowAll: (value: boolean) => void;
       onSearch: () => void;
+      setSearchInput: (value: string) => void;
+      searchInput: string;
    } = useContext(FrontDesk);
-   const queryClient = useQueryClient();
 
    return (
       <div>
@@ -146,10 +146,8 @@ export default function Frontdesk_Header() {
             <form
                onSubmit={(e) => {
                   e.preventDefault();
+                  setSearchCustomer(searchInput);
                   onSearch();
-                  if (searchCustomer !== '') {
-                     setStateShowAll(true);
-                  }
                }}
             >
                <div className="relative flex items-center">
@@ -158,9 +156,10 @@ export default function Frontdesk_Header() {
                      type="text"
                      placeholder="Search for customer"
                      className="pl-10 "
-                     value={searchCustomer}
+                     value={searchInput}
+                     pattern="^[A-Za-zก-๏ ]{1,35}$"
                      onChange={(e) => {
-                        setSearchCustomer(e.target.value);
+                        setSearchInput(e.target.value);
                      }}
                   />
                   <Button
@@ -207,7 +206,7 @@ export default function Frontdesk_Header() {
                            <div>All</div>
                         </div>
                      </DropdownMenuRadioItem>
-                     {roomsTypeDataFetch?.map((type: any) => (
+                     {roomsTypeData?.map((type: any) => (
                         <DropdownMenuRadioItem key={type} value={type}>
                            <div className="flex items-center justify-between">
                               <div>{type}</div>

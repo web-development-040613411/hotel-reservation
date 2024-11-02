@@ -19,22 +19,21 @@ export default function ReservationTable() {
       selectedYear,
       selectedMonth,
       daysArray,
-      reservationDataFetch,
+      reservationData,
       searchCustomer,
       stateShowAll,
    }: {
       roomsDataFilter: allRooms;
-
       roomType: string;
       selectedYear: string;
       selectedMonth: number;
       daysArray: string[];
       searchCustomer: string;
       stateShowAll: boolean;
-      reservationDataFetch: Reservation[];
+      reservationData: Reservation[];
    } = useContext(FrontDesk);
 
-   if (!roomsDataFilter) return null;
+   if (!roomsDataFilter || !reservationData || !daysArray) return null;
 
    const roomsData = Object.fromEntries(
       Object.entries(roomsDataFilter as allRooms)?.filter(([key]) => {
@@ -54,7 +53,7 @@ export default function ReservationTable() {
             day
          ).padStart(2, '0')}`
       );
-      const ThisTypeReservation = reservationDataFetch?.filter(
+      const ThisTypeReservation = reservationData?.filter(
          (reservation: any) =>
             reservation.types_name === roomType &&
             new Date(reservation.check_in) <= thisColDate &&
@@ -140,11 +139,10 @@ export default function ReservationTable() {
                            )}
                         </TableRow>
                         {rooms.map((room: Room) => {
-                           const thisRoomReservations =
-                              reservationDataFetch?.filter(
-                                 (reservation: any) =>
-                                    reservation.room_id === room.id
-                              );
+                           const thisRoomReservations = reservationData?.filter(
+                              (reservation: any) =>
+                                 reservation.room_id === room.id
+                           );
 
                            return (
                               <TableRow key={`room-row-${room.id}`}>

@@ -57,7 +57,7 @@ export const UseReservation = (
    fullname: string
 ) => {
    return useQuery({
-      queryKey: ['reservations', year, month],
+      queryKey: ['reservations', year, month, fullname],
       queryFn: () => FetchReservationData(year, month, fullname),
    });
 };

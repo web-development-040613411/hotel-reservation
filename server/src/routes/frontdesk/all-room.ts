@@ -28,9 +28,19 @@ export const allRoomsRoute = new Elysia({ prefix: '/all-room' }).get(
             return acc;
         }, {});
 
+        const sortedgroupedRooms = Object.entries(groupedRooms).reduce(
+            (acc: any, [type, rooms]) => {
+                acc[type] = rooms.sort(
+                    (a: any, b: any) => parseInt(a.number) - parseInt(b.number)
+                );
+                return acc;
+            },
+            {}
+        );
+
         return {
             status: 'success',
-            data: groupedRooms,
+            data: sortedgroupedRooms,
         };
     }
 );
@@ -41,8 +51,6 @@ export const allRoomTypeRoute = new Elysia({ prefix: '/all-room-type' }).get(
         const allRoomTypes = await sql`
             SELECT * FROM room_types
         `;
-
-        //only return the name of the room type
         const roomTypesName = allRoomTypes.map((roomType) => {
             return roomType.name;
         });

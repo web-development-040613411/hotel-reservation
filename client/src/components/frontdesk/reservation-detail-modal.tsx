@@ -33,6 +33,8 @@ export default function Reservation_detail_modal({
    const check_out = async (reservations_id: string) => {
       checkOutMutation.mutate(reservations_id);
    };
+
+   const postpone = (id: string) => {};
    return (
       <Dialog>
          <DialogTrigger asChild>
@@ -211,6 +213,7 @@ export default function Reservation_detail_modal({
                <Button
                   variant="default"
                   className="bg-yellow-600 text-white hover:bg-yellow-700 font-bold"
+                  onClick={() => postpone(thisReservation.reservations_id)}
                >
                   Post-pone
                </Button>

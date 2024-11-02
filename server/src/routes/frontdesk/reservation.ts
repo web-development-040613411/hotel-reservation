@@ -1,38 +1,6 @@
 import { sql } from '@/libs/db';
 import Elysia, { t } from 'elysia';
 import { SearchReservationSchema } from '@/libs/validation';
-interface Reservation {
-    reservations_id: string | null;
-    customer_id: string | null;
-    first_name: string | null;
-    last_name: string | null;
-    address: string | null;
-    email: string | null;
-    phone_number: string | null;
-    sub_district: string | null;
-    district: string | null;
-    province: string | null;
-    postcode: string | null;
-    room_number: string;
-    price: number | null;
-    room_id: string | null;
-    check_in: string | null;
-    check_out: string | null;
-    display_color: string | null;
-    transaction_status: string | null;
-    createAt: string | null;
-    current_status: string;
-    types_name: string;
-    capacity: number;
-    detail: string;
-    picture_path: string;
-    price_per_night: number;
-}
-
-interface Room {
-    room_number: string;
-    reservations: Reservation[];
-}
 
 export const reservationRoute = new Elysia({ prefix: '/reservations' }).get(
     '/',

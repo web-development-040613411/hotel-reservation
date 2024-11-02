@@ -11,47 +11,52 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { useState } from 'react';
+import { useContext } from 'react';
+import { FrontDesk } from '@/context/front-desk';
+import { useQueryClient } from '@tanstack/react-query';
 
-interface Frontdesk_HeaderProps {
-   arrayMoth: string[];
-   selectedYear: string;
-   changeSelectedYear: (year: string) => void;
-   prevYearSet: () => void;
-   arrayYear: number[];
-   startYearIndex: number;
-   YearPerPage: number;
-   nextYearSet: () => void;
-   selectedMonth: number;
-   changeSelectedMonth: (month: string) => void;
-   searchCustomer: string;
-   setSeachCustomer: (value: string) => void;
-   FetchReservationData: () => void;
-   stateShowAll: boolean;
-   roomType: string;
-   setRoomType: (value: string) => void;
-   roomTypeArray: string[];
-}
+export default function Frontdesk_Header() {
+   const {
+      roomType,
+      setRoomType,
+      roomsTypeDataFetch,
+      changeSelectedYear,
+      changeSelectedMonth,
+      prevYearSet,
+      nextYearSet,
+      arrayMonth,
+      arrayYear,
+      selectedYear,
+      selectedMonth,
+      startYearIndex,
+      YearPerPage,
+      setSearchCustomer,
+      searchCustomer,
+      stateShowAll,
+      setStateShowAll,
+      onSearch,
+   }: {
+      roomType: string;
+      setRoomType: (value: string) => void;
+      roomsTypeDataFetch: any;
+      changeSelectedYear: (value: string) => void;
+      changeSelectedMonth: (value: string) => void;
+      prevYearSet: () => void;
+      nextYearSet: () => void;
+      arrayMonth: string[];
+      arrayYear: string[];
+      selectedYear: string;
+      selectedMonth: string;
+      startYearIndex: number;
+      YearPerPage: number;
+      setSearchCustomer: (value: string) => void;
+      searchCustomer: string;
+      stateShowAll: boolean;
+      setStateShowAll: (value: boolean) => void;
+      onSearch: () => void;
+   } = useContext(FrontDesk);
+   const queryClient = useQueryClient();
 
-export default function Frontdesk_Header({
-   arrayMoth,
-   selectedYear,
-   changeSelectedYear,
-   prevYearSet,
-   arrayYear,
-   startYearIndex,
-   YearPerPage,
-   nextYearSet,
-   selectedMonth,
-   changeSelectedMonth,
-   searchCustomer,
-   setSeachCustomer,
-   FetchReservationData,
-   stateShowAll,
-   roomType,
-   setRoomType,
-   roomTypeArray,
-}: Frontdesk_HeaderProps) {
    return (
       <div>
          <div className="flex justify-between items-center">
@@ -117,7 +122,7 @@ export default function Frontdesk_Header({
             >
                {'<'}
             </ToggleGroupItem>
-            {arrayMoth.map((month, index) => (
+            {arrayMonth.map((month: any, index: any) => (
                <ToggleGroupItem
                   key={month}
                   value={(index + 1).toString()}
@@ -141,7 +146,10 @@ export default function Frontdesk_Header({
             <form
                onSubmit={(e) => {
                   e.preventDefault();
-                  FetchReservationData();
+                  onSearch();
+                  if (searchCustomer !== '') {
+                     setStateShowAll(true);
+                  }
                }}
             >
                <div className="relative flex items-center">
@@ -152,7 +160,7 @@ export default function Frontdesk_Header({
                      className="pl-10 "
                      value={searchCustomer}
                      onChange={(e) => {
-                        setSeachCustomer(e.target.value);
+                        setSearchCustomer(e.target.value);
                      }}
                   />
                   <Button
@@ -167,8 +175,8 @@ export default function Frontdesk_Header({
                         variant="outline"
                         className="ml-2 text-white bg-blue-800 hover:bg-blue-900 hover:text-white"
                         onClick={() => {
-                           setSeachCustomer('');
-                           FetchReservationData();
+                           setSearchCustomer('');
+                           setStateShowAll(false);
                         }}
                      >
                         Show All
@@ -176,13 +184,11 @@ export default function Frontdesk_Header({
                   )}
                </div>
             </form>
-
-            {/* Right side */}
             <div className="relative flex items-center"></div>
             <DropdownMenu modal={false}>
                <DropdownMenuTrigger asChild>
                   <Button variant="outline">
-                     Roomtypes &nbsp;
+                     {roomType === 'all' ? 'RoomTypes ' : roomType}&nbsp;
                      <ChevronDown />
                   </Button>
                </DropdownMenuTrigger>
@@ -201,7 +207,7 @@ export default function Frontdesk_Header({
                            <div>All</div>
                         </div>
                      </DropdownMenuRadioItem>
-                     {roomTypeArray.map((type) => (
+                     {roomsTypeDataFetch?.map((type: any) => (
                         <DropdownMenuRadioItem key={type} value={type}>
                            <div className="flex items-center justify-between">
                               <div>{type}</div>

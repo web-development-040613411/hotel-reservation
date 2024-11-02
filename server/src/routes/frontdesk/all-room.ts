@@ -34,3 +34,22 @@ export const allRoomsRoute = new Elysia({ prefix: '/all-room' }).get(
         };
     }
 );
+
+export const allRoomTypeRoute = new Elysia({ prefix: '/all-room-type' }).get(
+    '/',
+    async ({ set }) => {
+        const allRoomTypes = await sql`
+            SELECT * FROM room_types
+        `;
+
+        //only return the name of the room type
+        const roomTypesName = allRoomTypes.map((roomType) => {
+            return roomType.name;
+        });
+
+        return {
+            status: 'success',
+            data: roomTypesName,
+        };
+    }
+);

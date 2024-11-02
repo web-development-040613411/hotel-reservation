@@ -7,7 +7,7 @@ export const arrayYear = Array.from(
    { length: endYear - startYear + 1 },
    (_, i) => startYear + i
 );
-export const arrayMoth = [
+export const arrayMonth = [
    'January',
    'February',
    'March',
@@ -21,3 +21,5 @@ export const arrayMoth = [
    'November',
    'December',
 ];
+
+export const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

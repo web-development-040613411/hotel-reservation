@@ -14,19 +14,25 @@ import {
    getDarkenColorClass,
    getLightenColorClass,
 } from '@/lib/frontdesk/random-color';
-import { Reservation } from '@/components/frontdesk/reservation-table';
+import { Reservation } from '@/lib/frontdesk/type';
 import { Badge } from '../ui/badge';
+import { useCheckInMutation } from '@/hooks/frontdesk/check-in';
+import { useCheckOutMutation } from '@/hooks/frontdesk/check-out';
 interface Reservation_detail_modalProps {
    thisReservation: Reservation;
-   check_in: (id: string) => void;
-   check_out: (id: string) => void;
 }
 
 export default function Reservation_detail_modal({
    thisReservation,
-   check_in,
-   check_out,
 }: Reservation_detail_modalProps) {
+   const checkInMutation = useCheckInMutation();
+   const checkOutMutation = useCheckOutMutation();
+   const check_in = async (reservations_id: string) => {
+      checkInMutation.mutate(reservations_id);
+   };
+   const check_out = async (reservations_id: string) => {
+      checkOutMutation.mutate(reservations_id);
+   };
    return (
       <Dialog>
          <DialogTrigger asChild>
@@ -79,22 +85,22 @@ export default function Reservation_detail_modal({
             <div className="mt-0 grid grid-cols-2 gap-4">
                <div>
                   {' '}
-                  <p>
+                  <p className="break-words">
                      <strong>Name : </strong> {thisReservation.first_name}{' '}
                      {thisReservation.last_name}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Tel : </strong>
                      {thisReservation.phone_number}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Email : </strong>
                      {thisReservation.email}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Address : </strong>
                   </p>
-                  <p>
+                  <p className="break-words">
                      {thisReservation.address +
                         ', ' +
                         thisReservation.sub_district +
@@ -105,15 +111,15 @@ export default function Reservation_detail_modal({
                         ', ' +
                         thisReservation.postcode}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Check-in :</strong>{' '}
                      {new Date(thisReservation.check_in).toLocaleDateString()}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Check-out :</strong>{' '}
                      {new Date(thisReservation.check_out).toLocaleDateString()}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Special Request :</strong>{' '}
                      {thisReservation?.special_request?.length > 0
                         ? thisReservation.special_request
@@ -121,18 +127,18 @@ export default function Reservation_detail_modal({
                   </p>
                </div>
                <div>
-                  <p>
+                  <p className="break-words">
                      <strong>Room Number :</strong>{' '}
                      {thisReservation.room_number}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Room Type: </strong> {thisReservation.types_name}
                   </p>
-                  <p>
+                  <p className="break-words">
                      <strong>Capacity :</strong> {thisReservation.capacity}
                   </p>
                   <div className="flex align-middle text-center">
-                     <p>
+                     <p className="break-words">
                         <strong>Status :&nbsp;</strong>
                      </p>
                      {thisReservation.current_status === 'occupied' ? (
@@ -178,24 +184,33 @@ export default function Reservation_detail_modal({
                <Button
                   variant="default"
                   className="
-                bg-green-500 text-white hover:bg-green-600 font-bold
+                bg-green-600 text-white hover:bg-green-700 font-bold
             "
-                  disabled={thisReservation.current_status === 'occupied'}
+                  disabled={
+                     thisReservation.current_status === 'occupied' ||
+                     thisReservation.current_status === 'departing' ||
+                     thisReservation.current_status === 'maintenance' ||
+                     thisReservation.current_status === 'off_market' ||
+                     new Date(thisReservation.check_out) < new Date()
+                  }
                   onClick={() => check_in(thisReservation.reservations_id)}
                >
                   Check-in
                </Button>
                <Button
                   variant="default"
-                  className="bg-red-500 text-white hover:bg-red-600 font-bold"
+                  className="bg-red-600 text-white hover:bg-red-700 font-bold"
                   onClick={() => check_out(thisReservation.reservations_id)}
-                  disabled={thisReservation.current_status === 'vacant'}
+                  disabled={
+                     thisReservation.current_status === 'vacant' ||
+                     new Date(thisReservation.check_out) < new Date()
+                  }
                >
                   Check-out
                </Button>
                <Button
                   variant="default"
-                  className="bg-yellow-500 text-white hover:bg-yellow-600 font-bold"
+                  className="bg-yellow-600 text-white hover:bg-yellow-700 font-bold"
                >
                   Post-pone
                </Button>

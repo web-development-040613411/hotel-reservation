@@ -1,3 +1,5 @@
+'use client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import localFont from 'next/font/local';
 
 const geistSans = localFont({
@@ -11,6 +13,8 @@ const geistMono = localFont({
    weight: '100 900',
 });
 
+const queryClient = new QueryClient();
+
 export default function ReservationsLayout({
    children,
 }: {
@@ -21,7 +25,9 @@ export default function ReservationsLayout({
          <body
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
          >
-            <main>{children}</main>
+            <QueryClientProvider client={queryClient}>
+               <main>{children}</main>
+            </QueryClientProvider>
          </body>
       </html>
    );

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {
    TableSticky,
    TableHeader,
@@ -8,81 +8,54 @@ import {
    TableCell,
 } from '@/components/ui/table';
 import Reservation_detail_modal from './reservation-detail-modal';
+import { FrontDesk } from '@/context/front-desk';
 
-export type Reservation = {
-   reservations_id: string;
-   customer_id: string;
-   first_name: string;
-   last_name: string;
-   address: string;
-   email: string;
-   phone_number: string;
-   sub_district: string | null;
-   district: string | null;
-   province: string | null;
-   postcode: string | null;
-   room_number: string;
-   price: number;
-   room_id: string;
-   check_in: Date;
-   check_out: Date;
-   display_color: string;
-   transaction_status: string;
-   createAt: string;
-   current_status: string;
-   types_name: string;
-   capacity: number;
-   detail: string;
-   picture_path: string;
-   price_per_night: number;
-   special_request: string;
-};
+import { allRooms, Reservation, Room } from '@/lib/frontdesk/type';
 
-export type Room = {
-   id: string;
-   number: string;
-   current_status: string;
-   detail: string;
-   picture_path: string;
-   price: number;
-   capacity: number;
-};
+export default function ReservationTable() {
+   const {
+      roomsDataFilter,
+      roomType,
+      selectedYear,
+      selectedMonth,
+      daysArray,
+      reservationDataFetch,
+      searchCustomer,
+      stateShowAll,
+   }: {
+      roomsDataFilter: allRooms;
 
-export type vacantRoomOfDay = {
-   [key: string]: number[];
-};
+      roomType: string;
+      selectedYear: string;
+      selectedMonth: number;
+      daysArray: string[];
+      searchCustomer: string;
+      stateShowAll: boolean;
+      reservationDataFetch: Reservation[];
+   } = useContext(FrontDesk);
 
-export type allRooms = {
-   [key: string]: Room[];
-};
+   if (!roomsDataFilter) return null;
 
-interface ReservationTableProps {
-   selectedYear: string;
-   selectedMonth: number;
-   roomsData: any;
-   reservationData: Reservation[];
-   daysArray: string[];
-   check_in: (id: string) => void;
-   check_out: (id: string) => void;
-}
+   const roomsData = Object.fromEntries(
+      Object.entries(roomsDataFilter as allRooms)?.filter(([key]) => {
+         if (roomType === 'all') return true;
+         return key === roomType;
+      })
+   );
 
-export default function ReservationTable({
-   selectedYear,
-   selectedMonth,
-   roomsData,
-   reservationData,
-   daysArray,
-   check_in,
-   check_out,
-}: ReservationTableProps) {
-   const checkAvailableRooms = (day: number, roomType: string) => {
+   const checkAvailableRooms = (
+      day: number,
+      roomType: string,
+      searchCustomer: string
+   ) => {
+      if (searchCustomer != '' && stateShowAll) return '-';
       const thisColDate = new Date(
          `${selectedYear}-${String(selectedMonth).padStart(2, '0')}-${String(
             day
          ).padStart(2, '0')}`
       );
-      const ThisTypeReservation = reservationData.filter(
-         (reservation) =>
+      const ThisTypeReservation = reservationDataFetch?.filter(
+         (reservation: any) =>
             reservation.types_name === roomType &&
             new Date(reservation.check_in) <= thisColDate &&
             new Date(reservation.check_out) >= thisColDate
@@ -94,9 +67,10 @@ export default function ReservationTable({
             room.current_status === 'occupied' ||
             room.current_status === 'departing'
       );
-      const availableRooms = ThisTypeRoom.length - ThisTypeReservation.length;
+      const availableRooms = ThisTypeRoom.length - ThisTypeReservation?.length;
       return availableRooms;
    };
+
    return (
       <TableSticky className="table-fixed mt-3 w-full relative">
          <TableHeader className="sticky top-0 bg-white border">
@@ -105,7 +79,7 @@ export default function ReservationTable({
                   <b>Rooms Types</b>
                </TableHead>
 
-               {daysArray.map((date, index) => (
+               {daysArray.map((date: any, index: any) => (
                   <TableHead
                      key={`date-${index}`}
                      className="text-center border text-black w-10"
@@ -122,7 +96,7 @@ export default function ReservationTable({
             </TableRow>
          </TableHeader>
          <TableBody>
-            {Object.entries(roomsData as allRooms).map(
+            {Object.entries(roomsData as allRooms)?.map(
                ([roomTypes, rooms]: [string, Room[]], index) => {
                   return (
                      <React.Fragment key={`roomTypes-${index}`}>
@@ -137,22 +111,27 @@ export default function ReservationTable({
                                     key={`room-type-${roomTypes}-${i}`}
                                     className="text-center border"
                                  >
-                                    {checkAvailableRooms(i + 1, roomTypes) ===
-                                    0 ? (
+                                    {checkAvailableRooms(
+                                       i + 1,
+                                       roomTypes,
+                                       searchCustomer
+                                    ) === 0 ? (
                                        <p
                                           className="bg-gray-600
                                         text-white py-1 rounded-md text-center"
                                        >
                                           {checkAvailableRooms(
                                              i + 1,
-                                             roomTypes
+                                             roomTypes,
+                                             searchCustomer
                                           )}
                                        </p>
                                     ) : (
                                        <p className="bg-green-600 text-white py-1 rounded-md text-center">
                                           {checkAvailableRooms(
                                              i + 1,
-                                             roomTypes
+                                             roomTypes,
+                                             searchCustomer
                                           )}
                                        </p>
                                     )}
@@ -161,9 +140,11 @@ export default function ReservationTable({
                            )}
                         </TableRow>
                         {rooms.map((room: Room) => {
-                           const thisRoomReservations = reservationData.filter(
-                              (reservation) => reservation.room_id === room.id
-                           );
+                           const thisRoomReservations =
+                              reservationDataFetch?.filter(
+                                 (reservation: any) =>
+                                    reservation.room_id === room.id
+                              );
 
                            return (
                               <TableRow key={`room-row-${room.id}`}>
@@ -206,8 +187,8 @@ export default function ReservationTable({
                                        );
 
                                        const thisReservation =
-                                          thisRoomReservations.find(
-                                             (reservation) =>
+                                          thisRoomReservations?.find(
+                                             (reservation: any) =>
                                                 new Date(
                                                    reservation.check_in
                                                 ) <= thisColDate &&
@@ -245,8 +226,6 @@ export default function ReservationTable({
                                                    thisReservation={
                                                       thisReservation
                                                    }
-                                                   check_in={check_in}
-                                                   check_out={check_out}
                                                 />
                                              </TableCell>
                                           );

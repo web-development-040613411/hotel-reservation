@@ -47,8 +47,7 @@ export default function RoomCard({ type, clickHandler }: Props) {
                 <div className="my-4">
                   <p className="text-start font-bold">
                     <span>cost / night:</span>
-                    <br />
-                    <span className="text-primary">
+                    <span className="text-primary ">
                       &nbsp;{type.price} bath
                     </span>
                   </p>

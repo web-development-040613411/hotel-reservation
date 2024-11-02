@@ -18,6 +18,7 @@ export default function Step2() {
   const title = "Choose Room";
   const step = 2;
 
+
   //for preserve room and change room type.
   const clickHandler = async (type: any) => {
     const formData = new FormData();
@@ -41,6 +42,7 @@ export default function Step2() {
       addInformation({ reservationId });
     } else {
       formData.append("reservation_id", information.reservationId);
+      formData.append("total_price", type.total_price);
 
       await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/change-type`,
@@ -94,6 +96,8 @@ export default function Step2() {
           <Card className="w-11/12 shadow-md border-primary shadow-primary m-0 md:p-8">
             <div className="p-8">
               <StepHeader title={title} step={step} />
+
+              <h1>Stay night: {information.stayNight}</h1>
             </div>
 
             <CardContent className="flex justify-center m-0 pb-1 w-full">

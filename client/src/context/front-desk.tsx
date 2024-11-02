@@ -212,16 +212,13 @@ export default function FrontDeskContextProvide({
             setNumberOfDays,
             daysArray,
             setDayArray,
-
             changeSelectedYear,
             changeSelectedMonth,
             prevYearSet,
             nextYearSet,
             arrayMonth,
             arrayYear,
-
             YearPerPage,
-
             searchCustomer,
             setSearchCustomer,
             stateShowAll,

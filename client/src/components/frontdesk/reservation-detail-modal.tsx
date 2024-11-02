@@ -18,6 +18,8 @@ import { Reservation } from '@/lib/frontdesk/type';
 import { Badge } from '../ui/badge';
 import { useCheckInMutation } from '@/hooks/frontdesk/check-in';
 import { useCheckOutMutation } from '@/hooks/frontdesk/check-out';
+import { LoadingSpinner } from '@/lib/frontdesk/spinner';
+import { PostponeModal } from './postpone-modal';
 interface Reservation_detail_modalProps {
    thisReservation: Reservation;
 }
@@ -25,16 +27,11 @@ interface Reservation_detail_modalProps {
 export default function Reservation_detail_modal({
    thisReservation,
 }: Reservation_detail_modalProps) {
-   const checkInMutation = useCheckInMutation();
-   const checkOutMutation = useCheckOutMutation();
-   const check_in = async (reservations_id: string) => {
-      checkInMutation.mutate(reservations_id);
-   };
-   const check_out = async (reservations_id: string) => {
-      checkOutMutation.mutate(reservations_id);
-   };
+   const { mutate: checkInMutate, isPending: checkInIsPending } =
+      useCheckInMutation();
+   const { mutate: checkOutMutation, isPending: checkOutIsPending } =
+      useCheckOutMutation();
 
-   const postpone = (id: string) => {};
    return (
       <Dialog>
          <DialogTrigger asChild>
@@ -58,7 +55,7 @@ export default function Reservation_detail_modal({
                   textOverflow: 'ellipsis',
                }}
                onMouseEnter={(e) => {
-                  e.currentTarget.style.opacity = '0.8';
+                  e.currentTarget.style.opacity = '0.6';
                }}
                onMouseLeave={(e) => {
                   e.currentTarget.style.opacity = '1';
@@ -144,35 +141,35 @@ export default function Reservation_detail_modal({
                         <strong>Status :&nbsp;</strong>
                      </p>
                      {thisReservation.current_status === 'occupied' ? (
-                        <Badge className="bg-amber-600 hover:bg-amber-700 font-bold text-sm">
+                        <Badge className="bg-amber-600 hover:bg-amber-600 font-bold text-sm">
                            occupied
                         </Badge>
                      ) : (
                         <></>
                      )}
                      {thisReservation.current_status === 'vacant' ? (
-                        <Badge className="bg-green-600 hover:bg-green-700 font-bold text-sm">
+                        <Badge className="bg-green-600 hover:bg-green-600 font-bold text-sm">
                            vacant
                         </Badge>
                      ) : (
                         <></>
                      )}
-                     {thisReservation.transaction_status === 'departing' ? (
-                        <Badge className="bg-sky-600 hover:bg-sky-700 font-bold text-sm">
+                     {thisReservation.current_status === 'departing' ? (
+                        <Badge className="bg-sky-600 hover:bg-sky-600 font-bold text-sm">
                            departing
                         </Badge>
                      ) : (
                         <></>
                      )}
-                     {thisReservation.transaction_status === 'maintenance' ? (
-                        <Badge className="bg-gray-600 hover:bg-gray-700 font-bold text-sm">
+                     {thisReservation.current_status === 'maintenance' ? (
+                        <Badge className="bg-gray-600 hover:bg-gray-600 font-bold text-sm">
                            maintenance
                         </Badge>
                      ) : (
                         <></>
                      )}
-                     {thisReservation.transaction_status === 'off_market' ? (
-                        <Badge className="bg-gray-600 hover:bg-gray-700 font-bold text-sm">
+                     {thisReservation.current_status === 'off_market' ? (
+                        <Badge className="bg-gray-600 hover:bg-gray-600 font-bold text-sm">
                            off market
                         </Badge>
                      ) : (
@@ -186,37 +183,34 @@ export default function Reservation_detail_modal({
                <Button
                   variant="default"
                   className="
-                bg-green-600 text-white hover:bg-green-700 font-bold
-            "
+                bg-green-600 text-white hover:bg-green-700 font-bold w-28 flex items-center justify-center"
                   disabled={
                      thisReservation.current_status === 'occupied' ||
                      thisReservation.current_status === 'departing' ||
                      thisReservation.current_status === 'maintenance' ||
                      thisReservation.current_status === 'off_market' ||
-                     new Date(thisReservation.check_out) < new Date()
+                     new Date(thisReservation.check_out) < new Date() ||
+                     new Date(thisReservation.check_out).getDate() ===
+                        new Date().getDate()
                   }
-                  onClick={() => check_in(thisReservation.reservations_id)}
+                  onClick={() => checkInMutate(thisReservation.reservations_id)}
                >
-                  Check-in
+                  {checkInIsPending ? <LoadingSpinner /> : 'Check-in'}
                </Button>
                <Button
                   variant="default"
-                  className="bg-red-600 text-white hover:bg-red-700 font-bold"
-                  onClick={() => check_out(thisReservation.reservations_id)}
+                  className="bg-red-600 text-white hover:bg-red-700 font-bold w-28 flex items-center justify-center"
+                  onClick={() =>
+                     checkOutMutation(thisReservation.reservations_id)
+                  }
                   disabled={
                      thisReservation.current_status === 'vacant' ||
                      new Date(thisReservation.check_out) < new Date()
                   }
                >
-                  Check-out
+                  {checkOutIsPending ? <LoadingSpinner /> : 'Check-out'}
                </Button>
-               <Button
-                  variant="default"
-                  className="bg-yellow-600 text-white hover:bg-yellow-700 font-bold"
-                  onClick={() => postpone(thisReservation.reservations_id)}
-               >
-                  Post-pone
-               </Button>
+               <PostponeModal thisReservation={thisReservation} />
             </DialogFooterStart>
          </DialogContent>
       </Dialog>

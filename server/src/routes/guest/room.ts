@@ -73,6 +73,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         }
 
         const { check_in, check_out, type_id } = validation.data;
+        check_in.setHours(12, 0, 0);
         check_out.setHours(12, 0, 0);
 
         const diffDate = getDiffDate(new Date(check_in), new Date(check_out));
@@ -140,9 +141,9 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             validation.data;
         // available "room_id": "2f1a9a38-f851-4f87-abba-d473737c5475",
         // not available "room_id": "0b494479-d63e-47bc-adae-62438b44f02f",
-
+        check_in.setHours(12, 0, 0);
         check_out.setHours(12, 0, 0);
-        
+
         await sql`UPDATE reservations SET room_id = (
                               SELECT
                                 rooms."id" AS room_id

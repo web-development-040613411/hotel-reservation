@@ -4,9 +4,10 @@ import { useContext } from 'react';
 import Frontdesk_Header from '@/components/frontdesk/header';
 import ReservationTable from '@/components/frontdesk/reservation-table';
 import FrontDeskContextProvide, { FrontDesk } from '@/context/front-desk';
-import { Skeleton } from '@/components/ui/skeleton';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import AllRoomTable from '@/components/frontdesk/allroom-table';
+import Skeleton_header from '@/components/frontdesk/skeleton_header';
+import Skeleton_table from '@/components/frontdesk/skeleton_table';
 
 export default function Page() {
    const queryClient = new QueryClient();
@@ -52,12 +53,12 @@ function Child() {
 
          <main className="p-3 ">
             {roomsLoading || roomsTypeLoading ? (
-               <Skeleton className="mt-3 h-screen w-full rounded-xl" />
+               <Skeleton_header />
             ) : (
                <Frontdesk_Header />
             )}
             {reservationLoading || roomsLoading || roomsTypeLoading ? (
-               <Skeleton className="mt-3 h-screen w-full rounded-xl" />
+               <Skeleton_table />
             ) : (
                <div className="relative w-full ">
                   <AllRoomTable />

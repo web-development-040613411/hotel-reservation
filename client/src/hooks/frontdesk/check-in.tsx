@@ -2,11 +2,7 @@
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const useCheckInMutation = (
-   selectedYear: string,
-   selectedMonth: string,
-   searchCustomer: string
-) => {
+export const useCheckInMutation = () => {
    const queryClient = useQueryClient();
 
    return useMutation({

@@ -57,7 +57,7 @@ export default function FrontDeskContextProvide({
          return dayNames[date.getDay()];
       })
    );
-   // Fetch data
+
    const {
       data: roomsData,
       isLoading: roomsLoading,

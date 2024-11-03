@@ -76,9 +76,11 @@ body {
 
   body {
     @apply bg-background text-foreground;
+    overflow-y: scroll;
   }
 }
 
 #body[data-scroll-locked] {
   margin-right: 0px !important;
+  overflow-y: scroll !important;
 }

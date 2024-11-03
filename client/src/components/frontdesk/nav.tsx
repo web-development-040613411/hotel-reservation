@@ -21,7 +21,6 @@ export default function Frontdesk_Nav() {
    return (
       <nav className="p-1 shadow-md">
          <div className="flex justify-between items-center">
-            {/* Left side */}
             <div className="flex items-center">
                <a className="flex items-center space-x-3 rtl:space-x-reverse">
                   <Image
@@ -41,7 +40,6 @@ export default function Frontdesk_Nav() {
                </a>
             </div>
 
-            {/* Right side */}
             <div className="relative flex items-center">
                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>

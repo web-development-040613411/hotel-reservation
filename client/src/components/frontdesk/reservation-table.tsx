@@ -155,27 +155,28 @@ export default function ReservationTable() {
                                     className="w-28 text-start border-gray-200 border-2 text-black"
                                  >
                                     {room.current_status === 'vacant' ? (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-green-500 mr-2 rounded-md"></p>
+                                       <div className="flex items-center leading-none h-full">
+                                          <p className="w-3 h-3 bg-green-500 mr-2 rounded-full"></p>
                                           <span>{' ' + room.number}</span>
                                        </div>
                                     ) : room.current_status === 'occupied' ? (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-amber-500 mr-2 rounded-md"></p>
+                                       <div className="flex items-center h-full leading-none">
+                                          <p className="w-3 h-3 bg-amber-500 mr-2 rounded-full"></p>
                                           <span>{' ' + room.number}</span>
                                        </div>
                                     ) : room.current_status === 'departing' ? (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-sky-500 mr-2 rounded-md"></p>
+                                       <div className="flex items-center h-full leading-none">
+                                          <p className="w-3 h-3 bg-sky-500 mr-2 rounded-full"></p>
                                           <span>{' ' + room.number}</span>
                                        </div>
                                     ) : (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-gray-500 mr-2 rounded-md"></p>
+                                       <div className="flex items-center h-full leading-none">
+                                          <p className="w-3 h-3 bg-gray-500 mr-2 rounded-full"></p>
                                           <span>{' ' + room.number}</span>
                                        </div>
                                     )}
                                  </TableCell>
+
                                  {(() => {
                                     const cells = [];
                                     for (let i = 0; i < daysArray.length; i++) {

@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/table';
 import { FrontDesk } from '@/context/front-desk';
 
-import { allRooms, Reservation, Room } from '@/lib/frontdesk/type';
+import { allRooms, Room } from '@/lib/frontdesk/type';
 
 export default function AllRoomTable() {
    const {
@@ -64,9 +64,7 @@ export default function AllRoomTable() {
                            key={`room-type-row-${roomTypes}`}
                            className="border-gray-200 border-2"
                         >
-                           <TableCell className="w-28 text-center border-gray-200 text-white font-bold">
-                              {roomTypes}
-                           </TableCell>
+                           <TableCell className="w-28 text-center border-gray-200 text-white font-bold"></TableCell>
 
                            {Array.from({ length: daysArray.length }).map(
                               (_, i) => (
@@ -94,29 +92,7 @@ export default function AllRoomTable() {
                                  <TableCell
                                     key={`room-cell-${room.id}`}
                                     className="w-28 text-start border-gray-200 border-2 text-black"
-                                 >
-                                    {room.current_status === 'vacant' ? (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-green-500 mr-2 rounded-md"></p>
-                                          <span>{' ' + room.number}</span>
-                                       </div>
-                                    ) : room.current_status === 'occupied' ? (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-amber-500 mr-2 rounded-md"></p>
-                                          <span>{' ' + room.number}</span>
-                                       </div>
-                                    ) : room.current_status === 'departing' ? (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-sky-500 mr-2 rounded-md"></p>
-                                          <span>{' ' + room.number}</span>
-                                       </div>
-                                    ) : (
-                                       <div className="flex items-center">
-                                          <p className="p-2 bg-gray-500 mr-2 rounded-md"></p>
-                                          <span>{' ' + room.number}</span>
-                                       </div>
-                                    )}
-                                 </TableCell>
+                                 ></TableCell>
                                  {(() => {
                                     const cells = [];
                                     for (let i = 0; i < daysArray.length; i++) {

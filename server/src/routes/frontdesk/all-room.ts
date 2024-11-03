@@ -1,5 +1,5 @@
 import { sql } from '@/libs/db';
-import Elysia, { t } from 'elysia';
+import Elysia from 'elysia';
 
 export const allRoomsRoute = new Elysia({ prefix: '/all-room' }).get(
     '/',

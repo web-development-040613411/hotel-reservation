@@ -1,5 +1,5 @@
 'use client';
-import React, { useContext } from 'react';
+
 import {
    Dialog,
    DialogContent,
@@ -21,7 +21,7 @@ import { useCheckInMutation } from '@/hooks/frontdesk/check-in';
 import { useCheckOutMutation } from '@/hooks/frontdesk/check-out';
 import { PostponeModal } from './postpone-modal';
 import { LoaderCircle } from 'lucide-react';
-import { FrontDesk } from '@/context/front-desk';
+
 interface Reservation_detail_modalProps {
    thisReservation: Reservation;
    isOverflowFromPreviousMonth: boolean;
@@ -33,19 +33,10 @@ export default function Reservation_detail_modal({
    isOverflowFromPreviousMonth,
    isOverflowToNextMonth,
 }: Reservation_detail_modalProps) {
-   const {
-      selectedYear,
-      selectedMonth,
-      searchCustomer,
-   }: {
-      selectedYear: string;
-      selectedMonth: string;
-      searchCustomer: string;
-   } = useContext(FrontDesk);
    const { mutate: checkInMutate, isPending: checkInIsPending } =
-      useCheckInMutation(selectedYear, selectedMonth, searchCustomer);
+      useCheckInMutation();
    const { mutate: checkOutMutate, isPending: checkOutIsPending } =
-      useCheckOutMutation(selectedYear, selectedMonth, searchCustomer);
+      useCheckOutMutation();
 
    return (
       <Dialog>

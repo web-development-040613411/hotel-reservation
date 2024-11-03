@@ -44,13 +44,13 @@ export const checkOutRoute = new Elysia({ prefix: '/check-out' }).patch(
             '-' +
             String(currentDate.getDate()).padStart(2, '0');
 
-        const updateReservation = await sql`
+        await sql`
         UPDATE reservations
         SET check_out = ${currentTime}
         WHERE id = ${thisReservation.id};
      `;
 
-        const updateRoom = await sql`
+        await sql`
             UPDATE rooms
             SET current_status ='vacant'
             WHERE id=${thisReservation.room_id}

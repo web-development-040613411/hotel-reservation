@@ -6,7 +6,7 @@ export const crontab = new Elysia()
     .use(
         cron({
             name: 'heartbeat',
-            pattern: '0 */1 * * * *',
+            pattern: '0 */10 * * * *',
             async run() {
       
               await sql`DELETE FROM reservations

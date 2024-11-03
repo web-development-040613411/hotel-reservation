@@ -9,6 +9,7 @@ import postgres from 'postgres';
 import { guestRoutes } from './routes/guest';
 import { stripeRoutes } from './routes/stripe';
 import { crontab } from './routes/crontab';
+import { authRoutes } from './routes/auth-route';
 
 export const app = new Elysia()
     .use(swagger())
@@ -50,6 +51,7 @@ export const app = new Elysia()
     .use(reservationRoute)
     .use(stripeRoutes)
     .use(crontab)
+    .use(authRoutes)
     .use(cors())
     .listen(3001);
 

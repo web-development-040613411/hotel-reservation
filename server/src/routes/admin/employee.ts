@@ -8,16 +8,50 @@ import {
 import { join } from 'path';
 import { unlink } from 'node:fs/promises';
 import { uploadFile } from '@/libs/upload-file';
+import { middleware } from '@/middleware';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
-    .get('/', async () => {
+    .use(middleware)
+    .get('/', async ({ user, set }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const employees = await sql`SELECT * FROM employees`;
         return {
             status: 'success',
             data: employees,
         };
     })
-    .get('/:id', async ({ params: { id }, set }) => {
+    .get('/:id', async ({ params: { id }, set, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const employee = await sql`SELECT * FROM employees WHERE id=${id}`;
         if (employee.length === 0) {
             set.status = 404;
@@ -31,7 +65,23 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             data: employee[0],
         };
     })
-    .post('/', async ({ body, set }) => {
+    .post('/', async ({ body, set, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const validateData = addEmployeeSchema.safeParse(body);
         if (!validateData.success) {
             set.status = 400;
@@ -91,7 +141,23 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             message: 'Employee added successfully',
         };
     })
-    .put('/:id', async ({ params: { id }, body, set }) => {
+    .put('/:id', async ({ params: { id }, body, set, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const validateData = updateEmployeeSchema.safeParse(body);
         if (!validateData.success) {
             set.status = 400;
@@ -152,7 +218,23 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
 
-    .delete('/:id', async ({ params: { id }, set }) => {
+    .delete('/:id', async ({ params: { id }, set, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
         const [employee] = await sql`SELECT * FROM employees WHERE id=${id}`;
 
         if (!employee) {
@@ -179,39 +261,57 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
 
 export const resetPasswordRoutes = new Elysia({
     prefix: '/reset-password',
-}).put('/:id', async ({ params: { id }, body, set }) => {
-    const validateData = ResetPasswordSchema.safeParse(body);
-    if (!validateData.success) {
-        set.status = 400;
-        return {
-            status: 'error',
-            message: validateData.error.errors[0].message,
-        };
-    }
-    const { password, confirm_password } = validateData.data;
+})
+    .use(middleware)
+    .put('/:id', async ({ params: { id }, body, set, user }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-    const employee = await sql`SELECT * FROM employees WHERE id=${id}`;
-    if (employee.length === 0) {
-        set.status = 404;
+        if (user.role !== 'administrator' && user.id !== id) {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+
+        const validateData = ResetPasswordSchema.safeParse(body);
+        if (!validateData.success) {
+            set.status = 400;
+            return {
+                status: 'error',
+                message: validateData.error.errors[0].message,
+            };
+        }
+        const { password, confirm_password } = validateData.data;
+
+        const employee = await sql`SELECT * FROM employees WHERE id=${id}`;
+        if (employee.length === 0) {
+            set.status = 404;
+            return {
+                status: 'error',
+                message: 'Employee not found',
+            };
+        }
+        if (password !== confirm_password) {
+            set.status = 400;
+            return {
+                status: 'error',
+                message: 'Password and confirm password does not match',
+            };
+        }
+        const hashedPassword = await Bun.password.hash(password, {
+            algorithm: 'bcrypt',
+            cost: 10,
+        });
+        await sql`UPDATE employees SET password=${hashedPassword} WHERE id=${id}`;
         return {
-            status: 'error',
-            message: 'Employee not found',
+            status: 'success',
+            message: 'Password updated successfully',
         };
-    }
-    if (password !== confirm_password) {
-        set.status = 400;
-        return {
-            status: 'error',
-            message: 'Password and confirm password does not match',
-        };
-    }
-    const hashedPassword = await Bun.password.hash(password, {
-        algorithm: 'bcrypt',
-        cost: 10,
     });
-    await sql`UPDATE employees SET password=${hashedPassword} WHERE id=${id}`;
-    return {
-        status: 'success',
-        message: 'Password updated successfully',
-    };
-});

@@ -18,7 +18,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
         const { username, password } = validate.data;
 
         const [user] =
-            await sql`SELECT * FROM employee WHERE LOWER(username)=LOWER(${username})`;
+            await sql`SELECT * FROM employees WHERE LOWER(username)=LOWER(${username})`;
 
         if (!user) {
             set.status = 400;

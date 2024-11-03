@@ -9,7 +9,7 @@ export const formInputs = [
     pattern: "^[A-Za-zก-๏\\- ]{1,35}$",
     max: 35,
     placeHolder: "only alphabet characters are allowed.",
-    errorMessage: "Only A-Z, a-z, ก-๏"
+    errorMessage: "Only A-Z, a-z, ตัวอักษรไทย"
   },
   {
     label: "Last Name",
@@ -21,7 +21,7 @@ export const formInputs = [
     pattern: "^[A-Za-zก-๏\\- ]{1,35}$",
     max: 35,
     placeHolder: "only alphabet characters are allowed.",
-    errorMessage: "Only A-Z, a-z, ก-๏"
+    errorMessage: "Only A-Z, a-z, ตัวอักษรไทย"
   },
   {
     label: "Address",
@@ -32,7 +32,7 @@ export const formInputs = [
     key: "address",
     pattern: "^[A-Za-zก-๏/0-9.'\\-\\#\\& ]{1,35}$",
     max: 35,
-    errorMessage: "Only A-Z, a-z, ก-๏, -, #, &, 1-9"
+    errorMessage: "Only A-Z, a-z, ตัวอักษรไทย, -, #, &, 1-9"
   },
   {
     label: "Province",
@@ -43,7 +43,7 @@ export const formInputs = [
     key: "province",
     pattern: "^[A-Za-zก-๏]{1,35}$",
     max: 35,
-    errorMessage: "Only A-Z, a-z, ก-๏"
+    errorMessage: "Only A-Z, a-z, ตัวอักษรไทย"
   },
   {
     label: "District",
@@ -54,7 +54,7 @@ export const formInputs = [
     key: "district",
     pattern: "^[A-Za-zก-๏]{1,35}$",
     max: 35,
-    errorMessage: "Only A-Z, a-z, ก-๏"
+    errorMessage: "Only A-Z, a-z, ตัวอักษรไทย"
   },
   {
     label: "Sub-District",
@@ -65,7 +65,7 @@ export const formInputs = [
     key: "subDistrict",
     pattern: "^[A-Za-zก-๏]{1,35}$",
     max: 35,
-    errorMessage: "Only A-Z, a-z, ก-๏"
+    errorMessage: "Only A-Z, a-z, ตัวอักษรไทย"
   },
   {
     label: "Postcode",
@@ -98,7 +98,12 @@ export const formInputs = [
     required: true,
     key: "email",
     max: 35,
+    errorMessage: ""
   },
+  {
+    errorMessage: "Only A-Z, a-z, ตัวอักษรไทย, 0-9, -, ., (, )",
+    key:""
+  }
 ];
 
 export const specialRequest = {

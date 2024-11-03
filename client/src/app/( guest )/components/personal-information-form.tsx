@@ -7,11 +7,16 @@ import {
   specialRequest,
 } from "@/app/( guest )/model/customer-information";
 import { ReservationContext } from "@/context/ReservationContext";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 
 class InvalidPatternInfo {
   errorMessage = "";
-  isInvalidPattern = true;
+  isInvalidPattern = false;
+
+  constructor(errorMessage: string, isInvalidPattern: boolean) {
+    this.errorMessage = errorMessage;
+    this.isInvalidPattern = isInvalidPattern;
+  }
 
   setIsInvalidPattern(status: boolean) {
     this.isInvalidPattern = status;
@@ -31,8 +36,9 @@ export default function PersonalInformationForm() {
     InvalidPatternInfo[]
   >(
     Array.from(
-      { length: formInputs.length + 1 },
-      () => new InvalidPatternInfo()
+      { length: formInputs.length },
+      (_, index) =>
+        new InvalidPatternInfo(formInputs[index].errorMessage || "", false)
     )
   );
   const [canPass, setCanPass] = useState(true);
@@ -77,36 +83,39 @@ export default function PersonalInformationForm() {
     index: number
   ) => {
     const regex = new RegExp(pattern);
+    const newInvalidPatternInfos = [...invalidPatternInfos];
     if (!regex.test(value)) {
-      const newInvalidPatternInfos = [...invalidPatternInfos];
-
       newInvalidPatternInfos[index].setIsInvalidPattern(true);
-      newInvalidPatternInfos[index].setErrorMessage(errorMessage);
 
       setInvalidPatternInfos(newInvalidPatternInfos);
     } else {
-      const newInvalidPatternInfos = [...invalidPatternInfos];
-
       newInvalidPatternInfos[index].setIsInvalidPattern(false);
 
       setInvalidPatternInfos(newInvalidPatternInfos);
     }
   };
 
-  const checkSpecialRequest = (value: string, pattern: string, errorMessage : string) => {
+  const checkSpecialRequest = (
+    value: string,
+    pattern: string,
+  ) => {
     const regex = new RegExp(pattern);
+    const newInvalidPatternInfos = [...invalidPatternInfos];
+
     if (!regex.test(value)) {
       setCanPass(false);
-      const newInvalidPatternInfos = [...invalidPatternInfos];
 
       newInvalidPatternInfos[9].setIsInvalidPattern(true);
-      newInvalidPatternInfos[9].setErrorMessage(errorMessage);
 
       setInvalidPatternInfos(newInvalidPatternInfos);
     } else {
       setCanPass(true);
+
+      newInvalidPatternInfos[9].setIsInvalidPattern(false);
+
+      setInvalidPatternInfos(newInvalidPatternInfos);
     }
-  }
+  };
 
   return (
     <form
@@ -122,11 +131,9 @@ export default function PersonalInformationForm() {
                 {input.label} <span className="text-red-500"> *</span>
               </Label>
 
-              {invalidPatternInfos[index].isInvalidPattern && (
-                <h1 className="text-red-500 text-xs font-bold">
-                  {invalidPatternInfos[index].errorMessage}
-                </h1>
-              )}
+              <h1 className={`${invalidPatternInfos[index].isInvalidPattern ? 'text-red-500' : 'text-gray-400' } text-xs font-bold`}>
+                {invalidPatternInfos[index].errorMessage}
+              </h1>
             </div>
             <Input
               type={input.type}
@@ -155,7 +162,7 @@ export default function PersonalInformationForm() {
       </div>
 
       <div className="md:w-1/2 flex-grow flex flex-col gap-2">
-        {formInputs.slice(6).map((input, index) => {
+        {formInputs.slice(6, 9).map((input, index) => {
           const shiftedIndex = index + 6;
           return (
             <div key={shiftedIndex}>
@@ -164,11 +171,15 @@ export default function PersonalInformationForm() {
                   {input.label} <span className="text-red-500"> *</span>
                 </Label>
 
-                {invalidPatternInfos[shiftedIndex].isInvalidPattern && (
-                  <h1 className="text-red-500 text-xs font-bold">
-                    {invalidPatternInfos[shiftedIndex].errorMessage}
-                  </h1>
-                )}
+                <h1
+                  className={`${
+                    invalidPatternInfos[shiftedIndex].isInvalidPattern
+                      ? "text-red-500"
+                      : "text-gray-400"
+                  } text-xs font-bold`}
+                >
+                  {invalidPatternInfos[shiftedIndex].errorMessage}
+                </h1>
               </div>
               <Input
                 type={input.type}
@@ -195,13 +206,17 @@ export default function PersonalInformationForm() {
           );
         })}
         <div className="md:flex-grow md:flex md:flex-col md:my-2 md:gap-2">
-          <div className="flex items-center justify-between px-2">
-            <Label htmlFor="email">Special Requests</Label>
-            {invalidPatternInfos[9].isInvalidPattern && (
-              <h1 className="text-red-500 text-xs font-bold">
-                {invalidPatternInfos[9].errorMessage}
-              </h1>
-            )}
+          <div className="flex items-center justify-between px-2 mb-2">
+            <Label htmlFor="special-request" className="whitespace-nowrap">Special Requests</Label>
+            <h1
+              className={`${
+                invalidPatternInfos[9].isInvalidPattern
+                  ? "text-red-500"
+                  : "text-gray-400"
+              } text-xs font-bold mx-4`}
+            >
+              {invalidPatternInfos[9].errorMessage}
+            </h1>
           </div>
           <Textarea
             placeholder="Type your message here."
@@ -211,7 +226,6 @@ export default function PersonalInformationForm() {
               checkSpecialRequest(
                 e.target.value,
                 specialRequest.pattern,
-                specialRequest.errorMessage
               );
             }}
             defaultValue={
@@ -220,11 +234,7 @@ export default function PersonalInformationForm() {
           />
         </div>
 
-        <Button
-          className={btnClass}
-          type="submit"
-          disabled={!isChange }
-        >
+        <Button className={btnClass} type="submit" disabled={!isChange}>
           {state == 4 ? "Confirm Edit" : "Confirm"}
         </Button>
       </div>

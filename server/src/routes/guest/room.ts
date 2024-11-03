@@ -107,6 +107,8 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
                                   LIMIT 1;`;
 
         if (!room) {
+            set.status = 400;
+
             return {
                 status: 'error',
                 message: 'Sorry last room just be purchased second ago.',

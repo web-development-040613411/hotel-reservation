@@ -17,7 +17,7 @@ export default function Step2() {
   const { dateRange } = information;
   const title = "Choose Room";
   const step = 2;
-
+  const [disibleRoomType, setDisibleRoomType] = useState();
 
   //for preserve room and change room type.
   const clickHandler = async (type: any) => {
@@ -35,9 +35,15 @@ export default function Step2() {
         }
       );
 
-      const reservationId = await response
-        .json()
-        .then((data) => data.reservationId);
+      const responseJson = await response.json();
+
+      if ( response.status !== 200 ) {
+        setDisibleRoomType(type.type_id);
+        alert(responseJson.message || 'Sorry last room just be purchased second ago.');
+        return;
+      }
+
+      const reservationId = responseJson.reservationId;
 
       addInformation({ reservationId });
     } else {
@@ -104,13 +110,14 @@ export default function Step2() {
               <div className="md:grid md:grid-cols-2 md:gap-4 w-full h-full">
                 {
                   !isLoading ? 
-                    roomTypes.map((type) => (
-                    <RoomCard
-                      key={type.type_id}
-                      type={type}
-                      clickHandler={clickHandler}
-                    />
-                    ))
+                    roomTypes.map((type) => {
+                      if (type.type_id != disibleRoomType) {
+                        return <RoomCard key={type.type_id} type={type} clickHandler={clickHandler} />
+                      }
+                      else {
+                        return ""
+                      }
+                    })
                   :
                   Array.from({ length: 4 }).map((_, index) => (
                     <Skeleton key={index} className="w-full h-64 bg-gray-100"/>

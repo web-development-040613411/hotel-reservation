@@ -1,5 +1,5 @@
 'use client';
-
+import React, { useContext } from 'react';
 import {
    Dialog,
    DialogContent,
@@ -75,7 +75,7 @@ export default function Reservation_detail_modal({
                         ? 'calc(100% - 1.4rem)'
                         : isOverflowFromPreviousMonth
                         ? 'calc(100% + 1.4rem)'
-                        : '100%'
+                        : 'calc(100% - 2.8rem)'
                   }`,
                }}
                onMouseEnter={(e) => {

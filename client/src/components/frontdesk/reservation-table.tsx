@@ -55,7 +55,12 @@ export default function ReservationTable() {
          (reservation: any) =>
             reservation.types_name === roomType &&
             new Date(reservation.check_in) <= thisColDate &&
-            new Date(reservation.check_out) > thisColDate
+            new Date(reservation.check_out) >= thisColDate
+      );
+
+      const uniqueReservation = ThisTypeReservation?.filter(
+         (item, index, self) =>
+            index === self.findIndex((t) => t.room_id === item.room_id)
       );
 
       const ThisTypeRoom = roomsData[roomType].filter(
@@ -64,7 +69,7 @@ export default function ReservationTable() {
             room.current_status === 'occupied' ||
             room.current_status === 'departing'
       );
-      const availableRooms = ThisTypeRoom.length - ThisTypeReservation?.length;
+      const availableRooms = ThisTypeRoom.length - uniqueReservation?.length;
       return availableRooms;
    };
 

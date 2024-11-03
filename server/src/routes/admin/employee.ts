@@ -12,7 +12,7 @@ import { middleware } from '@/middleware';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .use(middleware)
-    .get('/', async ({ user, set }) => {
+    .get('/', async ({ user, set, query }) => {
         // if (!user) {
         //     set.status = 401;
         //     return {
@@ -28,9 +28,14 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         //         message: 'Forbidden',
         //     };
         // }
+        const q = query.q || '';
 
         const employees =
-            await sql`SELECT id, username, first_name, last_name, date_of_birth, role, profile_picture, phone_number FROM employees`;
+            await sql`SELECT id, username, first_name, last_name, date_of_birth, role, profile_picture, phone_number 
+            FROM employees
+            WHERE username LIKE ${'%' + q + '%'}
+            `;
+            
         return {
             status: 'success',
             data: employees,

@@ -33,6 +33,10 @@ function Child() {
     if (reservationId) {
       removeReserveRecord(reservationId);
     }
+
+    if ( state != 1 ){ 
+      alert('You have been inactive for 5 minutes. Please start over.');
+    }
   }, timer);
 
   const resetTimer = () => {
@@ -42,6 +46,10 @@ function Child() {
       setState(1);
       if (reservationId) {
         removeReserveRecord(reservationId);
+      }
+
+      if ( state != 1 ){ 
+        alert('You have been inactive for 5 minutes. Please start over.');
       }
     }, timer);
   };

@@ -146,6 +146,45 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         check_in.setHours(12, 0, 0);
         check_out.setHours(12, 0, 0);
 
+        const diffDate = getDiffDate(new Date(check_in), new Date(check_out));
+
+        const [room] = await sql`
+                                SELECT
+                                  rooms."id" AS room_id,
+                                  ${diffDate} * room_types.price AS price
+                                FROM
+                                  rooms
+                                  LEFT JOIN room_types ON rooms.type_id = room_types."id" 
+                                WHERE
+                                  (
+                                  SELECT
+                                    reservations."id" 
+                                  FROM
+                                    reservations
+                                  WHERE
+                                    reservations.room_id = rooms."id" 
+                                    AND (
+                                      ( ( ( ${check_out} ) > reservations.check_in ) AND ( ( ${check_in} ) < reservations.check_out ) ) 
+                                      OR ( ( ( ${check_in} ) < reservations.check_out ) AND ( ( ${check_out} ) > reservations.check_in ) ) 
+                                      OR ( ( ( ${check_in} ) > reservations.check_in ) AND ( ( ${check_out} ) < reservations.check_out ) ) 
+                                      OR ( ( ( ${check_out} ) > reservations.check_out ) AND ( ( ${check_in} ) < reservations.check_in ) ) 
+                                    ) 
+                                    LIMIT 1 
+                                  ) IS NULL 
+                                  AND rooms.type_id = ${type_id}
+                                ORDER BY
+                                  rooms."number" ASC
+                                  LIMIT 1;`;
+
+        if (!room) {
+            set.status = 400;
+
+            return {
+                status: 'error',
+                message: 'Sorry last room just be purchased second ago.',
+            };
+        }
+
         await sql`UPDATE reservations SET room_id = (
                               SELECT
                                 rooms."id" AS room_id

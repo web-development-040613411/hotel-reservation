@@ -50,13 +50,21 @@ export default function Step2() {
       formData.append("reservation_id", information.reservationId);
       formData.append("total_price", type.total_price);
 
-      await fetch(
+      const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/change-type`,
         {
           method: "POST",
           body: formData,
         }
       );
+
+      const responseJson = await response.json();
+
+      if ( response.status !== 200 ) {
+        setDisibleRoomType(type.type_id);
+        alert(responseJson.message || 'Sorry last room just be purchased second ago.');
+        return;
+      }
     }
 
     addInformation({ roomType: type });

@@ -34,7 +34,9 @@ CREATE TABLE reservations (
   check_out DATE NOT NULL,
   display_color VARCHAR,
   transaction_status transaction_status,
-  stripe_session_id VARCHAR NULL
+  stripe_session_id VARCHAR NULL,
+  createAt TIMESTAMP DEFAULT NOW(),
+  createTime TIME DEFAULT NOW()
 );
 
 CREATE TABLE employee (

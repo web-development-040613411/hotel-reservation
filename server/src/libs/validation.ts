@@ -80,7 +80,6 @@ export const ResetPasswordSchema = z.object({
         .min(6, 'Password is required'),
 });
 
-<<<<<<< HEAD
 export const NewCustomerSchema = z.object({
     first_name: z
         .string({ message: 'First name is required' })
@@ -115,8 +114,6 @@ export const NewCustomerSchema = z.object({
         .min(1, 'Email is required'),
 });
 
-=======
->>>>>>> main
 export type ResetPasswordValues = z.infer<typeof ResetPasswordSchema>;
 
 export const loginSchema = z.object({
@@ -128,7 +125,6 @@ export const loginSchema = z.object({
         .min(1, 'Password is required'),
 });
 
-<<<<<<< HEAD
 export const SearchReservationSchema = z.object({
     year: z.string({ message: 'Year is required' }),
     month: z.string({ message: 'Month is required' }),
@@ -136,7 +132,6 @@ export const SearchReservationSchema = z.object({
 });
 
 export type SearchReservationValues = z.infer<typeof SearchReservationSchema>;
-=======
 export const GetVacantRoomsSchema = z.object({
     check_in: z.coerce.date(),
     check_out: z.coerce.date(),
@@ -191,4 +186,3 @@ export const PaymentSchema = z.object({
     reservationId: z.string({ message: 'Reservation ID is required' }).uuid(),
     roomTypeId: z.string({ message: 'Type ID is required' }).uuid(),
 });
->>>>>>> main

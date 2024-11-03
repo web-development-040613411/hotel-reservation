@@ -6,10 +6,10 @@ export const formInputs = [
     name: "first-name",
     required: true,
     key: "firstName",
-    pattern: "^[A-Za-zก-๑]{1,35}$",
+    pattern: "^[A-Za-zก-๏\\- ]{1,35}$",
     max: 35,
     placeHolder: "only alphabet characters are allowed.",
-    errorMessage: "Only A-Z, a-z, ก-๑"
+    errorMessage: "Only A-Z, a-z, ก-๏"
   },
   {
     label: "Last Name",
@@ -18,10 +18,10 @@ export const formInputs = [
     name: "last-name",
     required: true,
     key: "lastName",
-    pattern: "^[A-Za-zก-๑]{1,35}$",
+    pattern: "^[A-Za-zก-๏\\- ]{1,35}$",
     max: 35,
     placeHolder: "only alphabet characters are allowed.",
-    errorMessage: "Only A-Z, a-z, ก-๑"
+    errorMessage: "Only A-Z, a-z, ก-๏"
   },
   {
     label: "Address",
@@ -100,3 +100,8 @@ export const formInputs = [
     max: 35,
   },
 ];
+
+export const specialRequest = {
+  pattern: "^[A-Za-zก-๏/0-9\\.'\\-\\(\\) ]*$",
+  errorMessage: "Only A-Z, a-z, ก-๏, 0-9, -, ., (, )"
+}

@@ -2,19 +2,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { formInputs } from "@/app/( guest )/model/customer-information";
+import {
+  formInputs,
+  specialRequest,
+} from "@/app/( guest )/model/customer-information";
 import { ReservationContext } from "@/context/ReservationContext";
 import { useContext, useEffect, useState } from "react";
 
 class InvalidPatternInfo {
   errorMessage = "";
-  isInvalidPattern = false;
+  isInvalidPattern = true;
 
-  setIsInvalidPattern( status : boolean ) {
+  setIsInvalidPattern(status: boolean) {
     this.isInvalidPattern = status;
   }
 
-  setErrorMessage( message : string ) {
+  setErrorMessage(message: string) {
     this.errorMessage = message;
   }
 }
@@ -24,15 +27,26 @@ export default function PersonalInformationForm() {
     useContext(ReservationContext);
   const { personalInformation } = information;
   const [isChange, setIsChange] = useState(false);
-  const [invalidPatternInfos, setInvalidPatternInfos] = useState<InvalidPatternInfo[]>( Array.from({ length: formInputs.length },
-    () => new InvalidPatternInfo()
-  ));
+  const [invalidPatternInfos, setInvalidPatternInfos] = useState<
+    InvalidPatternInfo[]
+  >(
+    Array.from(
+      { length: formInputs.length + 1 },
+      () => new InvalidPatternInfo()
+    )
+  );
+  const [canPass, setCanPass] = useState(true);
+
   const btnClass = `bg-primary w-full rounded-lg  hover:bg-gray-800 active:bg-gray-800
                     p-4 my-4 hover:bg-primary-hover 
-                    font-bold text-white`
+                    font-bold text-white`;
 
   const onSubmitHandler = (e: any) => {
     e.preventDefault();
+
+    if (!canPass) {
+      return;
+    }
 
     const personalInformation = {
       firstName: e.target[0].value,
@@ -56,31 +70,43 @@ export default function PersonalInformationForm() {
     }
   };
 
-  const checkPattern = ( pattern: string, value: string , errorMessage: string, index: number) => {
+  const checkPattern = (
+    pattern: string,
+    value: string,
+    errorMessage: string,
+    index: number
+  ) => {
     const regex = new RegExp(pattern);
     if (!regex.test(value)) {
       const newInvalidPatternInfos = [...invalidPatternInfos];
-      
+
       newInvalidPatternInfos[index].setIsInvalidPattern(true);
       newInvalidPatternInfos[index].setErrorMessage(errorMessage);
 
-      setInvalidPatternInfos(
-        newInvalidPatternInfos
-      );
+      setInvalidPatternInfos(newInvalidPatternInfos);
     } else {
       const newInvalidPatternInfos = [...invalidPatternInfos];
-      
+
       newInvalidPatternInfos[index].setIsInvalidPattern(false);
 
-      setInvalidPatternInfos(
-        newInvalidPatternInfos
-      );
+      setInvalidPatternInfos(newInvalidPatternInfos);
+    }
+  };
+
+  const checkSpecialRequest = (value: string, pattern: string, errorMessage : string) => {
+    const regex = new RegExp(pattern);
+    if (!regex.test(value)) {
+      setCanPass(false);
+      const newInvalidPatternInfos = [...invalidPatternInfos];
+
+      newInvalidPatternInfos[9].setIsInvalidPattern(true);
+      newInvalidPatternInfos[9].setErrorMessage(errorMessage);
+
+      setInvalidPatternInfos(newInvalidPatternInfos);
+    } else {
+      setCanPass(true);
     }
   }
-
-  useEffect( () => {
-    console.log( invalidPatternInfos )
-  }, [invalidPatternInfos] )
 
   return (
     <form
@@ -96,10 +122,11 @@ export default function PersonalInformationForm() {
                 {input.label} <span className="text-red-500"> *</span>
               </Label>
 
-              {
-                invalidPatternInfos[index].isInvalidPattern && <h1 className="text-red-500 text-xs font-bold">{invalidPatternInfos[index].errorMessage}</h1>
-              }
-              
+              {invalidPatternInfos[index].isInvalidPattern && (
+                <h1 className="text-red-500 text-xs font-bold">
+                  {invalidPatternInfos[index].errorMessage}
+                </h1>
+              )}
             </div>
             <Input
               type={input.type}
@@ -109,8 +136,13 @@ export default function PersonalInformationForm() {
               className="my-2"
               required={input.required}
               onChange={(e) => {
-                setIsChange(true)
-                checkPattern(input.pattern!, e.target.value,  input.errorMessage!, index )
+                setIsChange(true);
+                checkPattern(
+                  input.pattern!,
+                  e.target.value,
+                  input.errorMessage!,
+                  index
+                );
               }}
               defaultValue={
                 personalInformation ? personalInformation[input.key] : ""
@@ -124,64 +156,77 @@ export default function PersonalInformationForm() {
 
       <div className="md:w-1/2 flex-grow flex flex-col gap-2">
         {formInputs.slice(6).map((input, index) => {
-          const newIndex = index+6;
-          return (<div key={newIndex}>
-            <div className="flex items-center justify-between px-2">
+          const shiftedIndex = index + 6;
+          return (
+            <div key={shiftedIndex}>
+              <div className="flex items-center justify-between px-2">
                 <Label htmlFor={input.id}>
                   {input.label} <span className="text-red-500"> *</span>
                 </Label>
 
-                {
-                  invalidPatternInfos[newIndex].isInvalidPattern && <h1 className="text-red-500 text-xs font-bold">{invalidPatternInfos[newIndex].errorMessage}</h1>
-                }
-                
+                {invalidPatternInfos[shiftedIndex].isInvalidPattern && (
+                  <h1 className="text-red-500 text-xs font-bold">
+                    {invalidPatternInfos[shiftedIndex].errorMessage}
+                  </h1>
+                )}
               </div>
-            <Input
-              type={input.type}
-              id={input.id}
-              placeholder={input.placeHolder}
-              name={input.name}
-              className="my-2"
-              required={input.required}
-              onChange={(e) => {
-                setIsChange(true)
-                checkPattern(input.pattern!, e.target.value,  input.errorMessage!, newIndex )
-              }}
-              defaultValue={
-                personalInformation ? personalInformation[input.key] : ""
-              }
-              maxLength={input.max}
-            />
-          </div>)
+              <Input
+                type={input.type}
+                id={input.id}
+                placeholder={input.placeHolder}
+                name={input.name}
+                className="my-2"
+                required={input.required}
+                onChange={(e) => {
+                  setIsChange(true);
+                  checkPattern(
+                    input.pattern!,
+                    e.target.value,
+                    input.errorMessage!,
+                    shiftedIndex
+                  );
+                }}
+                defaultValue={
+                  personalInformation ? personalInformation[input.key] : ""
+                }
+                maxLength={input.max}
+              />
+            </div>
+          );
         })}
         <div className="md:flex-grow md:flex md:flex-col md:my-2 md:gap-2">
-          <Label htmlFor="email">Special Requests</Label>
+          <div className="flex items-center justify-between px-2">
+            <Label htmlFor="email">Special Requests</Label>
+            {invalidPatternInfos[9].isInvalidPattern && (
+              <h1 className="text-red-500 text-xs font-bold">
+                {invalidPatternInfos[9].errorMessage}
+              </h1>
+            )}
+          </div>
           <Textarea
             placeholder="Type your message here."
             className="md:flex-grow"
-            onChange={() => setIsChange(true)}
+            onChange={(e) => {
+              setIsChange(true);
+              checkSpecialRequest(
+                e.target.value,
+                specialRequest.pattern,
+                specialRequest.errorMessage
+              );
+            }}
             defaultValue={
               personalInformation ? personalInformation.specialRequests : ""
             }
           />
         </div>
 
-        {state == 4 ? (
-          <Button
-            className={btnClass}
-            type="submit"
-            disabled={!isChange}
-          >
-            Confirm Edit
-          </Button>
-        ) : (
-          <Button
-            className={btnClass}
-            type="submit"
-          >
-            Confirm
-          </Button>
-        )}
+        <Button
+          className={btnClass}
+          type="submit"
+          disabled={!isChange }
+        >
+          {state == 4 ? "Confirm Edit" : "Confirm"}
+        </Button>
       </div>
     </form>
   );

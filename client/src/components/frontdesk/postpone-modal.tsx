@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import {
    Dialog,
@@ -18,7 +19,9 @@ interface PostponeModalProps {
 }
 
 export function PostponeModal({ thisReservation }: PostponeModalProps) {
-   const postpone = (id: string) => {};
+   const postpone = (id: string) => {
+      console.log('Postpone reservation with id: ', id);
+   };
    return (
       <Dialog>
          <DialogTrigger>

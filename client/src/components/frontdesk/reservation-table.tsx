@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import {
-   TableSticky,
+   Table,
    TableHeader,
    TableRow,
    TableHead,
@@ -9,9 +9,7 @@ import {
 } from '@/components/ui/table';
 import Reservation_detail_modal from './reservation-detail-modal';
 import { FrontDesk } from '@/context/front-desk';
-
 import { allRooms, Reservation, Room } from '@/lib/frontdesk/type';
-
 export default function ReservationTable() {
    const {
       roomsDataFilter,
@@ -57,7 +55,7 @@ export default function ReservationTable() {
          (reservation: any) =>
             reservation.types_name === roomType &&
             new Date(reservation.check_in) <= thisColDate &&
-            new Date(reservation.check_out) >= thisColDate
+            new Date(reservation.check_out) > thisColDate
       );
 
       const ThisTypeRoom = roomsData[roomType].filter(
@@ -71,17 +69,17 @@ export default function ReservationTable() {
    };
 
    return (
-      <TableSticky className="table-fixed mt-3 w-full relative">
-         <TableHeader className="sticky top-0 bg-white border">
+      <Table className="table-fixed mt-3 w-full absolute z-20 border-2 border-gray-200">
+         <TableHeader className="sticky top-0 bg-white border-2 border-gray-200 z-30">
             <TableRow className="border">
-               <TableHead className="w-28 text-center border-b text-white bg-blue-600">
+               <TableHead className="w-28 text-center border-2 border-gray-200 text-white bg-blue-600">
                   <b>Rooms Types</b>
                </TableHead>
 
                {daysArray.map((date: any, index: any) => (
                   <TableHead
                      key={`date-${index}`}
-                     className="text-center border text-black w-10"
+                     className="text-center  border-2 border-gray-200 text-black w-10"
                   >
                      <b>{date}</b>
                      <br />{' '}
@@ -99,8 +97,11 @@ export default function ReservationTable() {
                ([roomTypes, rooms]: [string, Room[]], index) => {
                   return (
                      <React.Fragment key={`roomTypes-${index}`}>
-                        <TableRow key={`room-type-row-${roomTypes}`}>
-                           <TableCell className="w-28 text-center border text-black font-bold">
+                        <TableRow
+                           key={`room-type-row-${roomTypes}`}
+                           className="border-gray-200 border-2"
+                        >
+                           <TableCell className="w-28 text-center border-gray-200 text-black font-bold">
                               {roomTypes}
                            </TableCell>
 
@@ -108,7 +109,7 @@ export default function ReservationTable() {
                               (_, i) => (
                                  <TableCell
                                     key={`room-type-${roomTypes}-${i}`}
-                                    className="text-center border"
+                                    className="text-center border-gray-200 border-2"
                                  >
                                     {checkAvailableRooms(
                                        i + 1,
@@ -145,10 +146,13 @@ export default function ReservationTable() {
                            );
 
                            return (
-                              <TableRow key={`room-row-${room.id}`}>
+                              <TableRow
+                                 key={`room-row-${room.id}`}
+                                 className="relative h-12 border-gray-200 border-2"
+                              >
                                  <TableCell
                                     key={`room-cell-${room.id}`}
-                                    className="w-28 text-start border text-black"
+                                    className="w-28 text-start border-gray-200 border-2 text-black"
                                  >
                                     {room.current_status === 'vacant' ? (
                                        <div className="flex items-center">
@@ -183,6 +187,20 @@ export default function ReservationTable() {
                                              thisColDays
                                           ).padStart(2, '0')}`
                                        );
+                                       const firstDayOfMonth = new Date(
+                                          `${selectedYear}-${String(
+                                             selectedMonth
+                                          ).padStart(2, '0')}-01`
+                                       );
+                                       const lastDayOfMonth = new Date(
+                                          `${selectedYear}-${String(
+                                             selectedMonth
+                                          ).padStart(2, '0')}-${
+                                             daysArray.length
+                                          }`
+                                       );
+                                       let isOverflowFromPreviousMonth = false;
+                                       let isOverflowToNextMonth = false;
 
                                        const thisReservation =
                                           thisRoomReservations?.find(
@@ -200,29 +218,84 @@ export default function ReservationTable() {
                                           const checkOutDate = new Date(
                                              thisReservation.check_out
                                           );
+                                          const checkInDate = new Date(
+                                             thisReservation.check_in
+                                          );
 
-                                          if (checkOutDate >= thisColDate) {
-                                             const timeDiff =
-                                                checkOutDate.getTime() -
-                                                thisColDate.getTime();
-                                             const dayDiff = Math.ceil(
-                                                timeDiff / (1000 * 3600 * 24)
+                                          const timeDiff =
+                                             checkOutDate.getTime() -
+                                             thisColDate.getTime();
+                                          const dayDiff = Math.ceil(
+                                             timeDiff / (1000 * 3600 * 24)
+                                          );
+
+                                          const nextReservation =
+                                             thisRoomReservations?.find(
+                                                (reservation: Reservation) =>
+                                                   new Date(
+                                                      reservation.check_in
+                                                   ).getTime() ===
+                                                      checkOutDate.getTime() &&
+                                                   reservation.room_id ===
+                                                      thisReservation.room_id
                                              );
-                                             endSpan = Math.min(
-                                                dayDiff + 1,
-                                                daysArray.length - i
+
+                                          const beforeReservation =
+                                             thisRoomReservations?.find(
+                                                (reservation: Reservation) =>
+                                                   new Date(
+                                                      reservation.check_out
+                                                   ).getTime() ===
+                                                      checkInDate.getTime() &&
+                                                   reservation.room_id ===
+                                                      thisReservation.room_id
                                              );
+
+                                          if (dayDiff > 0) {
+                                             if (nextReservation) {
+                                                endSpan = Math.min(
+                                                   dayDiff,
+                                                   daysArray.length - i
+                                                );
+                                                i = i + 1;
+                                             } else if (beforeReservation) {
+                                                endSpan = Math.min(
+                                                   dayDiff + 2,
+                                                   daysArray.length - i
+                                                );
+                                                i = i - 1;
+                                             } else {
+                                                endSpan = Math.min(
+                                                   dayDiff + 1,
+                                                   daysArray.length - i
+                                                );
+                                             }
+
+                                             isOverflowFromPreviousMonth =
+                                                new Date(
+                                                   thisReservation?.check_in
+                                                ) < firstDayOfMonth;
+                                             isOverflowToNextMonth =
+                                                new Date(
+                                                   thisReservation?.check_out
+                                                ) > lastDayOfMonth;
                                           }
 
                                           cells.push(
                                              <TableCell
                                                 key={`reservation-cell-${thisReservation.reservations_id}-${i}`}
-                                                className="border p-0"
+                                                className="border-gray-200 border-2 p-0"
                                                 colSpan={endSpan}
                                              >
                                                 <Reservation_detail_modal
                                                    thisReservation={
                                                       thisReservation
+                                                   }
+                                                   isOverflowFromPreviousMonth={
+                                                      isOverflowFromPreviousMonth
+                                                   }
+                                                   isOverflowToNextMonth={
+                                                      isOverflowToNextMonth
                                                    }
                                                 />
                                              </TableCell>
@@ -248,6 +321,6 @@ export default function ReservationTable() {
                }
             )}
          </TableBody>
-      </TableSticky>
+      </Table>
    );
 }

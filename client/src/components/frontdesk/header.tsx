@@ -1,3 +1,4 @@
+'use client';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, Search } from 'lucide-react';
 import {
@@ -85,7 +86,7 @@ export default function Frontdesk_Header() {
             </ToggleGroupItem>
             {arrayYear
                .slice(startYearIndex, startYearIndex + YearPerPage)
-               .map((year: any) => (
+               .map((year: string) => (
                   <ToggleGroupItem
                      key={year}
                      value={year.toString()}
@@ -122,13 +123,13 @@ export default function Frontdesk_Header() {
             >
                {'<'}
             </ToggleGroupItem>
-            {arrayMonth.map((month: any, index: any) => (
+            {arrayMonth.map((month: string, index: number) => (
                <ToggleGroupItem
                   key={month}
                   value={(index + 1).toString()}
                   className="font-bold border  rounded-none flex-1 data-[state=on]:bg-blue-600 data-[state=on]:text-white data-[disabled]:bg-blue-600 data-[disabled]:text-white data-[disabled]:opacity-100"
                   variant="outline"
-                  disabled={selectedMonth === index + 1}
+                  disabled={selectedMonth == (index + 1).toString()}
                >
                   {month}
                </ToggleGroupItem>
@@ -206,7 +207,7 @@ export default function Frontdesk_Header() {
                            <div>All</div>
                         </div>
                      </DropdownMenuRadioItem>
-                     {roomsTypeData?.map((type: any) => (
+                     {roomsTypeData?.map((type: string) => (
                         <DropdownMenuRadioItem key={type} value={type}>
                            <div className="flex items-center justify-between">
                               <div>{type}</div>

@@ -1,7 +1,12 @@
+'use client';
 import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-export const useCheckInMutation = () => {
+export const useCheckInMutation = (
+   selectedYear: string,
+   selectedMonth: string,
+   searchCustomer: string
+) => {
    const queryClient = useQueryClient();
 
    return useMutation({
@@ -26,7 +31,12 @@ export const useCheckInMutation = () => {
             queryKey: ['rooms'],
          });
          queryClient.invalidateQueries({
-            queryKey: ['reservations'],
+            queryKey: [
+               'reservations',
+               selectedYear,
+               selectedMonth,
+               searchCustomer,
+            ],
          });
          queryClient.invalidateQueries({
             queryKey: ['roomTypes'],

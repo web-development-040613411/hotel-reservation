@@ -1,4 +1,5 @@
-import React from 'react';
+'use client';
+import React, { useContext } from 'react';
 import {
    Dialog,
    DialogContent,
@@ -18,19 +19,33 @@ import { Reservation } from '@/lib/frontdesk/type';
 import { Badge } from '../ui/badge';
 import { useCheckInMutation } from '@/hooks/frontdesk/check-in';
 import { useCheckOutMutation } from '@/hooks/frontdesk/check-out';
-import { LoadingSpinner } from '@/lib/frontdesk/spinner';
 import { PostponeModal } from './postpone-modal';
+import { LoaderCircle } from 'lucide-react';
+import { FrontDesk } from '@/context/front-desk';
 interface Reservation_detail_modalProps {
    thisReservation: Reservation;
+   isOverflowFromPreviousMonth: boolean;
+   isOverflowToNextMonth: boolean;
 }
 
 export default function Reservation_detail_modal({
    thisReservation,
+   isOverflowFromPreviousMonth,
+   isOverflowToNextMonth,
 }: Reservation_detail_modalProps) {
+   const {
+      selectedYear,
+      selectedMonth,
+      searchCustomer,
+   }: {
+      selectedYear: string;
+      selectedMonth: string;
+      searchCustomer: string;
+   } = useContext(FrontDesk);
    const { mutate: checkInMutate, isPending: checkInIsPending } =
-      useCheckInMutation();
-   const { mutate: checkOutMutation, isPending: checkOutIsPending } =
-      useCheckOutMutation();
+      useCheckInMutation(selectedYear, selectedMonth, searchCustomer);
+   const { mutate: checkOutMutate, isPending: checkOutIsPending } =
+      useCheckOutMutation(selectedYear, selectedMonth, searchCustomer);
 
    return (
       <Dialog>
@@ -41,9 +56,17 @@ export default function Reservation_detail_modal({
                      thisReservation.display_color
                   ),
                   color: getDarkenColorClass(thisReservation.display_color),
-                  padding: '0.5rem',
-                  borderRadius: '10px',
-                  borderLeft: `5px solid ${getDarkenColorClass(
+                  padding: '0.35rem',
+                  borderRadius: `${
+                     isOverflowFromPreviousMonth
+                        ? '0 0.5rem 0.5rem 0'
+                        : isOverflowToNextMonth
+                        ? '0.5rem 0 0 0.5rem'
+                        : '0.5rem'
+                  }`,
+                  borderLeft: `${
+                     isOverflowFromPreviousMonth ? '0' : '0.4rem'
+                  } solid ${getDarkenColorClass(
                      thisReservation.display_color
                   )}`,
                   cursor: 'pointer',
@@ -53,6 +76,16 @@ export default function Reservation_detail_modal({
                   whiteSpace: 'nowrap',
                   overflow: 'hidden',
                   textOverflow: 'ellipsis',
+                  margin: '0px',
+                  position: 'relative',
+                  left: `${isOverflowFromPreviousMonth ? '0' : '1.4rem'}`,
+                  width: `${
+                     isOverflowToNextMonth
+                        ? 'calc(100% - 1.4rem)'
+                        : isOverflowFromPreviousMonth
+                        ? 'calc(100% + 1.4rem)'
+                        : '100%'
+                  }`,
                }}
                onMouseEnter={(e) => {
                   e.currentTarget.style.opacity = '0.6';
@@ -61,7 +94,7 @@ export default function Reservation_detail_modal({
                   e.currentTarget.style.opacity = '1';
                }}
             >
-               {thisReservation.first_name + ' ' + thisReservation.last_name}
+               {thisReservation.first_name + ' ' + thisReservation.last_name}{' '}
             </div>
          </DialogTrigger>
          <DialogContent className="max-w-lg p-4">
@@ -191,24 +224,38 @@ export default function Reservation_detail_modal({
                      thisReservation.current_status === 'off_market' ||
                      new Date(thisReservation.check_out) < new Date() ||
                      new Date(thisReservation.check_out).getDate() ===
+                        new Date().getDate() ||
+                     new Date(thisReservation.check_in).getDate() >
                         new Date().getDate()
                   }
                   onClick={() => checkInMutate(thisReservation.reservations_id)}
                >
-                  {checkInIsPending ? <LoadingSpinner /> : 'Check-in'}
+                  {checkInIsPending ? (
+                     <LoaderCircle className="animate-spin" />
+                  ) : (
+                     'Check-in'
+                  )}
                </Button>
                <Button
                   variant="default"
                   className="bg-red-600 text-white hover:bg-red-700 font-bold w-28 flex items-center justify-center"
                   onClick={() =>
-                     checkOutMutation(thisReservation.reservations_id)
+                     checkOutMutate(thisReservation.reservations_id)
                   }
                   disabled={
                      thisReservation.current_status === 'vacant' ||
-                     new Date(thisReservation.check_out) < new Date()
+                     thisReservation.current_status === 'maintenance' ||
+                     thisReservation.current_status === 'off_market' ||
+                     new Date(thisReservation.check_out) < new Date() ||
+                     new Date(thisReservation.check_in).getDate() >=
+                        new Date().getDate()
                   }
                >
-                  {checkOutIsPending ? <LoadingSpinner /> : 'Check-out'}
+                  {checkOutIsPending ? (
+                     <LoaderCircle className="animate-spin" />
+                  ) : (
+                     'Check-out'
+                  )}
                </Button>
                <PostponeModal thisReservation={thisReservation} />
             </DialogFooterStart>

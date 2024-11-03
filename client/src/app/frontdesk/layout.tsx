@@ -1,33 +1,40 @@
-'use client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import type { Metadata } from 'next';
 import localFont from 'next/font/local';
+import '../globals.css';
+import './frontdesk.css';
+import { Toaster } from '@/components/ui/sonner';
 
 const geistSans = localFont({
-   src: '../fonts/GeistVF.woff',
+   src: './fonts/GeistVF.woff',
    variable: '--font-geist-sans',
    weight: '100 900',
 });
 const geistMono = localFont({
-   src: '../fonts/GeistMonoVF.woff',
+   src: './fonts/GeistMonoVF.woff',
    variable: '--font-geist-mono',
    weight: '100 900',
 });
 
-const queryClient = new QueryClient();
+export const metadata: Metadata = {
+   title: {
+      template: '%s | Mof Hotel',
+      default: 'Mof Hotel',
+   },
+};
 
-export default function ReservationsLayout({
+export default function RootLayout({
    children,
-}: {
+}: Readonly<{
    children: React.ReactNode;
-}) {
+}>) {
    return (
-      <html lang="en" className="overflow-y-scroll scroll-smooth">
+      <html lang="en">
          <body
+            id="body"
             className={`${geistSans.variable} ${geistMono.variable} antialiased`}
          >
-            <QueryClientProvider client={queryClient}>
-               <main>{children}</main>
-            </QueryClientProvider>
+            {children}
+            <Toaster richColors />
          </body>
       </html>
    );

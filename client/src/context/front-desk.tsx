@@ -1,3 +1,4 @@
+'use client';
 import { allRooms, Room } from '@/lib/frontdesk/type';
 import {
    thisYear,
@@ -56,7 +57,6 @@ export default function FrontDeskContextProvide({
          return dayNames[date.getDay()];
       })
    );
-
    // Fetch data
    const {
       data: roomsData,
@@ -76,7 +76,7 @@ export default function FrontDeskContextProvide({
       isError: reservationError,
    } = UseReservation(selectedYear, selectedMonth.toString(), searchCustomer);
 
-   const changeSelectedYear = (value: any) => {
+   const changeSelectedYear = (value: string) => {
       if (value === 'prev' || value === 'next') return;
       setSelectedYear(value);
    };

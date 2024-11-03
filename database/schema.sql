@@ -5,7 +5,9 @@ CREATE TABLE user_session (
 
 CREATE TYPE transaction_status AS ENUM (
   'preserve',
-  'paid'
+  'complete',
+  'open',
+  'expired'
 );
 
 CREATE TYPE role AS ENUM (
@@ -31,7 +33,10 @@ CREATE TABLE reservations (
   check_in DATE NOT NULL,
   check_out DATE NOT NULL,
   display_color VARCHAR,
-  transaction_status transaction_status
+  transaction_status transaction_status,
+  stripe_session_id VARCHAR NULL,
+  createAt TIMESTAMP DEFAULT NOW(),
+  createTime TIME DEFAULT NOW()
 );
 
 CREATE TABLE employee (
@@ -42,7 +47,9 @@ CREATE TABLE employee (
   date_of_birth DATE NOT NULL,
   password VARCHAR NOT NULL,
   role role,
-  session_id UUID NOT NULL
+  telephone VARCHAR NOT NULL,
+  session_id UUID NOT NULL,
+  phone_number VARCHAR NOT NULL,
 );
 
 CREATE TABLE website_config (
@@ -78,8 +85,7 @@ CREATE table districts (
   id  UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   code  varchar(10) UNIQUE,
   name_en varchar(255),
-  province_code VARCHAR REFERENCES provinces(code),
-  postal_code varchar(10)
+  province_code VARCHAR REFERENCES provinces(code)
 );
 
 CREATE table sub_districts (
@@ -100,7 +106,8 @@ CREATE TABLE customer_details (
   province_id UUID NOT NULL REFERENCES provinces(id),
   postal_code VARCHAR NOT NULL,
   phone_number VARCHAR NOT NULL,
-  email VARCHAR NOT NULL
+  email VARCHAR NOT NULL,
+  special_request VARCHAR NULL,
 );
 
 ALTER TABLE room ADD FOREIGN KEY (type_id) REFERENCES room_type (id);

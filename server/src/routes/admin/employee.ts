@@ -271,8 +271,8 @@ export const resetPasswordRoutes = new Elysia({
                 message: 'Unauthorized',
             };
         }
-        
-        if(user.role !== 'administrator' && user.id !== id) {
+
+        if (user.role !== 'administrator' && user.id !== id) {
             set.status = 403;
             return {
                 status: 'error',

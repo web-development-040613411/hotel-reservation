@@ -31,12 +31,7 @@ export const useCheckOutMutation = (
             queryKey: ['rooms'],
          });
          queryClient.invalidateQueries({
-            queryKey: [
-               'reservations',
-               selectedYear,
-               selectedMonth,
-               searchCustomer,
-            ],
+            queryKey: ['reservations'],
          });
          queryClient.invalidateQueries({
             queryKey: ['roomTypes'],

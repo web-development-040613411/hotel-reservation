@@ -171,7 +171,7 @@ export default function Reservation_detail_modal({
                   </p>
                   <div className="flex align-middle text-center">
                      <p className="break-words">
-                        <strong>Status :&nbsp;</strong>
+                        <strong>Room Status :&nbsp;</strong>
                      </p>
                      {thisReservation.current_status === 'occupied' ? (
                         <Badge className="bg-amber-600 hover:bg-amber-600 font-bold text-sm">

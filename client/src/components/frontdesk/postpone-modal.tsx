@@ -24,15 +24,12 @@ export function PostponeModal({ thisReservation }: PostponeModalProps) {
    };
    return (
       <Dialog>
-         <DialogTrigger>
-            {' '}
-            <Button
-               variant="default"
-               className="bg-yellow-600 text-white hover:bg-yellow-700 font-bold w-28 flex items-center justify-center"
-               onClick={() => postpone(thisReservation.reservations_id)}
-            >
-               Post-pone
-            </Button>
+         <DialogTrigger
+            className="bg-yellow-600 text-white hover:bg-yellow-700 font-bold w-28 flex items-center justify-center
+            rounded
+         "
+         >
+            Postpone
          </DialogTrigger>
          <DialogContent>
             <DialogHeader>

@@ -1,7 +1,7 @@
 import { sql } from '@/libs/db';
 import { lucia } from '@/libs/lucia';
 import { loginSchema } from '@/libs/validation';
-import Elysia from 'elysia';
+import Elysia, { t } from 'elysia';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
     .post('/login', async ({ set, cookie, body }) => {
@@ -78,4 +78,30 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
             status: 'success',
             message: 'Logout successful',
         };
+    })
+    .get('/check-user', async ({ cookie }) => {
+        const sessionId = cookie["auth_session"].value;
+
+        if(!sessionId) {
+            return {
+                status: 'error',
+                message: 'User not logged in',
+            }
+        }
+
+        const { user, session } = await lucia.validateSession(sessionId);
+
+        if(!user) {
+            return {
+                status: 'success',
+                message: "User not logged in",
+                user: null,
+            }
+        }
+
+        return {
+            status: 'success',
+            message: 'User logged in',
+            user,
+        }
     });

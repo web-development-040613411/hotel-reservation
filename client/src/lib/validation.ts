@@ -49,3 +49,24 @@ export const RoomSchema = z.object({
 })
 
 export type RoomValues = z.infer<typeof RoomSchema>;
+
+const BaseRoomTypeSchema = z.object({
+  name: z.string().min(1, "Room type name is required"),
+  price: z.coerce.number().min(1, "Price is required"),
+  capacity: z.coerce.number().min(1, "Capacity is required"),
+  detail: z.string().min(1, "Detail is required"),
+});
+
+export const AddRoomTypeSchema = BaseRoomTypeSchema.extend({
+  image: z.instanceof(File, { message: "Image is required" }).refine((value) => value.size !== 0, {
+    message: "Image is required",
+  }),
+});
+
+export type AddRoomTypeValues = z.infer<typeof AddRoomTypeSchema>;
+
+export const EditRoomTypeSchema = BaseRoomTypeSchema.extend({
+  image: z.instanceof(File).optional(),
+});
+
+export type EditRoomTypeValues = z.infer<typeof EditRoomTypeSchema>;

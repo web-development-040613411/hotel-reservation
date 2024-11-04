@@ -19,23 +19,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { AddRoomTypeSchema, AddRoomTypeValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const AddRoomTypeSchema = z.object({
-  name: z.string(),
-  price: z.coerce.number(),
-  capacity: z.coerce.number(),
-  detail: z.string(),
-  image: z.instanceof(File).optional(),
-});
+import { toast } from "sonner";
 
 export default function AddRoomTypeModal() {
-  const form = useForm({
+  const form = useForm<AddRoomTypeValues>({
     resolver: zodResolver(AddRoomTypeSchema),
     defaultValues: {
       name: "",
@@ -46,29 +39,37 @@ export default function AddRoomTypeModal() {
     },
   });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const router = useRouter();
 
   const handleAddRoomType = async () => {
     if (!formRef.current) return;
 
-    const form = new FormData(formRef.current);
+    const formData = new FormData(formRef.current);
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/room-types`,
-      {
-        method: "POST",
-        credentials: "include",
-        body: form,
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/room-types`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        }
+      );
+  
+      const data = await res.json();
+  
+      if (data.status === "success") {
+        form.reset();
+        toast.success(data.message);
+        router.refresh();
+        setIsModalOpen(false);
+      } else {
+        toast.error(data.message);
       }
-    );
-
-    const data = await res.json();
-
-    if (data.status === "success") {
-      router.refresh();
-      setIsModalOpen(false);
+    } catch {
+      toast.error("An error occurred.");
     }
   };
 

@@ -62,7 +62,7 @@ export default function Frontdesk_Header() {
       <div>
          <div className="flex justify-between items-center">
             <p className="text-2xl font-bold">Front Desk</p>
-            <Button className="font-bold bg-blue-800 hover:bg-blue-900">
+            <Button className="font-bold bg-blue-800 hover:bg-blue-900 border-0">
                Add Booking
             </Button>
          </div>

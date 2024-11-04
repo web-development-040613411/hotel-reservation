@@ -1,6 +1,5 @@
 import { sql } from '@/libs/db';
 import Elysia, { t } from 'elysia';
-import { NewCustomerSchema } from '@/libs/validation';
 
 export const customerRoutes = new Elysia({ prefix: '/customers' }).get(
     '/',

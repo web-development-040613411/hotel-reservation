@@ -1,9 +1,8 @@
 import { sql } from '@/libs/db';
-import Elysia, { t } from 'elysia';
-import { reservationType } from '@/libs/type';
+import Elysia from 'elysia';
 import { PostponeShcema } from '@/libs/validation';
-import { getDiffDate } from '@/libs/get-diff-date';
 import getVacantRoom from '@/libs/get-vacant-room';
+import { getRandomColorToDB } from '@/libs/random-color';
 
 export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
     '/',
@@ -17,60 +16,89 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                 },
             };
         }
-        const { reservationID, newCheckIn, newCheckOut } = validation.data;
+        const { reservationID, currentCheckout, newCheckOut } = validation.data;
 
-        const thisReservation = (await sql`
-            SELECT * FROM reservations WHERE id = ${reservationID}
-        `) as reservationType[];
-
-        const lasCheckOut = new Date(newCheckIn).toISOString().split('T')[0];
-        const newCheckOutT = new Date(newCheckOut).toISOString().split('T')[0];
-        const thisRoomReservations = await sql`
-            SELECT reservations.id , reservations.room_id , reservations.check_in , reservations.check_out , room_types.id AS roomtype_id , reservations.transaction_status FROM reservations INNER JOIN rooms ON reservations.room_id = rooms."id" 
-            INNER JOIN room_types ON rooms.type_id = room_types."id" WHERE room_id = ${thisReservation[0].room_id} AND reservations.check_in < ${newCheckOutT} AND reservations.check_out > ${lasCheckOut} 
-            AND reservations.transaction_status = 'complete' ORDER BY reservations.check_in ASC;
+        const [postponeReservation] = await sql`
+            SELECT
+	            reservations.room_id,
+	            room_types.price 
+            FROM
+                reservations
+                INNER JOIN rooms ON reservations.room_id = rooms."id"
+                INNER JOIN room_types ON rooms.type_id = room_types."id" 
+            WHERE
+                reservations."id" = ${reservationID}
         `;
 
-        if (thisRoomReservations.length === 0) {
-            //can postpone go to stripe
-            //
-            //
-        } else {
-            try {
-                await sql.begin(async (sql) => {
-                    for (let i = 0; i < thisRoomReservations.length; i++) {
+        const { room_id, price: pricePerNight } = postponeReservation;
+
+        const conflictReservations = await sql`
+            SELECT 
+                reservations.id, 
+                reservations.room_id, 
+                reservations.check_in, 
+                reservations.check_out, 
+                room_types.id AS roomtype_id, 
+                reservations.transaction_status 
+            FROM reservations 
+            INNER JOIN rooms 
+                ON reservations.room_id = rooms."id" 
+            INNER JOIN room_types
+                ON rooms.type_id = room_types."id" 
+            WHERE 
+                room_id = ${room_id} AND reservations.check_in < ${newCheckOut} 
+                AND reservations.check_in >= ${currentCheckout} 
+            ORDER BY reservations.check_in ASC;
+        `;
+
+        try {
+            await sql.begin(async (sql) => {
+                if (conflictReservations.length != 0) {
+                    for (let i = 0; i < conflictReservations.length; i++) {
+                        const {
+                            roomtype_id: type_id,
+                            check_in,
+                            check_out,
+                            id,
+                        } = conflictReservations[i];
+
                         const res = await getVacantRoom({
-                            type_id: thisRoomReservations[i].roomtype_id,
-                            check_in: thisRoomReservations[i].check_in,
-                            check_out: thisRoomReservations[i].check_out,
+                            type_id,
+                            check_in,
+                            check_out,
                         });
                         const vacantRoomID = res?.room_id;
-                        // console.log(vacantRoomID);
+
                         await sql`
                         UPDATE reservations
                         SET room_id = ${vacantRoomID}
-                        WHERE id = ${thisRoomReservations[i].id}
+                        WHERE id = ${id}
                         RETURNING *
                     `;
                     }
-                });
-            } catch (error) {
-                return {
-                    status: 400,
-                    body: {
-                        message: 'Failed to postpone reservation room is full',
-                    },
-                };
-            }
+                }
+                const randomColor = getRandomColorToDB();
 
-            //can postpone go to stripe
-            //
-            //
+                await sql`
+                    INSERT INTO reservations (room_id, check_in, check_out, price, display_color)
+                    VALUES (${room_id}, ${currentCheckout}, ${newCheckOut}, ${pricePerNight}, ${randomColor})
+                    RETURNING id;`;
+            });
+        } catch (error) {
+            console.log(error);
+            return {
+                status: 400,
+                body: {
+                    message: 'Failed to postpone reservation room is full',
+                },
+            };
         }
 
         return {
             status: 200,
             message: 'can postpone',
+            data: conflictReservations,
+            // reservationId: reservationId.id,
         };
     }
 );

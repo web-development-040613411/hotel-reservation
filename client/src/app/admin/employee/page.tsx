@@ -12,7 +12,7 @@ export default async function EmployeePage({
 }) {
   const { user } = await getCurrentUser();
 
-  if(!user) {
+  if(!user || user.role !== "administrator") {
     redirect("/");
   }
 

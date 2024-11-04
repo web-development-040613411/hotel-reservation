@@ -56,7 +56,7 @@ export default function LoginForm() {
       setIsLoading(false);
       if (data.status === "success") {
         toast.success(data.mesaage);
-        router.push("/admin");
+        router.push("/");
       } else {
         toast.error(data.message);
       }

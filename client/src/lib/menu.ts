@@ -1,4 +1,4 @@
-import { DoorOpen, LayoutDashboard, User } from "lucide-react";
+import { DoorOpen, LayoutDashboard, User,Airplay } from "lucide-react";
 
 export const adminMenu = [
   {
@@ -16,4 +16,9 @@ export const adminMenu = [
     href: "/admin/employee",
     icon: User,
   },
+  {
+    label: "Frontdesk",
+    href: "/frontdesk",
+    icon: Airplay
+  }
 ];

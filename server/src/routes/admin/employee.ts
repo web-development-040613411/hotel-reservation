@@ -13,27 +13,30 @@ import { middleware } from '@/middleware';
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .use(middleware)
     .get('/', async ({ user, set, query }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
-        const q = query.q || '';
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
+
+        const q = query.q?.toLowerCase() || '';
 
         const employees =
             await sql`SELECT id, username, first_name, last_name, date_of_birth, role, profile_picture, phone_number 
             FROM employees
-            WHERE username LIKE ${'%' + q + '%'}
+            WHERE LOWER(username) LIKE ${`%${q}%`}
+            OR LOWER(first_name) LIKE ${`%${q}%`}
+            OR LOWER(last_name) LIKE ${`%${q}%`}
             `;
             
         return {
@@ -42,21 +45,21 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
     .get('/:id', async ({ params: { id }, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const employee = await sql`SELECT * FROM employees WHERE id=${id}`;
         if (employee.length === 0) {
@@ -72,21 +75,21 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
     .post('/', async ({ body, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const validateData = addEmployeeSchema.safeParse(body);
         if (!validateData.success) {
@@ -108,7 +111,8 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         } = validateData.data;
 
         const IsEmployeeExist =
-            await sql`SELECT * FROM employees WHERE username=${username}`;
+            await sql`SELECT * FROM employees WHERE username=${username.toLowerCase()}`;
+
         if (IsEmployeeExist.length > 0) {
             set.status = 400;
             return {
@@ -143,7 +147,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
 
         await sql`INSERT INTO employees 
         (username, first_name, last_name, date_of_birth, password, role , profile_picture, phone_number) 
-        VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role}, ${uploadResult.url}, ${phone_number})`;
+        VALUES (${username.toLowerCase()}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role}, ${uploadResult.url}, ${phone_number})`;
 
         return {
             status: 'success',
@@ -151,21 +155,21 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
     .put('/:id', async ({ params: { id }, body, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const validateData = updateEmployeeSchema.safeParse(body);
         if (!validateData.success) {
@@ -227,21 +231,21 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         };
     })
     .delete('/:id', async ({ params: { id }, set, user }) => {
-        if (!user) {
-            set.status = 401;
-            return {
-                status: 'error',
-                message: 'Unauthorized',
-            };
-        }
+        // if (!user) {
+        //     set.status = 401;
+        //     return {
+        //         status: 'error',
+        //         message: 'Unauthorized',
+        //     };
+        // }
 
-        if (user.role !== 'administrator') {
-            set.status = 403;
-            return {
-                status: 'error',
-                message: 'Forbidden',
-            };
-        }
+        // if (user.role !== 'administrator') {
+        //     set.status = 403;
+        //     return {
+        //         status: 'error',
+        //         message: 'Forbidden',
+        //     };
+        // }
 
         const [employee] = await sql`SELECT * FROM employees WHERE id=${id}`;
 
@@ -252,14 +256,18 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 message: 'Employee not found',
             };
         }
-        const path = join(
-            '.',
-            process.env.UPLOAD_FOLDER!,
-            employee.profile_picture.split('/').pop()
-        );
+        
+        if(employee.profile_picture) {
+            const path = join(
+                '.',
+                process.env.UPLOAD_FOLDER!,
+                employee.profile_picture.split('/').pop()
+            );
 
+            await unlink(path);
+        }
+        
         await sql`DELETE FROM employees WHERE id=${id}`;
-        await unlink(path);
 
         return {
             status: 'success',

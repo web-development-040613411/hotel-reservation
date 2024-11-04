@@ -27,39 +27,20 @@ import {
 } from "@/components/ui/select";
 import { Employee, employeeRole } from "@/lib/type";
 import { formatDate } from "@/lib/utils";
+import { EditAccountEmployeeSchema, EditAccountEmployeeValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const EditAccountEmployeeSchema = z
-  .object({
-    username: z
-      .string({ message: "username is required" })
-      .min(1, "Name is required"),
-    first_name: z
-      .string({ message: "firstname is required" })
-      .min(1, "firstname is required"),
-    last_name: z
-      .string({ message: "lastname is required" })
-      .min(1, "lastname is required"),
-    phone_number: z.string().min(1, "phone number is required"),
-    date_of_birth: z
-      .string()
-      .date("date of birth is required")
-      .min(1, "date of birth is required"),
-    role: z.enum(employeeRole),
-    image: z.instanceof(File, { message: "Image is required" }).optional(),
-  });
+import { toast } from "sonner";
 
 interface EditAccountModalprops {
   employee: Employee;
 }
 
 export default function EditAccountModal({ employee }: EditAccountModalprops) {
-  const form = useForm({
+  const form = useForm<EditAccountEmployeeValues>({
     resolver: zodResolver(EditAccountEmployeeSchema),
     defaultValues: {
       username: employee.username,
@@ -85,20 +66,27 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
     const formData = new FormData(formRef.current);
     formData.append("role", form.getValues("role"));
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees/${employee.id}`,
-      {
-        method: "PUT",
-        credentials: "include",
-        body: formData,
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees/${employee.id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          body: formData,
+        }
+      );
+  
+      const data = await res.json();
+  
+      if (data.status === "success") {
+        toast.success(data.message);
+        router.refresh();
+        setIsModalOpen(false);
+      } else {
+        toast.error(data.message);
       }
-    );
-
-    const data = await res.json();
-
-    if (data.status === "success") {
-      router.refresh();
-      setIsModalOpen(false);
+    } catch (e) {
+      toast.error("An error occurred.");
     }
   };
 
@@ -122,7 +110,7 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
                 onSubmit={form.handleSubmit(() => handleCreateAccount())}
                 className="grid grid-cols-2 gap-4"
               >
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <Label>{`Employee's Picture`}</Label>
                   <Image
                     src={employee.profile_picture ? previewImage : ImagePlaceholder}
@@ -160,7 +148,7 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
                     )}
                   />
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <FormField
                     control={form.control}
                     name="username"
@@ -244,7 +232,7 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
                           <SelectContent>
                             {employeeRole.map((role, idx) => (
                               <SelectItem value={role} key={idx}>
-                                {role}
+                                {role.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                               </SelectItem>
                             ))}
                           </SelectContent>

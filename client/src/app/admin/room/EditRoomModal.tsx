@@ -29,11 +29,8 @@ import {
 } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
-
-const AddRoomSchema = z.object({
-  number: z.string(),
-  type_id: z.string(),
-});
+import { RoomSchema, RoomValues } from "@/lib/validation";
+import { toast } from "sonner";
 
 interface EditRoomModalProps {
   roomId: string;
@@ -42,8 +39,8 @@ interface EditRoomModalProps {
 }
 
 export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: EditRoomModalProps) {
-  const form = useForm({
-    resolver: zodResolver(AddRoomSchema),
+  const form = useForm<RoomValues>({
+    resolver: zodResolver(RoomSchema),
     defaultValues: {
       number: roomNumber,
       type_id: "",
@@ -54,24 +51,31 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
   const [isModalOpen, setIsModalOpen] = useState(false);
   const router = useRouter();
 
-  const handleEditRoom = async (values: z.infer<typeof AddRoomSchema>) => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/rooms/${roomId}`,
-      {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
+  const handleEditRoom = async (values: RoomValues) => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/rooms/${roomId}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(values),
+        }
+      );
+  
+      const data = await res.json();
+  
+      if (data.status === "success") {
+        toast.success(data.message);
+        router.refresh();
+        setIsModalOpen(false);
+      } else {
+        toast.error(data.message);
       }
-    );
-
-    const data = await res.json();
-
-    if (data.status === "success") {
-      router.refresh();
-      setIsModalOpen(false);
+    } catch {
+      toast.error("An error occurred.");
     }
   };
 

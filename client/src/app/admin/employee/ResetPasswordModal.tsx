@@ -4,18 +4,11 @@ import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { PasswordMatchSchema, PasswordMatchValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const ResetPasswordSchema = z.object({
-  password: z.string().min(6, "Password must be at least 6 characters"),
-  confirm_password: z.string().min(6, "Password must be at least 6 characters"),
-}).refine(data => data.password === data.confirm_password, {
-  message: "Passwords do not match",
-  path: ["confirm_password"]
-})
+import { toast } from "sonner";
 
 interface ResetPasswordModalProps {
   employeeId: string;
@@ -23,28 +16,36 @@ interface ResetPasswordModalProps {
 
 export default function ResetPasswordModal({ employeeId }: ResetPasswordModalProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const form = useForm({
-    resolver: zodResolver(ResetPasswordSchema),
+  const form = useForm<PasswordMatchValues>({
+    resolver: zodResolver(PasswordMatchSchema),
     defaultValues: {
       password: "",
       confirm_password: "",
     }
   })
 
-  const handleResetPassword = async (values: z.infer<typeof ResetPasswordSchema>) => {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/reset-password/${employeeId}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(values)
-    })
+  const handleResetPassword = async (values: PasswordMatchValues) => {
 
-    const data = await res.json();
-
-    if(data.status === "success") {
-      form.reset();
-      setIsModalOpen(false);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/reset-password/${employeeId}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values)
+      })
+  
+      const data = await res.json();
+  
+      if(data.status === "success") {
+        form.reset();
+        toast.success(data.message);
+        setIsModalOpen(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (e) {
+      toast.error("An error occurred.")
     }
   }
 
@@ -54,7 +55,7 @@ export default function ResetPasswordModal({ employeeId }: ResetPasswordModalPro
         <DialogTrigger asChild>
           <DropdownMenuItem onSelect={(e) => e.preventDefault()}>Reset Password</DropdownMenuItem>
         </DialogTrigger>
-        <DialogContent className="w-full max-w-2xl">
+        <DialogContent className="w-full max-w-md">
           <DialogHeader>
             <DialogTitle>Reset Password</DialogTitle>
             <DialogDescription>
@@ -74,7 +75,7 @@ export default function ResetPasswordModal({ employeeId }: ResetPasswordModalPro
                       <FormItem>
                         <Label>New password</Label>
                         <FormControl>
-                          <Input type="password" {...field} />
+                          <Input placeholder="New password" type="password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -87,7 +88,7 @@ export default function ResetPasswordModal({ employeeId }: ResetPasswordModalPro
                       <FormItem>
                         <Label>Confirm new password</Label>
                         <FormControl>
-                          <Input type="password" {...field} />
+                          <Input placeholder="Confirm new password" type="password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

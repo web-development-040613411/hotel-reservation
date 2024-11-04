@@ -25,44 +25,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { employeeRole } from "@/lib/type";
+import { CreateAccountEmployeeSchema, CreateAccountEmployeeValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-const CreateAccountEmployeeSchema = z
-  .object({
-    username: z
-      .string({ message: "username is required" })
-      .min(1, "Name is required"),
-    first_name: z
-      .string({ message: "firstname is required" })
-      .min(1, "firstname is required"),
-    last_name: z
-      .string({ message: "lastname is required" })
-      .min(1, "lastname is required"),
-    date_of_birth: z
-      .string({ message: "date of birth is required" })
-      .min(1, "date of birth is required"),
-    phone_number: z.string().min(10, "phone number is required").max(10),
-    password: z
-      .string({ message: "password is required" })
-      .min(6, "Password is required"),
-    confirm_password: z
-      .string({ message: "confirm password is required" })
-      .min(6, "Confirm password is required"),
-    role: z.enum(employeeRole),
-    image: z.instanceof(File, { message: "Image is required" }).optional(),
-  })
-  .refine((data) => data.password === data.confirm_password, {
-    message: "Password and confirm password doesn't match",
-    path: ["confirm_password"],
-  });
+import { toast } from "sonner";
 
 export default function CreateAccountModal() {
-  const form = useForm({
+  const form = useForm<CreateAccountEmployeeValues>({
     resolver: zodResolver(CreateAccountEmployeeSchema),
     defaultValues: {
       username: "",
@@ -88,20 +60,28 @@ export default function CreateAccountModal() {
     const formData = new FormData(formRef.current);
     formData.append("role", form.getValues("role"));
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees`,
-      {
-        method: "POST",
-        credentials: "include",
-        body: formData,
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        }
+      );
+  
+      const data = await res.json();
+  
+      if (data.status === "success") {
+        form.reset();
+        toast.success(data.message);
+        router.refresh();
+        setIsModalOpen(false);
+      } else {
+        toast.error(data.message);
       }
-    );
-
-    const data = await res.json();
-
-    if (data.status === "success") {
-      router.refresh();
-      setIsModalOpen(false);
+    } catch (e) {
+      toast.error("An error occurred.");
     }
   };
 
@@ -109,7 +89,7 @@ export default function CreateAccountModal() {
     <>
       <Dialog onOpenChange={setIsModalOpen} open={isModalOpen}>
         <DialogTrigger asChild>
-          <Button>Create Account</Button>
+          <Button className="hover:bg-primary-hover">Create Account</Button>
         </DialogTrigger>
         <DialogContent className="w-full max-w-2xl">
           <DialogHeader>
@@ -125,13 +105,13 @@ export default function CreateAccountModal() {
                 onSubmit={form.handleSubmit(() => handleCreateAccount())}
                 className="grid grid-cols-2 gap-4"
               >
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <Label>{`Employee's Picture`}</Label>
                   <Image
                     src={previewImage || ImagePlaceholder}
                     alt="Room type image"
                     width={0}
-                    height={0}
+                    height={0} 
                     sizes="100vw"
                     className="w-full max-h-80 h-full"
                   />
@@ -163,7 +143,7 @@ export default function CreateAccountModal() {
                     )}
                   />
                 </div>
-                <div className="space-y-4">
+                <div className="space-y-2">
                   <FormField
                     control={form.control}
                     name="username"
@@ -171,7 +151,7 @@ export default function CreateAccountModal() {
                       <FormItem>
                         <Label>Username</Label>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="Username" {...field} />
                         </FormControl>
                         <FormMessage/>
                       </FormItem>
@@ -184,7 +164,7 @@ export default function CreateAccountModal() {
                       <FormItem>
                         <Label>Password</Label>
                         <FormControl>
-                          <Input type="password" {...field} />
+                          <Input placeholder="Password" type="password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -197,7 +177,7 @@ export default function CreateAccountModal() {
                       <FormItem>
                         <Label>Confirm Password</Label>
                         <FormControl>
-                          <Input type="password" {...field} />
+                          <Input placeholder="Confirm password" type="password" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -210,7 +190,7 @@ export default function CreateAccountModal() {
                       <FormItem>
                         <Label>First Name</Label>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="First name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -223,7 +203,7 @@ export default function CreateAccountModal() {
                       <FormItem>
                         <Label>Last Name</Label>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="Last name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -236,7 +216,7 @@ export default function CreateAccountModal() {
                       <FormItem>
                         <Label>Phone number</Label>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="Phone number" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -270,7 +250,7 @@ export default function CreateAccountModal() {
                           <SelectContent>
                             {employeeRole.map((role, idx) => (
                               <SelectItem value={role} key={idx}>
-                                {role}
+                                {role.replaceAll("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -282,7 +262,7 @@ export default function CreateAccountModal() {
                   <Button className="w-full" type="submit">
                     Create Account
                   </Button>
-                  <Button variant="outline" className="w-full">Cancel</Button>
+                  <Button type="button" onClick={() => setIsModalOpen(false)} variant="outline" className="w-full">Cancel</Button>
                 </div>
               </form>
             </Form>

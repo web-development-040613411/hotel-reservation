@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 interface DeleteEmployeeModalProps {
   employeeId: string;
@@ -20,18 +21,25 @@ export default function DeleteEmployeeModal({ employeeId }: DeleteEmployeeModalP
   const router = useRouter();
 
   const handleDeleteRoom = async () => {
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees/${employeeId}`,
-      {
-        method: "DELETE",
-        credentials: "include",
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees/${employeeId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+  
+      const data = await res.json();
+  
+      if (data.status === "success") {
+        toast.success(data.message);
+        router.refresh();
+      } else {
+        toast.error(data.message);
       }
-    );
-
-    const data = await res.json();
-
-    if (data.status === "success") {
-      router.refresh();
+    } catch {
+      toast.error("An error occurred.");
     }
   };
 

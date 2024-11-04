@@ -77,7 +77,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             FROM rooms
             INNER JOIN room_types
             ON rooms.type_id = room_types.id
-            WHERE rooms.number LIKE ${'%' + q + '%'}
+            WHERE rooms.number LIKE ${`%${q}%`}
             ORDER BY rooms.number ASC`;
         } else {
             res = await sql`
@@ -85,7 +85,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             FROM rooms
             INNER JOIN room_types
             ON rooms.type_id = room_types.id
-            WHERE rooms.number LIKE ${'%' + q + '%'}
+            WHERE rooms.number LIKE ${`%${q}%`}
             AND rooms.current_status = ${status}
             ORDER BY rooms.number ASC`;
         }
@@ -229,7 +229,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         }
 
         await sql`DELETE FROM rooms
-              WHERE id=${id}`;
+                WHERE id=${id}`;
 
         return {
             status: 'success',

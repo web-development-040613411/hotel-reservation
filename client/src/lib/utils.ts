@@ -5,7 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-<<<<<<< HEAD
 export const roomStatus = [
   "vacant",
   "occupied",
@@ -13,7 +12,7 @@ export const roomStatus = [
   "off market",
   "departing",
 ];
-=======
+
 export function formatDate(date: string) {
   var d = new Date(date),
       month = '' + (d.getMonth() + 1),
@@ -27,4 +26,3 @@ export function formatDate(date: string) {
 
   return [year, month, day].join('-');
 }
->>>>>>> cb061464f1fb8bffe65857232482fe44cc33545a

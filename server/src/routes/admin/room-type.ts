@@ -8,7 +8,7 @@ import { middleware } from '@/middleware';
 
 export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
     .use(middleware)
-    .get('/', async ({ user, set }) => {
+    .get('/', async ({ user, set, query }) => {
         // if (!user) {
         //     set.status = 401;
         //     return {
@@ -24,8 +24,9 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         //         message: 'Forbidden',
         //     };
         // }
+        const q = query.q?.toLowerCase() || "";
 
-        const roomTypes = await sql`SELECT * FROM room_types`;
+        const roomTypes = await sql`SELECT * FROM room_types WHERE name LIKE ${`%${q}%`}`;
 
         return {
             status: 'success',

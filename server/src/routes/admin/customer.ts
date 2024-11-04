@@ -2,8 +2,9 @@ import { sql } from '@/libs/db';
 import Elysia, { t } from 'elysia';
 import { NewCustomerSchema } from '@/libs/validation';
 
-export const customerRoutes = new Elysia({ prefix: '/customers' })
-    .get('/', async () => {
+export const customerRoutes = new Elysia({ prefix: '/customers' }).get(
+    '/',
+    async () => {
         const customers = await sql`SELECT
                                 	FIRST_NAME,
                                 	LAST_NAME,
@@ -41,4 +42,5 @@ export const customerRoutes = new Elysia({ prefix: '/customers' })
             status: 'success',
             data: customers,
         };
-    });
+    }
+);

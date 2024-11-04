@@ -25,9 +25,9 @@ export const checkInRoute = new Elysia({ prefix: '/check-in' }).patch(
             };
         }
 
-        const currentDate = new Date().toDateString();
-        const checkInDate = new Date(thisReservation.check_in).toDateString();
-        const checkOutDate = new Date(thisReservation.check_out).toDateString();
+        const currentDate = new Date();
+        const checkInDate = new Date(thisReservation.check_in);
+        const checkOutDate = new Date(thisReservation.check_out);
 
         if (currentDate < checkInDate) {
             set.status = 400;
@@ -44,7 +44,7 @@ export const checkInRoute = new Elysia({ prefix: '/check-in' }).patch(
             };
         }
 
-        const updateRoom = await sql`
+        await sql`
             UPDATE rooms
             SET current_status ='occupied'
             WHERE id=${thisReservation.room_id}

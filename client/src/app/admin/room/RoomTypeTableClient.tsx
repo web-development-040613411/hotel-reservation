@@ -1,11 +1,9 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { RoomType } from "@/lib/type";
-import { flexRender, getCoreRowModel, useReactTable } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Image from "next/image";
 import DeleteRoomTypeModal from "./DeleteRoomTypeModal";
@@ -18,138 +16,57 @@ interface RoomTypeTableClientProps {
 export default function RoomTypeTableClient({
   roomTypes,
 }: RoomTypeTableClientProps) {
-  const table = useReactTable({
-    data: roomTypes,
-    columns: [
-      // {
-      //   id: "select",
-      //   header: ({ table }) => (
-      //     <div className="flex justify-center">
-      //       <Checkbox
-      //         checked={
-      //           table.getIsAllRowsSelected() ||
-      //           (table.getIsSomePageRowsSelected() && "indeterminate")
-      //         }
-      //         onCheckedChange={(value) =>
-      //           table.toggleAllPageRowsSelected(!!value)
-      //         }
-      //         aria-label="Select all"
-      //       />
-      //     </div>
-      //   ),
-      //   cell: ({ row }) => (
-      //     <div className="flex justify-center">
-      //       <Checkbox
-      //         checked={row.getIsSelected()}
-      //         onCheckedChange={(value) => row.toggleSelected(!!value)}
-      //         aria-label="Select row"
-      //       />
-      //     </div>
-      //   ),
-      //   enableHiding: false,
-      // },
-      {
-        header: "Room Type",
-        accessorKey: "name",
-        cell: ({ row }) => {
-          const name = row.original.name;
-          const picture = row.original.picture_path;
-          return (
-            <div className="flex items-center gap-2">
-              <Image
-                src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${picture}`}
-                alt={`${name}`}
-                width={0}
-                height={0}
-                sizes="100vw"
-                className="w-48 aspect-video"
-                priority
-              />
-              <span className="break-all">{name}</span>
-            </div>
-          );
-        }
-      },
-      {
-        header: "Detail",
-        accessorKey: "detail",
-        cell: ({ row }) => {
-          const detail = row.original.detail;
-
-          return <span className="break-all">{detail}</span>;
-        }
-      },
-      {
-        header: "Price",
-        accessorKey: "price",
-        cell: ({ row }) => {
-          const price = row.original.price;
-
-          return <span>${price} / night</span>;
-        },
-      },
-      {
-        header: "Capacity",
-        accessorKey: "capacity",
-      },
-      {
-        id: "action",
-        enableHiding: false,
-        cell: ({ row }) => {
-          const roomTypeId = row.original.id;
-          return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <EditRoomTypeModal roomType={row.original}/>
-                <DeleteRoomTypeModal roomTypeId={roomTypeId} />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          );
-        },
-      },
-    ],
-    getCoreRowModel: getCoreRowModel(),
-  });
-
   return (
     <>
       <Table>
         <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
-                  {flexRender(
-                    header.column.columnDef.header,
-                    header.getContext()
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          ))}
+          <TableRow>
+            <TableHead className="w-1/4">Room Type</TableHead>
+            <TableHead className="w-4/6">Detail</TableHead>
+            <TableHead className="w-2/6">Price</TableHead>
+            <TableHead className="w-2/6">Capacity</TableHead>
+            <TableHead className="w-2/6"></TableHead>
+          </TableRow>
         </TableHeader>
         <TableBody>
-          {table.getRowModel().rows.map((row) => (
-            <TableRow
-              key={row.id}
-              data-state={row.getIsSelected() && "selected"}
-            >
-              {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                </TableCell>
-              ))}
+          {roomTypes.map((roomType) => (
+            <TableRow key={roomType.id}>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${roomType.picture_path}`}
+                    alt={`${roomType.name}`}
+                    width={0}
+                    height={0}
+                    sizes="100vw"
+                    className="w-48 aspect-video"
+                    priority
+                  />
+                  <span className="break-all">{roomType.name}</span>
+                </div>
+              </TableCell>
+              <TableCell className="break-all">{roomType.detail}</TableCell>
+              <TableCell>{roomType.price}฿/night</TableCell>
+              <TableCell>{roomType.capacity}</TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="h-8 w-8 p-0">
+                      <span className="sr-only">Open menu</span>
+                      <MoreHorizontal className="size-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <EditRoomTypeModal roomType={roomType}/>
+                    <DeleteRoomTypeModal roomTypeId={roomType.id} />
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <p>entires {table.getRowModel().rows.length} types</p>
+      <p>entires {roomTypes.length} types</p>
     </>
   );
 }

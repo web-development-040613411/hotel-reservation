@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import RoomTypeTable from "./RoomTypeTable";
 import { getCurrentUser } from "@/actions/getCurrentUser";
 import { redirect } from "next/navigation";
+import RoomTableSkeleton from "./RoomTableSkeleton";
+import RoomTypeTableSkeleton from "./RoomTypeTableSkeleton";
 
 export default async function RoomPage({
   searchParams,
@@ -48,7 +50,7 @@ export default async function RoomPage({
             <>
               <RoomTypeTopSection />
               <div className="my-6">
-                <Suspense fallback={<>Loading...</>}>
+                <Suspense key={tab + q} fallback={<RoomTypeTableSkeleton />}>
                   <RoomTypeTable query={q} />
                 </Suspense>
               </div>
@@ -57,7 +59,7 @@ export default async function RoomPage({
             <>
               <RoomTopSection />
               <div className="my-6">
-                <Suspense fallback={<>Loading...</>}>
+                <Suspense key={tab + q + status} fallback={<RoomTableSkeleton />}>
                   <RoomTable status={status} query={q} />
                 </Suspense>
               </div>

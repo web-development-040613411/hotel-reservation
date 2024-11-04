@@ -3,6 +3,7 @@ import EmployeeTable from "./EmployeeTable";
 import TopSection from "./TopSection";
 import { getCurrentUser } from "@/actions/getCurrentUser";
 import { redirect } from "next/navigation";
+import EmployeeTableSkeleton from "./EmployeeTableSkeleton";
 
 export default async function EmployeePage({
   searchParams,
@@ -21,7 +22,7 @@ export default async function EmployeePage({
     <div className="bg-background w-full h-full rounded-md shadow-md border p-8">
       <TopSection />
       <div className="my-8">
-        <Suspense>
+        <Suspense fallback={<EmployeeTableSkeleton />}>
           <EmployeeTable query={q} />
         </Suspense>
       </div>

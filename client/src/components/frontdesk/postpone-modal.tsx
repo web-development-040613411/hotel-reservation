@@ -13,6 +13,7 @@ import {
 import { Button } from '../ui/button';
 import { Reservation } from '@/lib/frontdesk/type';
 import { DialogClose } from '@radix-ui/react-dialog';
+import { usePostPoneMutation } from '@/hooks/frontdesk/postpone';
 
 interface PostponeModalProps {
    thisReservation: Reservation;
@@ -20,7 +21,7 @@ interface PostponeModalProps {
 
 export function PostponeModal({ thisReservation }: PostponeModalProps) {
    const postpone = (id: string) => {
-      console.log('Postpone reservation with id: ', id);
+      const;
    };
    return (
       <Dialog>

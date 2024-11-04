@@ -1,7 +1,7 @@
 import { sql } from '@/libs/db';
 import { lucia } from '@/libs/lucia';
 import { loginSchema } from '@/libs/validation';
-import Elysia, { t } from 'elysia';
+import Elysia from 'elysia';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
     .post('/login', async ({ set, cookie, body }) => {
@@ -89,7 +89,7 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
             }
         }
 
-        const { user, session } = await lucia.validateSession(sessionId);
+        const { user } = await lucia.validateSession(sessionId);
 
         if(!user) {
             return {

@@ -1,8 +1,16 @@
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import LoginForm from "./LoginForm";
+import { getCurrentUser } from "@/actions/getCurrentUser";
+import { redirect } from "next/navigation";
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const { user } = await getCurrentUser();
+
+  if(user) {
+    redirect("/admin");
+  }
+
   return (
     <div className="flex w-full min-h-screen bg-background justify-center items-center">
       <div className="flex flex-col gap-2 justify-center shadow-md items-center w-full max-w-sm h-fit bg-background p-6 rounded-lg border">

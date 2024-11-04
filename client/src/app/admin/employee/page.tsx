@@ -1,12 +1,20 @@
 import { Suspense } from "react";
 import EmployeeTable from "./EmployeeTable";
 import TopSection from "./TopSection";
+import { getCurrentUser } from "@/actions/getCurrentUser";
+import { redirect } from "next/navigation";
 
-export default function EmployeePage({
+export default async function EmployeePage({
   searchParams,
 }: {
   searchParams?: { q?: string };
 }) {
+  const { user } = await getCurrentUser();
+
+  if(!user) {
+    redirect("/login");
+  }
+
   const q = searchParams?.q || "";
 
   return (

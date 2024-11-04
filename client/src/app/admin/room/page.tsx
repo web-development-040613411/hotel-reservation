@@ -4,12 +4,20 @@ import RoomTable from "./RoomTable";
 import { RoomTopSection, RoomTypeTopSection } from "./TopSection";
 import { cn } from "@/lib/utils";
 import RoomTypeTable from "./RoomTypeTable";
+import { getCurrentUser } from "@/actions/getCurrentUser";
+import { redirect } from "next/navigation";
 
 export default async function RoomPage({
   searchParams,
 }: {
   searchParams?: { q?: string; status?: string; tab?: string };
 }) {
+  const { user } = await getCurrentUser();
+
+  if(!user) {
+    redirect("/login");
+  }
+
   const q = searchParams?.q || "";
   const status = searchParams?.status || "";
   const tab = searchParams?.tab === "room-type" ? "room-type" : "room";

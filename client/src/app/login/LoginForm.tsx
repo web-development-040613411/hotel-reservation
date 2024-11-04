@@ -10,12 +10,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const LoginSchema = z.object({
@@ -33,7 +33,6 @@ export default function LoginForm() {
       password: "",
     },
   });
-  const { toast } = useToast();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -56,25 +55,13 @@ export default function LoginForm() {
 
       setIsLoading(false);
       if (data.status === "success") {
-        toast({
-          title: "Success",
-          description: data.message,
-        });
+        toast.success(data.mesaage);
         router.push("/admin");
       } else {
-        setIsLoading(false);
-        toast({
-          title: "Error",
-          description: data.message,
-          variant: "destructive",
-        });
+        toast.error(data.message);
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "An error occurred",
-        variant: "destructive",
-      });
+      toast.error("An error occurred.");
     }
   };
 

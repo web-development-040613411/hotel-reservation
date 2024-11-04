@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
-import './globals.css';
-import { Toaster } from '@/components/ui/sonner';
+import './frontdesk.css';
 
 const geistSans = localFont({
    src: './fonts/GeistVF.woff',
@@ -21,20 +20,17 @@ export const metadata: Metadata = {
    },
 };
 
-export default function RootLayout({
+export default function FrontdeskLayout({
    children,
 }: Readonly<{
    children: React.ReactNode;
 }>) {
    return (
-      <html lang="en">
-         <body
-            id="body"
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-         >
-            {children}
-            <Toaster richColors />
-         </body>
-      </html>
+      <body
+         id="body"
+         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+         {children}
+      </body>
    );
 }

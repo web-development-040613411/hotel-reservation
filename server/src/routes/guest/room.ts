@@ -2,7 +2,7 @@ import { sql } from '@/libs/db';
 import { getDiffDate } from '@/libs/get-diff-date';
 import getVacantRoom from '@/libs/get-vacant-room';
 import { getRandomColorToDB } from '@/libs/random-color';
-import { ChangeRoomSchema, GetVacantRoomsSchema } from '@/libs/validation';
+import { ChangeRoomSchema, GetVacantRoomsSchema, NewCustomerSchema } from '@/libs/validation';
 import Elysia, { t } from 'elysia';
 import { z } from 'zod';
 
@@ -149,4 +149,41 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             status: 'success',
             message: 'Preserve reservation has been removed.',
         };
+    })
+    .post('/customer', async ({ body, set }) => {
+      const validation = NewCustomerSchema.safeParse(body);
+
+      if (!validation.success) {
+          set.status = 400;
+          return {
+              status: 'error',
+              message: validation.error.message,
+          };
+      }
+
+      const { personalInformation, reservationId } = validation.data;
+      const { firstName, lastName, address, phoneNumber, email, subDistrict, district, province, postcode, specialRequests } = personalInformation;
+
+      const [customerID] = await sql`
+        INSERT INTO customer_details (first_name, last_name, address, phone_number, email, sub_district, district, province, postcode, special_request)
+        VALUES (${firstName}, ${lastName}, ${address}, ${phoneNumber}, ${email}, ${subDistrict}, ${district}, ${province}, ${postcode}, ${
+              specialRequests || null
+          })
+        RETURNING id;
+      `;
+
+      console.log(customerID.id, reservationId);
+
+      await sql`
+        UPDATE reservations
+        SET 
+        customer_id = ${customerID.id}
+        WHERE id = ${reservationId};
+      `;
+
+      return {
+          status: 'success',
+          message: 'Customer detail has been added.',
+      }
+ 
     });

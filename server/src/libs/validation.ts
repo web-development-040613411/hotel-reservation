@@ -37,6 +37,7 @@ export const addEmployeeSchema = z
         date_of_birth: z
             .string({ message: 'date of birth is required' })
             .min(1, 'date of birth is required'),
+        phone_number: z.string().min(10, 'phone number is required').max(10, "phone number is too long"),
         password: z
             .string({ message: 'password is required' })
             .min(6, 'Password is required'),
@@ -62,6 +63,7 @@ export const updateEmployeeSchema = z.object({
     last_name: z
         .string({ message: 'lastname is required' })
         .min(1, 'lastname is required'),
+    phone_number: z.string().min(10, 'phone number is required').max(10, "phone number is too long"),
     date_of_birth: z
         .string({ message: 'date of birth is required' })
         .min(1, 'date of birth is required'),
@@ -81,37 +83,38 @@ export const ResetPasswordSchema = z.object({
 });
 
 export const NewCustomerSchema = z.object({
-    first_name: z
+    personalInformation: z.object({
+    firstName: z
         .string({ message: 'First name is required' })
         .min(1, 'First name is required'),
-    last_name: z
+    lastName: z
         .string({ message: 'Last name is required' })
         .min(1, 'Last name is required'),
     address: z
         .string({ message: 'Address is required' })
         .min(1, 'Address is required'),
-    sub_district_id: z
+    subDistrict: z
         .string({ message: 'Sub district is required' })
-        .uuid()
         .min(1, 'Sub district is required'),
-    district_id: z
+    district: z
         .string({ message: 'District is required' })
-        .uuid()
         .min(1, 'District is required'),
-    province_id: z
+    province: z
         .string({ message: 'Province is required' })
-        .uuid()
         .min(1, 'Province is required'),
-    postal_code: z
+    postcode: z
         .string({ message: 'Postal code is required' })
-        .length(5, 'Postal code length is 5'),
-    phone_number: z
+        .min(1, 'Postal code is required'),
+    phoneNumber: z
         .string({ message: 'Phone number is required' })
         .min(1, 'Phone number is required'),
     email: z
         .string({ message: 'Email is required' })
         .email()
         .min(1, 'Email is required'),
+    specialRequests: z.string().optional()
+    }),
+    reservationId: z.string({ message: 'Reservation ID is required' }).uuid(),
 });
 
 export type ResetPasswordValues = z.infer<typeof ResetPasswordSchema>;
@@ -150,37 +153,10 @@ export const ChangeRoomSchema = z.object({
 
 export const PaymentSchema = z.object({
     personalInformation: z.object({
-        firstName: z
-            .string({ message: 'Name is required' })
-            .min(1, 'Name is required'),
-        lastName: z
-            .string({ message: 'Name is required' })
-            .min(1, 'Name is required'),
-        address: z
-            .string({ message: 'Address is required' })
-            .min(1, 'Address is required'),
-        phoneNumber: z
-            .string({ message: 'Phone number is required' })
-            .min(1, 'Phone number is required'),
         email: z
             .string({ message: 'Email is required' })
             .email({ message: 'Email is required' })
             .min(1, 'Email is required'),
-        subDistrict: z
-            .string({ message: 'Sub district is required' })
-            .min(1, 'Sub district is required'),
-        district: z
-            .string({ message: 'District is required' })
-            .min(1, 'District is required'),
-        province: z
-            .string({ message: 'Province is required' })
-            .min(1, 'Province is required'),
-        postcode: z
-            .string({ message: 'Postal code is required' })
-            .length(5, 'Postal code is required'),
-        specialRequest: z
-            .string({ message: 'Special request is required' })
-            .optional(),
     }),
     totalPrice: z
         .number({ message: 'Price is required' })

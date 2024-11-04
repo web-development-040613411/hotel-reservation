@@ -303,6 +303,9 @@ export default function ReservationTable() {
                                                    isOverflowToNextMonth={
                                                       isOverflowToNextMonth
                                                    }
+                                                   nextReservation={
+                                                      nextReservation
+                                                   }
                                                 />
                                              </TableCell>
                                           );

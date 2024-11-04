@@ -6,12 +6,12 @@ export const usePostPoneMutation = () => {
    const queryClient = useQueryClient();
    return useMutation({
       mutationFn: async ({
-         id,
-         newCheckIn,
+         reservationID,
+         currentCheckout,
          newCheckOut,
       }: {
-         id: string;
-         newCheckIn: string;
+         reservationID: string;
+         currentCheckout: string;
          newCheckOut: string;
       }) => {
          const res = await fetch(
@@ -19,8 +19,8 @@ export const usePostPoneMutation = () => {
 
             {
                body: JSON.stringify({
-                  reservationID: id,
-                  newCheckIn: newCheckIn,
+                  reservationID: reservationID,
+                  newCheckIn: currentCheckout,
                   newCheckOut: newCheckOut,
                }),
                method: 'PATCH',

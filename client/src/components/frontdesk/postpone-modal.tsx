@@ -21,7 +21,7 @@ interface PostponeModalProps {
 
 export function PostponeModal({ thisReservation }: PostponeModalProps) {
    const postpone = (id: string) => {
-      const;
+      console.log('s');
    };
    return (
       <Dialog>

@@ -1,5 +1,5 @@
 import { sql } from '@/libs/db';
-import Elysia from 'elysia';
+import Elysia, { t } from 'elysia';
 import { PostponeShcema } from '@/libs/validation';
 import getVacantRoom from '@/libs/get-vacant-room';
 import { getRandomColorToDB } from '@/libs/random-color';
@@ -108,5 +108,11 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                 },
             };
         }
+    }, {
+        body: t.Object({
+            reservationID: t.String(),
+            currentCheckout: t.Date(),
+            newCheckOut: t.Date()
+        })
     }
 );

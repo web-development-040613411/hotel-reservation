@@ -191,6 +191,6 @@ export const PaymentSchema = z.object({
 
 export const PostponeShcema = z.object({
     reservationID: z.string({ message: 'reservationID is required' }),
-    newCheckIn: z.coerce.date({ message: 'New check in is required' }),
+    currentCheckout: z.coerce.date({ message: 'New check in is required' }),
     newCheckOut: z.coerce.date({ message: 'New check out is required' }),
 });

@@ -112,7 +112,7 @@ export default function AddRoomModal() {
                     <FormItem>
                       <FormLabel>Room Number</FormLabel>
                       <FormControl>
-                        <Input type="number" {...field} />
+                        <Input type="number" placeholder="Room number" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -130,7 +130,7 @@ export default function AddRoomModal() {
                       >
                         <FormControl>
                           <SelectTrigger className="text-wrap break-all">
-                            <SelectValue />
+                            <SelectValue placeholder="Room type"/>
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>

@@ -105,13 +105,13 @@ export default function AddRoomTypeModal() {
                     render={({ field: { value, onChange, ...fieldProps } }) => (
                       <FormItem>
                         <FormControl>
-                          <Button type="button">
+                          <Button type="button" className="relative">
                             Choose file
                             <Input
                               {...fieldProps}
                               type="file"
                               accept="image/*"
-                              className="opacity-0 absolute"
+                              className="opacity-0 absolute hover:cursor-pointer"
                               onChange={(e) => {
                                 if (e.target.files && e.target.files[0]) {
                                   const file = e.target.files[0];
@@ -135,7 +135,7 @@ export default function AddRoomTypeModal() {
                       <FormItem>
                         <FormLabel>Room Type Name</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="Type name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -148,7 +148,7 @@ export default function AddRoomTypeModal() {
                       <FormItem>
                         <FormLabel>Rate / Night</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input type="number" placeholder="price" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -161,7 +161,7 @@ export default function AddRoomTypeModal() {
                       <FormItem>
                         <FormLabel>Capacity</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input placeholder="Capacity" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -174,7 +174,7 @@ export default function AddRoomTypeModal() {
                       <FormItem>
                         <FormLabel>Description</FormLabel>
                         <FormControl>
-                          <Textarea {...field} />
+                          <Textarea placeholder="Detail" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

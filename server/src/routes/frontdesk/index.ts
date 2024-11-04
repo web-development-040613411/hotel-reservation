@@ -2,10 +2,11 @@ import Elysia from 'elysia';
 import { checkInRoute } from './check-in';
 import { checkOutRoute } from './check-out';
 import { reservationRoute } from './reservation';
-import { postPoneRoute } from './postpone';
+import { allRoomsRoute, allRoomTypeRoute } from './all-room';
 
 export const frontdeskRoute = new Elysia({ prefix: '/frontdesk' })
     .use(checkInRoute)
     .use(checkOutRoute)
     .use(reservationRoute)
-    .use(postPoneRoute);
+    .use(allRoomsRoute)
+    .use(allRoomTypeRoute);

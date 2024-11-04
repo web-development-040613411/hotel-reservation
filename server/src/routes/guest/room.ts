@@ -1,5 +1,6 @@
 import { sql } from '@/libs/db';
 import { getDiffDate } from '@/libs/get-diff-date';
+import getVacantRoom from '@/libs/get-vacant-room';
 import { getRandomColorToDB } from '@/libs/random-color';
 import { ChangeRoomSchema, GetVacantRoomsSchema } from '@/libs/validation';
 import Elysia, { t } from 'elysia';
@@ -13,43 +14,10 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             const uniqueRooms = [];
 
             const { check_in, check_out } = query;
-            const diffDate = getDiffDate(new Date(check_in), new Date(check_out));
-
+          
             for (const roomType of roomTypes) {
-                const res = await sql`
-                        SELECT
-                        room_types."name",
-                        ${diffDate} * room_types.price AS total_price,
-                        price,
-                        room_types.detail,
-                        room_types.id AS type_id,
-                        room_types.picture_path
-                      FROM
-                        rooms
-                        LEFT JOIN room_types ON rooms.type_id = room_types."id" 
-                      WHERE
-                        (
-                        SELECT
-                          reservations."id" 
-                        FROM
-                          reservations
-                        WHERE
-                          reservations.room_id = rooms."id" 
-                          AND (
-                            ( ( ( ${check_out} ) > reservations.check_in ) AND ( ( ${check_in} ) < reservations.check_out ) ) 
-                            OR ( ( ( ${check_in} ) < reservations.check_out ) AND ( ( ${check_out} ) > reservations.check_in ) ) 
-                            OR ( ( ( ${check_in} ) > reservations.check_in ) AND ( ( ${check_out} ) < reservations.check_out ) ) 
-                            OR ( ( ( ${check_out} ) > reservations.check_out ) AND ( ( ${check_in} ) < reservations.check_in ) ) 
-                          ) 
-                          LIMIT 1 
-                        ) IS NULL 
-                        AND rooms.type_id = ${roomType.id}
-                      ORDER BY
-                        rooms."number" ASC
-                        LIMIT 1;
-                        
-                          `;
-                uniqueRooms.push(...res);
+                const res = await getVacantRoom({ roomType: roomType.id, check_in, check_out});
+                uniqueRooms.push(res);
             }
             return {
                 status: 'success',

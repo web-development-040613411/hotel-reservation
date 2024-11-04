@@ -28,6 +28,7 @@ export default function Step4() {
 
   const { roomType, personalInformation, reservationId } = information;
   const { type_id: roomTypeId } = roomType;
+  const { email } = personalInformation;
 
   const checkOut = async () => {
     setIsLoading(true);
@@ -45,11 +46,22 @@ export default function Step4() {
         body: JSON.stringify({
           roomTypeId,
           totalPrice,
-          personalInformation,
+          personalInformation : { email },
           reservationId,
         }),
       }
     );
+
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/customer`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        reservationId,
+        personalInformation
+      }),
+    });
 
     const data = await response.json();
     const sessionId = data.data.session_id;

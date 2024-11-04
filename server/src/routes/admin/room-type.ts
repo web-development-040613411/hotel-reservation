@@ -8,7 +8,7 @@ import { middleware } from '@/middleware';
 
 export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
     .use(middleware)
-    .get('/', async ({ user, set }) => {
+    .get('/', async ({ user, set, query }) => {
         if (!user) {
             set.status = 401;
             return {
@@ -24,8 +24,9 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
                 message: 'Forbidden',
             };
         }
+        const q = query.q?.toLowerCase() || "";
 
-        const roomTypes = await sql`SELECT * FROM room_types`;
+        const roomTypes = await sql`SELECT * FROM room_types WHERE LOWER(name) LIKE ${`%${q}%`}`;
 
         return {
             status: 'success',
@@ -61,7 +62,7 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
 
         const { name, detail, capacity, price, image } = validateData.data;
 
-        if (!image) {
+        if (!image || image.size === 0) {
             set.status = 400;
             return {
                 status: 'error',
@@ -150,7 +151,7 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         }
 
         let url = roomType.picture_path;
-        if (image) {
+        if (image && image.size !== 0) {
             const uploadResult = await uploadFile(image);
 
             if (uploadResult.status === 'error') {

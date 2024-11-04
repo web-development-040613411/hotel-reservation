@@ -12,7 +12,7 @@ import { middleware } from '@/middleware';
 
 export const employeeRoutes = new Elysia({ prefix: '/employees' })
     .use(middleware)
-    .get('/', async ({ user, set }) => {
+    .get('/', async ({ user, set, query }) => {
         if (!user) {
             set.status = 401;
             return {
@@ -29,7 +29,16 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        const employees = await sql`SELECT * FROM employees`;
+        const q = query.q?.toLowerCase() || '';
+
+        const employees =
+            await sql`SELECT id, username, first_name, last_name, date_of_birth, role, profile_picture, phone_number 
+            FROM employees
+            WHERE LOWER(username) LIKE ${`%${q}%`}
+            OR LOWER(first_name) LIKE ${`%${q}%`}
+            OR LOWER(last_name) LIKE ${`%${q}%`}
+            `;
+            
         return {
             status: 'success',
             data: employees,
@@ -97,11 +106,13 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             date_of_birth,
             password,
             role,
+            phone_number,
             image,
         } = validateData.data;
 
         const IsEmployeeExist =
-            await sql`SELECT * FROM employees WHERE username=${username}`;
+            await sql`SELECT * FROM employees WHERE username=${username.toLowerCase()}`;
+
         if (IsEmployeeExist.length > 0) {
             set.status = 400;
             return {
@@ -134,7 +145,9 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        await sql`INSERT INTO employees (username, first_name, last_name, date_of_birth, password, role , profile_picture) VALUES (${username}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role} , ${uploadResult.url})`;
+        await sql`INSERT INTO employees 
+        (username, first_name, last_name, date_of_birth, password, role , profile_picture, phone_number) 
+        VALUES (${username.toLowerCase()}, ${first_name}, ${last_name}, ${date_of_birth}, ${hashedPassword}, ${role}, ${uploadResult.url}, ${phone_number})`;
 
         return {
             status: 'success',
@@ -166,7 +179,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 message: validateData.error.errors[0].message,
             };
         }
-        const { username, first_name, last_name, date_of_birth, role, image } =
+        const { username, first_name, last_name, date_of_birth, role, image, phone_number } =
             validateData.data;
 
         const [existsingEmployee] =
@@ -180,7 +193,7 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
         }
 
         let url = existsingEmployee.profile_picture;
-        if (image) {
+        if (image && image.size > 0) {
             const uploadResult = await uploadFile(image);
             if (uploadResult.status === 'error') {
                 set.status = 400;
@@ -210,14 +223,13 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
             };
         }
 
-        await sql`UPDATE employees SET username=${username}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url} WHERE id=${id}`;
+        await sql`UPDATE employees SET username=${username}, first_name=${first_name}, last_name=${last_name}, date_of_birth=${date_of_birth}, role=${role} , profile_picture=${url}, phone_number=${phone_number} WHERE id=${id}`;
 
         return {
             status: 'success',
             message: 'Employee updated successfully',
         };
     })
-
     .delete('/:id', async ({ params: { id }, set, user }) => {
         if (!user) {
             set.status = 401;
@@ -244,14 +256,18 @@ export const employeeRoutes = new Elysia({ prefix: '/employees' })
                 message: 'Employee not found',
             };
         }
-        const path = join(
-            '.',
-            process.env.UPLOAD_FOLDER!,
-            employee.profile_picture.split('/').pop()
-        );
+        
+        if(employee.profile_picture) {
+            const path = join(
+                '.',
+                process.env.UPLOAD_FOLDER!,
+                employee.profile_picture.split('/').pop()
+            );
 
+            await unlink(path);
+        }
+        
         await sql`DELETE FROM employees WHERE id=${id}`;
-        await unlink(path);
 
         return {
             status: 'success',

@@ -1,15 +1,10 @@
-import { LayoutDashboard, User, DoorOpen, Users } from "lucide-react";
+import { DoorOpen, LayoutDashboard, User } from "lucide-react";
 
 export const adminMenu = [
   {
     label: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
-  },
-  {
-    label: "Guest",
-    href: "/admin/guest",
-    icon: Users,
   },
   {
     label: "Room",

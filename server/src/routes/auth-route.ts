@@ -78,4 +78,30 @@ export const authRoutes = new Elysia({ prefix: '/auth' })
             status: 'success',
             message: 'Logout successful',
         };
+    })
+    .get('/check-user', async ({ cookie }) => {
+        const sessionId = cookie["auth_session"].value;
+
+        if(!sessionId) {
+            return {
+                status: 'error',
+                message: 'User not logged in',
+            }
+        }
+
+        const { user } = await lucia.validateSession(sessionId);
+
+        if(!user) {
+            return {
+                status: 'success',
+                message: "User not logged in",
+                user: null,
+            }
+        }
+
+        return {
+            status: 'success',
+            message: 'User logged in',
+            user,
+        }
     });

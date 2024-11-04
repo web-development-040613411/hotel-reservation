@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { getCurrentUser } from "@/actions/getCurrentUser";
 import { redirect } from "next/navigation";
 import { formatCurrency } from "@/lib/utils";
+import RevenueChart from "./RevenueChart";
 
 interface DashboardData {
   totalBooking: number;
@@ -11,6 +12,7 @@ interface DashboardData {
   availableRoom: number;
   soldOutRoom: number;
   offMarketRoom: number;
+  revenuePerMonth: {month: string, sum: number }[]
 }
 
 async function getDashboardData(): Promise<
@@ -36,7 +38,7 @@ export default async function AdminPage() {
   const { user } = await getCurrentUser();
   
   if(!user) {
-    redirect("/login");
+    redirect("/");
   }
 
   const result = await getDashboardData();
@@ -76,7 +78,7 @@ export default async function AdminPage() {
           </div>
           <div className="w-full bg-background p-4 border shadow space-y-4">
             <h2 className="text-2xl font-bold">Reservation Stats</h2>
-            <div>Graph</div>
+            <RevenueChart data={result.data.revenuePerMonth} />
           </div>
           <div className="w-full bg-background p-4 border shadow space-y-4">
             <h2 className="text-2xl font-bold">Today</h2>

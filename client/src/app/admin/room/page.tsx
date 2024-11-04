@@ -15,7 +15,7 @@ export default async function RoomPage({
   const { user } = await getCurrentUser();
 
   if(!user) {
-    redirect("/login");
+    redirect("/");
   }
 
   const q = searchParams?.q || "";

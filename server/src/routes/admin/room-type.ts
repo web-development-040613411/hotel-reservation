@@ -9,21 +9,21 @@ import { middleware } from '@/middleware';
 export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
     .use(middleware)
     .get('/', async ({ user, set, query }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
         const q = query.q?.toLowerCase() || "";
 
         const roomTypes = await sql`SELECT * FROM room_types WHERE LOWER(name) LIKE ${`%${q}%`}`;
@@ -34,21 +34,21 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         };
     })
     .post('/', async ({ body, set, user }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
 
         const validateData = addRoomTypeSchema.safeParse(body);
 
@@ -102,21 +102,21 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         };
     })
     .put('/:id', async ({ params: { id }, body, set, user }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
 
         const [roomType] = await sql`SELECT * FROM room_types WHERE id=${id}`;
 
@@ -181,21 +181,21 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         };
     })
     .delete('/:id', async ({ params: { id }, set, user }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
 
         const [roomType] = await sql`SELECT * FROM room_types WHERE id=${id}`;
 

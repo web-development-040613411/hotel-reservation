@@ -6,21 +6,21 @@ import Elysia, { t } from 'elysia';
 export const roomRoutes = new Elysia({ prefix: '/rooms' })
     .use(middleware)
     .post('/', async ({ set, body, user }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
 
         const validation = createAndUpdateRoomSchema.safeParse(body);
 
@@ -48,21 +48,21 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         };
     })
     .get('/', async ({ user, set, query }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
         
         const q = query.q || '';
         const status = query.status || '';
@@ -135,21 +135,21 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         };
     })
     .put('/:id', async ({ params, set, body, user }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
 
         const { id } = params;
 
@@ -188,21 +188,21 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
         };
     })
     .delete('/:id', async ({ set, params, user }) => {
-        // if (!user) {
-        //     set.status = 401;
-        //     return {
-        //         status: 'error',
-        //         message: 'Unauthorized',
-        //     };
-        // }
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
 
-        // if (user.role !== 'administrator') {
-        //     set.status = 403;
-        //     return {
-        //         status: 'error',
-        //         message: 'Forbidden',
-        //     };
-        // }
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
 
         const { id } = params;
 
@@ -236,7 +236,23 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             message: 'Your room have been removed.',
         };
     })
-    .patch('/status', async ({ set, body }) => {
+    .patch('/status', async ({ user, set, body }) => {
+        if (!user) {
+            set.status = 401;
+            return {
+                status: 'error',
+                message: 'Unauthorized',
+            };
+        }
+
+        if (user.role !== 'administrator') {
+            set.status = 403;
+            return {
+                status: 'error',
+                message: 'Forbidden',
+            };
+        }
+        
         const { id } = body;
 
         const status = body.status.replace(' ', '_');

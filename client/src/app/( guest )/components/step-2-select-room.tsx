@@ -77,7 +77,7 @@ export default function Step2() {
     const getData = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/vacant-rooms?check_in=${dateRange.from}&check_out=${dateRange.to}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/vacant-rooms?check_in=${new Date(dateRange.from).toISOString().slice(0,10)}&check_out=${new Date(dateRange.to).toISOString().slice(0,10)}`,
           {
             method: "GET",
             headers: {
@@ -95,6 +95,7 @@ export default function Step2() {
         setIsLoading(false);
       } catch (error) {
         setIsError(true);
+        console.log( error );
       }
     };
 

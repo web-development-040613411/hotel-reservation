@@ -8,7 +8,7 @@ export interface InputProps
 		extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 const SearchInput = React.forwardRef<HTMLInputElement, InputProps>(
-	({ className, type, ...props }, ref) => {
+	({ className, ...props }, ref) => {
 		const searchParams = useSearchParams();
 		const router = useRouter();
 		const pathname = usePathname();
@@ -35,6 +35,7 @@ const SearchInput = React.forwardRef<HTMLInputElement, InputProps>(
 					onChange={(e) => setQuery(e.target.value)}
 					value={query}
 					ref={ref}
+					className={className}
 					{...props}
 				/>
 				<SearchIcon	className='absolute top-1/2 transform -translate-y-1/2 right-2 h-5 w-5 text-gray-500' />

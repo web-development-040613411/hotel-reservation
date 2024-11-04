@@ -29,7 +29,6 @@ import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { z } from "zod";
 
 interface EditRoomTypeModalProps {
   roomType: RoomType;

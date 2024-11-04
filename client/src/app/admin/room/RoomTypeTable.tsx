@@ -17,6 +17,7 @@ async function getRoomTypes(
     }/admin/room-types?${searchParams.toString()}`,
     {
       headers: headers(),
+      cache: "no-store"
     }
   );
 

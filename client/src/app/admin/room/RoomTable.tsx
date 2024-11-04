@@ -18,6 +18,7 @@ async function getRooms(
     }/admin/rooms?${searchParams.toString()}`,
     {
       headers: headers(),
+      cache: "no-store",
     }
   );
 

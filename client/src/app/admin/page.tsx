@@ -18,26 +18,6 @@ interface DashboardData {
   revenuePerMonth: {month: string, sum: number }[]
 }
 
-async function getDashboardData(): Promise<
-  | { status: "error"; message: string }
-  | {
-      status: "success";
-      data: DashboardData;
-    }
-> {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/dashboard`,
-    {
-      headers: headers(),
-      cache: "no-store"
-    }
-  );
-
-  const data = await res.json();
-
-  return data;
-}
-
 export default async function AdminPage() {
   const { user } = await getCurrentUser();
   

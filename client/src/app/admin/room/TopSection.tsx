@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import AddRoomModal from "./AddRoomModal";
 import AddRoomTypeModal from "./AddRoomTypeModal";
 import { roomStatus } from "@/lib/utils";
+import { SearchInput } from "../SearchInput";
 
 export function RoomTopSection() {
   const searchParams = useSearchParams();
@@ -44,14 +45,7 @@ export function RoomTopSection() {
 
   return (
     <div className="flex justify-between">
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <Input
-          onChange={(e) => setQuery(e.target.value)}
-          value={query}
-          placeholder="Room number"
-        />
-        <Button type="submit">Search</Button>
-      </form>
+      <SearchInput placeholder="Room number"/>
       <div className="flex gap-2">
         <AddRoomModal />
         <DropdownMenu>
@@ -81,34 +75,9 @@ export function RoomTopSection() {
 }
 
 export function RoomTypeTopSection() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const [query, setQuery] = useState<string>(searchParams.get("q") || "");
-
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    const params = new URLSearchParams(searchParams);
-    if (query) {
-      params.set("q", query);
-    } else {
-      params.delete("q");
-    }
-    router.replace(`${pathname}?${params.toString()}`);
-  };
-
   return (
     <div className="flex justify-between">
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <Input
-          onChange={(e) => setQuery(e.target.value)}
-          value={query}
-          placeholder="Room type"
-        />
-        <Button type="submit">Search</Button>
-      </form>
+      <SearchInput placeholder="Room type"/>
       <div className="flex gap-2">
         <AddRoomTypeModal />
       </div>

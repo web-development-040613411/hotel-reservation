@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/select";
 import { RoomSchema, RoomValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -41,9 +42,11 @@ export default function AddRoomModal() {
 
   const [roomType, setRoomType] = useState<{ id: string; name: string }[]>([]);
   const [isModalOpen, setModalIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleAddRoom = async (values: RoomValues) => {
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/rooms`,
@@ -58,7 +61,8 @@ export default function AddRoomModal() {
       );
   
       const data = await res.json();
-  
+      setIsLoading(false);
+
       if (data.status === "success") {
         form.reset();
         toast.success(data.message);
@@ -68,6 +72,7 @@ export default function AddRoomModal() {
         toast.error(data.message);
       }
     } catch {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };
@@ -148,8 +153,8 @@ export default function AddRoomModal() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Add room
+                <Button disabled={isLoading} type="submit" className="w-full">
+                  {isLoading ? <Loader2 className="animate-spin" /> : "Add Room"}
                 </Button>
               </form>
             </Form>

@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { AddRoomTypeSchema, AddRoomTypeValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -40,6 +41,7 @@ export default function AddRoomTypeModal() {
   });
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const router = useRouter();
 
@@ -48,6 +50,7 @@ export default function AddRoomTypeModal() {
 
     const formData = new FormData(formRef.current);
 
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/room-types`,
@@ -59,7 +62,8 @@ export default function AddRoomTypeModal() {
       );
   
       const data = await res.json();
-  
+      setIsLoading(false);
+
       if (data.status === "success") {
         form.reset();
         toast.success(data.message);
@@ -69,6 +73,7 @@ export default function AddRoomTypeModal() {
         toast.error(data.message);
       }
     } catch {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };
@@ -181,8 +186,8 @@ export default function AddRoomTypeModal() {
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full">
-                    Add
+                  <Button disabled={isLoading} type="submit" className="w-full">
+                    {isLoading ? <Loader2 className="animate-spin"/> : "Add Room Type"}
                   </Button>
                   <Button
                     type="button"

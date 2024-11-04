@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PasswordMatchSchema, PasswordMatchValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -15,17 +16,18 @@ interface ResetPasswordModalProps {
 }
 
 export default function ResetPasswordModal({ employeeId }: ResetPasswordModalProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const form = useForm<PasswordMatchValues>({
     resolver: zodResolver(PasswordMatchSchema),
     defaultValues: {
       password: "",
       confirm_password: "",
     }
-  })
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleResetPassword = async (values: PasswordMatchValues) => {
-
+    setIsLoading(true);
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/reset-password/${employeeId}`, {
         method: "PATCH",
@@ -36,7 +38,8 @@ export default function ResetPasswordModal({ employeeId }: ResetPasswordModalPro
       })
   
       const data = await res.json();
-  
+      setIsLoading(false);
+
       if(data.status === "success") {
         form.reset();
         toast.success(data.message);
@@ -45,6 +48,7 @@ export default function ResetPasswordModal({ employeeId }: ResetPasswordModalPro
         toast.error(data.message);
       }
     } catch (e) {
+      setIsLoading(false);
       toast.error("An error occurred.")
     }
   }
@@ -95,9 +99,9 @@ export default function ResetPasswordModal({ employeeId }: ResetPasswordModalPro
                     )}
                   />
                   <Button className="w-full" type="submit">
-                    Reset Password
+                    {isLoading ? <Loader2 className="animate-spin" /> : `Reset Password`}
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button type="button" onClick={() => setIsModalOpen(false)} variant="outline" className="w-full">
                     Cancel
                   </Button>
               </form>

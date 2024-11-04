@@ -27,6 +27,7 @@ import {
 import { employeeRole } from "@/lib/type";
 import { CreateAccountEmployeeSchema, CreateAccountEmployeeValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -50,6 +51,7 @@ export default function CreateAccountModal() {
   });
   const router = useRouter();
   const formRef = useRef<HTMLFormElement | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -60,6 +62,7 @@ export default function CreateAccountModal() {
     const formData = new FormData(formRef.current);
     formData.append("role", form.getValues("role"));
 
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees`,
@@ -71,7 +74,9 @@ export default function CreateAccountModal() {
       );
   
       const data = await res.json();
-  
+      
+      setIsLoading(false);
+      
       if (data.status === "success") {
         form.reset();
         toast.success(data.message);
@@ -81,6 +86,7 @@ export default function CreateAccountModal() {
         toast.error(data.message);
       }
     } catch (e) {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };
@@ -260,7 +266,7 @@ export default function CreateAccountModal() {
                     )}
                   />
                   <Button className="w-full" type="submit">
-                    Create Account
+                    {isLoading ? <Loader2 className="animate-spin" /> : `Create Account` }
                   </Button>
                   <Button type="button" onClick={() => setIsModalOpen(false)} variant="outline" className="w-full">Cancel</Button>
                 </div>

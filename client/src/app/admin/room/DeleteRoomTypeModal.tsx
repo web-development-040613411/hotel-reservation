@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
 interface DeleteRoomModalProps {
@@ -19,9 +21,11 @@ interface DeleteRoomModalProps {
 
 export default function DeleteRoomTypeModal({ roomTypeId }: DeleteRoomModalProps) {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleDeleteRoom = async () => {
     try {
+      setIsLoading(true);
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/room-types/${roomTypeId}`,
         {
@@ -31,7 +35,8 @@ export default function DeleteRoomTypeModal({ roomTypeId }: DeleteRoomModalProps
       );
   
       const data = await res.json();
-  
+      setIsLoading(false);
+
       if (data.status === "success") {
         toast.success(data.message);
         router.refresh();
@@ -39,6 +44,7 @@ export default function DeleteRoomTypeModal({ roomTypeId }: DeleteRoomModalProps
         toast.error(data.message);
       }
     } catch {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };
@@ -60,7 +66,9 @@ export default function DeleteRoomTypeModal({ roomTypeId }: DeleteRoomModalProps
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button variant="destructive" onClick={handleDeleteRoom}>Delete</Button>
+            <Button disabled={isLoading} variant="destructive" onClick={handleDeleteRoom}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "Delete"}
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

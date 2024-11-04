@@ -31,6 +31,7 @@ import { useRouter } from "next/navigation";
 import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { RoomSchema, RoomValues } from "@/lib/validation";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 interface EditRoomModalProps {
   roomId: string;
@@ -49,10 +50,12 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
 
   const [roomType, setRoomType] = useState<{ id: string; name: string }[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleEditRoom = async (values: RoomValues) => {
     try {
+      setIsLoading(true);
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/rooms/${roomId}`,
         {
@@ -66,7 +69,8 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
       );
   
       const data = await res.json();
-  
+      setIsLoading(false);
+
       if (data.status === "success") {
         toast.success(data.message);
         router.refresh();
@@ -75,6 +79,7 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
         toast.error(data.message);
       }
     } catch {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };
@@ -156,8 +161,8 @@ export default function EditRoomModal({ roomId, roomNumber, roomTypeName }: Edit
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Edit
+                <Button disabled={isLoading} type="submit" className="w-full">
+                  {isLoading ? <Loader2 className="animate-spin"/> : "Edit"}
                 </Button>
               </form>
             </Form>

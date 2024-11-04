@@ -23,6 +23,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { RoomType } from "@/lib/type";
 import { EditRoomTypeSchema, EditRoomTypeValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -47,6 +48,7 @@ export default function EditRoomTypeModal({ roomType }: EditRoomTypeModalProps) 
   });
   const [previewImage, setPreviewImage] = useState<string | null>(`${process.env.NEXT_PUBLIC_BACKEND_URL}${roomType.picture_path}`);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const formRef = useRef<HTMLFormElement | null>(null);
   const router = useRouter();
 
@@ -55,6 +57,7 @@ export default function EditRoomTypeModal({ roomType }: EditRoomTypeModalProps) 
 
     const formData = new FormData(formRef.current);
 
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/room-types/${roomType.id}`,
@@ -66,7 +69,8 @@ export default function EditRoomTypeModal({ roomType }: EditRoomTypeModalProps) 
       );
   
       const data = await res.json();
-  
+      setIsLoading(false);
+
       if (data.status === "success") {
         toast.success(data.message);
         router.refresh();
@@ -75,6 +79,7 @@ export default function EditRoomTypeModal({ roomType }: EditRoomTypeModalProps) 
         toast.error(data.message);
       }
     } catch {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };
@@ -189,8 +194,8 @@ export default function EditRoomTypeModal({ roomType }: EditRoomTypeModalProps) 
                       </FormItem>
                     )}
                   />
-                  <Button type="submit" className="w-full">
-                    Edit
+                  <Button disabled={isLoading} type="submit" className="w-full">
+                    {isLoading ? <Loader2 className="animate-spin"/> : "Edit"}
                   </Button>
                   <Button
                     type="button"

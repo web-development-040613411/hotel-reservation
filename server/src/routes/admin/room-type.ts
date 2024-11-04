@@ -26,7 +26,7 @@ export const roomTypeRoutes = new Elysia({ prefix: '/room-types' })
         // }
         const q = query.q?.toLowerCase() || "";
 
-        const roomTypes = await sql`SELECT * FROM room_types WHERE name LIKE ${`%${q}%`}`;
+        const roomTypes = await sql`SELECT * FROM room_types WHERE LOWER(name) LIKE ${`%${q}%`}`;
 
         return {
             status: 'success',

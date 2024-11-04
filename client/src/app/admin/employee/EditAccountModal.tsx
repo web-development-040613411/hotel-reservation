@@ -29,6 +29,7 @@ import { Employee, employeeRole } from "@/lib/type";
 import { formatDate } from "@/lib/utils";
 import { EditAccountEmployeeSchema, EditAccountEmployeeValues } from "@/lib/validation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
@@ -59,6 +60,7 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
   const [previewImage, setPreviewImage] = useState<string>(
     `${process.env.NEXT_PUBLIC_BACKEND_URL}${employee.profile_picture}`
   );
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleCreateAccount = async () => {
     if (!formRef.current) return;
@@ -66,6 +68,7 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
     const formData = new FormData(formRef.current);
     formData.append("role", form.getValues("role"));
 
+    setIsLoading(true);
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND_URL}/admin/employees/${employee.id}`,
@@ -77,7 +80,8 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
       );
   
       const data = await res.json();
-  
+      setIsLoading(false);
+
       if (data.status === "success") {
         toast.success(data.message);
         router.refresh();
@@ -86,6 +90,7 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
         toast.error(data.message);
       }
     } catch (e) {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };
@@ -242,9 +247,9 @@ export default function EditAccountModal({ employee }: EditAccountModalprops) {
                     )}
                   />
                   <Button className="w-full" type="submit">
-                    Edit
+                    {isLoading ? <Loader2 className="animate-spin"/> : "Save"}
                   </Button>
-                  <Button variant="outline" className="w-full">
+                  <Button type="button" onClick={() => setIsModalOpen(false)} variant="outline" className="w-full">
                     Cancel
                   </Button>
                 </div>

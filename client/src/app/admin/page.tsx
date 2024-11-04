@@ -1,9 +1,5 @@
-import { BedSingle, Coins, NotepadText, UserRound } from "lucide-react";
-import { headers } from "next/headers";
 import { getCurrentUser } from "@/actions/getCurrentUser";
 import { redirect } from "next/navigation";
-import { formatCurrency } from "@/lib/utils";
-import RevenueChart from "./RevenueChart";
 import { Suspense } from "react";
 import DashboardContent from "./DashboardContent";
 import DashboardSkeleton from "./DashboardSkeleton";
@@ -21,7 +17,7 @@ interface DashboardData {
 export default async function AdminPage() {
   const { user } = await getCurrentUser();
   
-  if(!user) {
+  if(!user || user.role !== "administrator") {
     redirect("/");
   }
   

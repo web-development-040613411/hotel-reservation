@@ -49,7 +49,7 @@ export function RoomTypeCarousel({ allroomtypes }: RoomTypeCarouselProps) {
                               </div>
 
                               <div className="flex flex-col p-4 ">
-                                 <h1 className="text-center font-black">
+                                 <h1 className="text-center font-bold text-xl">
                                     {type.name}
                                  </h1>
 

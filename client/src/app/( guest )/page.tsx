@@ -33,13 +33,13 @@ function Child() {
    const timer = 5 * 60 * 1000;
 
    var userTimeout = setTimeout(() => {
-      setState(1);
-      if (reservationId) {
-         removeReserveRecord(reservationId);
-      }
-
       if (state != 1) {
+         if (reservationId) {
+            removeReserveRecord(reservationId);
+         }
+
          alert('You have been inactive for 5 minutes. Please start over.');
+         setState(1);
       }
    }, timer);
 
@@ -47,13 +47,13 @@ function Child() {
       clearTimeout(userTimeout);
 
       userTimeout = setTimeout(() => {
-         setState(1);
-         if (reservationId) {
-            removeReserveRecord(reservationId);
-         }
-
          if (state != 1) {
+            if (reservationId) {
+               removeReserveRecord(reservationId);
+            }
+
             alert('You have been inactive for 5 minutes. Please start over.');
+            setState(1);
          }
       }, timer);
    };

@@ -101,7 +101,9 @@ export const ChangeRoomSchema = z.object({
     check_in: z.coerce.date(),
     check_out: z.coerce.date(),
     type_id: z.string({ message: 'type_id is required' }).uuid(),
-    total_price: z.coerce.number({ message: 'Price is required' }).min(1, 'Price is required'),
+    total_price: z.coerce
+        .number({ message: 'Price is required' })
+        .min(1, 'Price is required'),
     reservation_id: z.string({ message: 'Reservation ID is required' }).uuid(),
 });
 
@@ -144,4 +146,10 @@ export const PaymentSchema = z.object({
         .min(1, 'Price is required'),
     reservationId: z.string({ message: 'Reservation ID is required' }).uuid(),
     roomTypeId: z.string({ message: 'Type ID is required' }).uuid(),
+});
+
+export const PostponeShcema = z.object({
+    reservationID: z.string({ message: 'reservationID is required' }),
+    newCheckIn: z.coerce.date({ message: 'New check in is required' }),
+    newCheckOut: z.coerce.date({ message: 'New check out is required' }),
 });

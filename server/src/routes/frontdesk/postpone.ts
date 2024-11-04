@@ -6,7 +6,7 @@ import { getRandomColorToDB } from '@/libs/random-color';
 
 export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
     '/',
-    async ({ body }) => {
+    async ({ body, set }) => {
         const validation = PostponeShcema.safeParse(body);
         if (!validation.success) {
             return {
@@ -21,7 +21,8 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
         const [postponeReservation] = await sql`
             SELECT
 	            reservations.room_id,
-	            room_types.price 
+	            room_types.price,
+                reservations.customer_id
             FROM
                 reservations
                 INNER JOIN rooms ON reservations.room_id = rooms."id"
@@ -30,7 +31,11 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                 reservations."id" = ${reservationID}
         `;
 
-        const { room_id, price: pricePerNight } = postponeReservation;
+        const {
+            room_id,
+            price: pricePerNight,
+            customer_id: customerId,
+        } = postponeReservation;
 
         const conflictReservations = await sql`
             SELECT 
@@ -52,7 +57,7 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
         `;
 
         try {
-            await sql.begin(async (sql) => {
+            const preserveReservation = await sql.begin(async (sql) => {
                 if (conflictReservations.length != 0) {
                     for (let i = 0; i < conflictReservations.length; i++) {
                         const {
@@ -74,18 +79,28 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                         SET room_id = ${vacantRoomID}
                         WHERE id = ${id}
                         RETURNING *
-                    `;
+                        `;
                     }
                 }
+
                 const randomColor = getRandomColorToDB();
 
-                await sql`
-                    INSERT INTO reservations (room_id, check_in, check_out, price, display_color)
-                    VALUES (${room_id}, ${currentCheckout}, ${newCheckOut}, ${pricePerNight}, ${randomColor})
+                const [preserveReservation] = await sql`
+                    INSERT INTO reservations (room_id, check_in, check_out, price, display_color, customer_id)
+                    VALUES (${room_id}, ${currentCheckout}, ${newCheckOut}, ${pricePerNight}, ${randomColor}, ${customerId})
                     RETURNING id;`;
+
+                return preserveReservation;
             });
+
+            return {
+                status: 200,
+                message: 'can postpone',
+                reservationId: preserveReservation.id,
+            };
         } catch (error) {
             console.log(error);
+            set.status = 400;
             return {
                 status: 400,
                 body: {
@@ -93,12 +108,5 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                 },
             };
         }
-
-        return {
-            status: 200,
-            message: 'can postpone',
-            data: conflictReservations,
-            // reservationId: reservationId.id,
-        };
     }
 );

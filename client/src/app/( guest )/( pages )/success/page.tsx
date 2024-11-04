@@ -18,10 +18,13 @@ export default function Page() {
                         items-center justify-center
                         gap-8"
           >
-            <Check className="w-96 h-96 text-green-400"/>
+            <Check className="w-96 h-96 text-green-400" />
             <div className="text-center">
               <h1 className="text-xl font-bold">You are all set.</h1>
-              <p>The reservation has send to your email address name <span className="font-black text-primary">{email}</span>,</p>
+              <p>
+                The reservation has send to your email address name{" "}
+                <span className="font-black text-primary">{email}</span>,
+              </p>
               <p>please check your email for more details.</p>
             </div>
           </div>

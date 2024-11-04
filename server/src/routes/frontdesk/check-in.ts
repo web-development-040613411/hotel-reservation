@@ -44,7 +44,7 @@ export const checkInRoute = new Elysia({ prefix: '/check-in' }).patch(
             };
         }
 
-        const updateRoom = await sql`
+        await sql`
             UPDATE rooms
             SET current_status ='occupied'
             WHERE id=${thisReservation.room_id}

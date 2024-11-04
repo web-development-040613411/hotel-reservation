@@ -20,9 +20,6 @@ export const uploadFile = async (file: File): Promise<UploadFileResult> => {
         };
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-
     const date = new Date();
 
     const fileName = `${uuidv4()}-${date.getDate()}-${date.getMonth()}.${
@@ -31,7 +28,7 @@ export const uploadFile = async (file: File): Promise<UploadFileResult> => {
     const path = join('.', process.env.UPLOAD_FOLDER!, fileName);
     const url = `/file/${fileName}`;
 
-    await Bun.write(path, buffer);
+    await Bun.write(path, file);
 
     return {
         status: 'success',

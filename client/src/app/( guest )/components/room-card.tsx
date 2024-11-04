@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { ReservationContext } from "@/context/ReservationContext";
 import { useContext } from "react";
+import Image from 'next/image'
 
 type Props = {
   type: RoomType;
@@ -24,12 +25,12 @@ export default function RoomCard({ type, clickHandler }: Props) {
             className="relative bg-black
                           w-1/2 "
           >
-            {/* <Image
-                        src={type.picture_path ? type.picture_path : ""}
-                        layout="fill"
-                        className="object-cover rounded-l-xl"
-                        alt={`Picture of ${type.type_name}`}
-                      /> */}
+            <Image
+                    src={process.env.NEXT_PUBLIC_BACKEND_URL + type.picture_path}
+                    layout="fill"
+                    className="object-cover rounded-l-xl"
+                    alt={`Picture of ${type.type_name}`}
+                  />
           </div>
 
           <div

@@ -1,0 +1,2 @@
+ALTER TABLE reservations
+ADD COLUMN createTime TIME DEFAULT NOW();

@@ -1,0 +1,2 @@
+ALTER TABLE employees
+ADD phone_number VARCHAR DEFAULT '0863102395';

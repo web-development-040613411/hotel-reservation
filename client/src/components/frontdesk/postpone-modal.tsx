@@ -68,7 +68,7 @@ export function PostponeModal({ thisReservation }: PostponeModalProps) {
             <DialogFooterStart>
                <Button
                   variant="default"
-                  className="bg-green-600 text-white hover:bg-green-700 font-bold w-28 flex items-center justify-center"
+                  className="border-0 bg-green-600 text-white hover:bg-green-700 font-bold w-28 flex items-center justify-center"
                   onClick={() => postpone(thisReservation.reservations_id)}
                >
                   Post-pone

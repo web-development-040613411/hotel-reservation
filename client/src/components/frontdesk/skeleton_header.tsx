@@ -5,7 +5,7 @@ function Skeleton_header() {
    return (
       <div>
          <div className="flex justify-between">
-            <Skeleton className="mt h-9 w-1/6 rounded-xl" />
+            <Skeleton className="mt h-9 w-1/6 rounded-xl " />
             <Skeleton className="mt h-9 w-1/6 rounded-xl" />
          </div>
          <div className="flex justify-center mt-2">

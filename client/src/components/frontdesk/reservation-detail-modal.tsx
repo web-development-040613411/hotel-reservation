@@ -165,7 +165,7 @@ export default function Reservation_detail_modal({
                         <strong>Room Status :&nbsp;</strong>
                      </p>
                      {thisReservation.current_status === 'occupied' ? (
-                        <Badge className="bg-amber-600 hover:bg-amber-600 font-bold text-sm">
+                        <Badge className="bg-amber-600  hover:bg-amber-600 font-bold text-sm">
                            occupied
                         </Badge>
                      ) : (
@@ -207,7 +207,7 @@ export default function Reservation_detail_modal({
                <Button
                   variant="default"
                   className="
-                bg-green-600 text-white hover:bg-green-700 font-bold w-28 flex items-center justify-center"
+                bg-green-600 border-0 text-white hover:bg-green-700 font-bold w-28 flex items-center justify-center"
                   disabled={
                      thisReservation.current_status === 'occupied' ||
                      thisReservation.current_status === 'departing' ||
@@ -229,7 +229,7 @@ export default function Reservation_detail_modal({
                </Button>
                <Button
                   variant="default"
-                  className="bg-red-600 text-white hover:bg-red-700 font-bold w-28 flex items-center justify-center"
+                  className="bg-red-600 border-0 text-white hover:bg-red-700 font-bold w-28 flex items-center justify-center"
                   onClick={() =>
                      checkOutMutate(thisReservation.reservations_id)
                   }

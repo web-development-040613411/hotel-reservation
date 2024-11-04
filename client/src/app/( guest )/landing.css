@@ -1,0 +1,4 @@
+.fade-transparent {
+    -webkit-mask-image: linear-gradient(black 80%, transparent 100%);
+
+}

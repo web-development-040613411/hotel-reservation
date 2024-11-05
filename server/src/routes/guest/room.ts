@@ -59,7 +59,7 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
 
         const [reservationId] = await sql`
             INSERT INTO reservations (room_id, check_in, check_out, price, display_color)
-            VALUES (${room.room_id}, ${check_in}, ${check_out}, ${room.price}, ${randomColor})
+            VALUES (${room.room_id}, ${check_in}, ${check_out}, ${room.total_price}, ${randomColor})
             RETURNING id;
         `;
 

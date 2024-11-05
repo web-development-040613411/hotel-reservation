@@ -23,8 +23,8 @@ export default function Step2() {
    const clickHandler = async (type: any) => {
       const formData = new FormData();
       formData.append('type_id', type.type_id);
-      formData.append('check_in', dateRange.from);
-      formData.append('check_out', dateRange.to);
+      formData.append('check_in', dateRange.from.toLocaleDateString());
+      formData.append('check_out', dateRange.to.toLocaleDateString());
 
       if (!information.reservationId) {
          const response = await fetch(
@@ -82,8 +82,11 @@ export default function Step2() {
     // for retrieve data
     const getData = async () => {
       try {
+        const checkIn = new Date(dateRange.from).toLocaleDateString();
+        const checkOut = new Date(dateRange.to).toLocaleDateString();
+
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/vacant-rooms?check_in=${new Date(dateRange.from).toISOString().slice(0,10)}&check_out=${new Date(dateRange.to).toISOString().slice(0,10)}`,
+          `${process.env.NEXT_PUBLIC_BACKEND_URL}/guest/rooms/vacant-rooms?check_in=${checkIn}&check_out=${checkOut}`,
           {
             method: "GET",
             headers: {

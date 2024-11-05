@@ -1,14 +1,30 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 interface SuccessProps {
   email: string;
 }
 
 export default function Success({ email }: SuccessProps) {
+
+  const queryClient = useQueryClient();
+   useEffect(() => {
+      queryClient.invalidateQueries({
+         queryKey: ['rooms'],
+      });
+      queryClient.invalidateQueries({
+         queryKey: ['reservations'],
+      });
+      queryClient.invalidateQueries({
+         queryKey: ['roomTypes'],
+      });
+   });
+   
   return (
     <>
       <div className="w-full flex justify-center">

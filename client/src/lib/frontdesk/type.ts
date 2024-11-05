@@ -25,6 +25,7 @@ export type Reservation = {
    picture_path: string;
    price_per_night: number;
    special_request: string;
+   type_id: string;
 };
 
 export type Room = {

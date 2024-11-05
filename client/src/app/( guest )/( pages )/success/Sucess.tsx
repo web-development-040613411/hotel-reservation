@@ -25,19 +25,19 @@ export default function Success({ email }: SuccessProps) {
               <p>The reservation has send to your email address name <span className="font-black text-primary">{email}</span>,</p>
               <p>please check your email for more details.</p>
             </div>
+            <Link href="/">
+              <Button
+                className=" bg-primary w-11/12 max-w-96 rounded-lg  hover:bg-gray-800 active:bg-gray-800
+                            hover:bg-primary
+                            my-4
+                            font-bold text-white
+                            absolute bottom-20 left-1/2 -translate-x-1/2"
+                type="button"
+              >
+                Back to booking
+              </Button>
+            </Link>
           </div>
-          <Link href="/">
-            <Button
-              className=" bg-primary w-11/12 max-w-96 rounded-lg  hover:bg-gray-800 active:bg-gray-800
-                          hover:bg-primary
-                          my-4
-                          font-bold text-white
-                          absolute bottom-20 left-1/2 -translate-x-1/2"
-              type="button"
-            >
-              Back to booking
-            </Button>
-          </Link>
         </div>
       </div>
     </>

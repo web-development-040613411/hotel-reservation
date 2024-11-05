@@ -1,44 +1,7 @@
-"use client";
+import Success from "./Sucess";
 
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Check } from "lucide-react";
-
-export default function Page() {
-  const urlParam = new URLSearchParams(window.location.search);
-  const email = urlParam.get("email");
-
+export default function SuccessPage({ searchParams }: { searchParams: { email: string } }) {
   return (
-    <>
-      <div className="w-full flex justify-center">
-        <div className="w-11/12 max-w-fit">
-          <div
-            className="flex flex-col
-                        h-dvh
-                        items-center justify-center
-                        gap-8"
-          >
-            <Check className="w-96 h-96 text-green-400"/>
-            <div className="text-center">
-              <h1 className="text-xl font-bold">You are all set.</h1>
-              <p>The reservation has send to your email address name <span className="font-black text-primary">{email}</span>,</p>
-              <p>please check your email for more details.</p>
-            </div>
-          </div>
-          <Link href="/">
-            <Button
-              className=" bg-primary w-11/12 max-w-96 rounded-lg  hover:bg-gray-800 active:bg-gray-800
-                          hover:bg-primary
-                          my-4
-                          font-bold text-white
-                          absolute bottom-20 left-1/2 -translate-x-1/2"
-              type="button"
-            >
-              Back to booking
-            </Button>
-          </Link>
-        </div>
-      </div>
-    </>
-  );
+    <Success email={searchParams.email} />
+  )
 }

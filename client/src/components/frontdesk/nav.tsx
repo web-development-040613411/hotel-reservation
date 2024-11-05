@@ -1,6 +1,8 @@
 'use client';
-import { LogOut } from 'lucide-react';
+
+import Logo from '@/assets/logo.png';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import {
    DropdownMenu,
    DropdownMenuContent,
@@ -10,14 +12,38 @@ import {
    DropdownMenuSeparator,
    DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
+import { User } from '@/lib/type';
+import { LogOut } from 'lucide-react';
 import Image from 'next/image';
-import Logo from '@/assets/logo.png';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
-export default function Frontdesk_Nav() {
-   const Logout = async () => {
-      console.log('Logout');
+interface Frontdesk_NavProps {
+   user: User;
+}
+
+export default function Frontdesk_Nav({ user }: Frontdesk_NavProps) {
+   const router = useRouter();
+   
+   const logout = async () => {
+      try {
+         const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, {
+            credentials: 'include',
+         })
+
+         const data = await res.json();
+
+         if(data.status === "success") {
+            router.refresh();
+            toast.success(data.message);
+         } else {
+            toast.error(data.message);
+         }
+      } catch {
+         toast.error("An error occurred.");
+      }
    };
+
    return (
       <nav className="p-1 shadow-md">
          <div className="flex justify-between items-center">
@@ -49,7 +75,7 @@ export default function Frontdesk_Nav() {
                      >
                         <Avatar className="w-14 h-14">
                            <AvatarImage
-                              src="https://github.com/shadcn.png"
+                              src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${user.profile_picture}`}
                               alt="Front Desk"
                            />
                            <AvatarFallback>FD</AvatarFallback>
@@ -62,7 +88,7 @@ export default function Frontdesk_Nav() {
                      <DropdownMenuGroup>
                         <DropdownMenuItem
                            className="cursor-pointer"
-                           onClick={Logout}
+                           onClick={logout}
                         >
                            <LogOut className="mr-2 h-4 w-4 text-red-600" />
                            <span className="text-red-600">Logout</span>

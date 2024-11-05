@@ -240,10 +240,10 @@ export default function Reservation_detail_modal({
                   disabled={
                      thisReservation.current_status === 'vacant' ||
                      thisReservation.current_status === 'maintenance' ||
-                     thisReservation.current_status === 'off_market' ||
-                     new Date(thisReservation.check_out) < new Date() ||
-                     new Date(thisReservation.check_in).getDate() >=
-                        new Date().getDate()
+                     thisReservation.current_status === 'off_market'
+                     // new Date(thisReservation.check_out) < new Date() ||
+                     // new Date(thisReservation.check_in).getDate() >=
+                     //    new Date().getDate()
                   }
                >
                   {checkOutIsPending ? (

@@ -3,6 +3,7 @@ import Elysia, { t } from 'elysia';
 import { PostponeShcema } from '@/libs/validation';
 import getVacantRoom from '@/libs/get-vacant-room';
 import { getRandomColorToDB } from '@/libs/random-color';
+import { getDiffDate } from '@/libs/get-diff-date';
 
 export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
     '/',
@@ -59,7 +60,7 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
         `;
 
         try {
-            const preserveReservation = await sql.begin(async (sql) => {
+            const [preserveReservation, totalPrice] = await sql.begin(async (sql) => {
                 if (conflictReservations.length != 0) {
                     for (let i = 0; i < conflictReservations.length; i++) {
                         const {
@@ -85,20 +86,25 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                     }
                 }
 
+                const totalPrice = pricePerNight * getDiffDate(new Date(currentCheckout.toLocaleDateString()), new Date(newCheckOut.toLocaleDateString()));
+
                 const randomColor = getRandomColorToDB();
 
                 const [preserveReservation] = await sql`
                     INSERT INTO reservations (room_id, check_in, check_out, price, display_color, customer_id)
-                    VALUES (${room_id}, ${currentCheckout}, ${newCheckOut}, ${pricePerNight}, ${randomColor}, ${customerId})
+                    VALUES (${room_id}, ${currentCheckout}, ${newCheckOut}, ${totalPrice}, ${randomColor}, ${customerId})
                     RETURNING id;`;
 
-                return preserveReservation;
+                return [preserveReservation, totalPrice];
             });
 
             return {
                 status: 200,
                 message: 'can postpone',
-                reservationId: preserveReservation.id,
+                data : {
+                    reservationId: preserveReservation.id,
+                    totalPrice,
+                }
             };
         } catch (error) {
             set.status = 400;

@@ -127,7 +127,7 @@ export default function Step2() {
                      <div className="md:grid md:grid-cols-2 md:gap-4 w-full h-full">
                         {!isLoading
                            ? roomTypes.map((type) => {
-                                if (type.type_id != disibleRoomType) {
+                                if (type?.type_id != disibleRoomType) {
                                    return (
                                       <RoomCard
                                          key={type.type_id}

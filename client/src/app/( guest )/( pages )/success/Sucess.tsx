@@ -46,8 +46,7 @@ export default function Success({ email }: SuccessProps) {
                 className=" bg-primary w-11/12 max-w-96 rounded-lg  hover:bg-gray-800 active:bg-gray-800
                             hover:bg-primary
                             my-4
-                            font-bold text-white
-                            absolute bottom-20 left-1/2 -translate-x-1/2"
+                            font-bold text-white"
                 type="button"
               >
                 Back to booking

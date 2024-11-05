@@ -82,6 +82,8 @@ export function PostponeModal({ thisReservation }: PostponeModalProps) {
                            .toISOString()
                            .split('T')[0],
                         newCheckOut: newCheckOut,
+                        roomTypeId: thisReservation.type_id,
+                        email: thisReservation.email,
                      })
                   }
                >

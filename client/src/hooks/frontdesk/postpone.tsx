@@ -14,16 +14,16 @@ export const usePostPoneMutation = () => {
          currentCheckout: string;
          newCheckOut: string;
       }) => {
+         console.log(reservationID, currentCheckout, newCheckOut);
          const res = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND_URL}/frontdesk/postpone/`,
-
             {
                body: JSON.stringify({
-                  reservationID: reservationID,
-                  newCheckIn: currentCheckout,
-                  newCheckOut: newCheckOut,
+                  reservationID,
+                  currentCheckout,
+                  newCheckOut,
                }),
-               method: 'PATCH',
+               method: 'PUT',
                headers: {
                   'Content-Type': 'application/json',
                },
@@ -31,7 +31,7 @@ export const usePostPoneMutation = () => {
          );
          const data = await res.json();
          if (!res.ok) {
-            throw new Error(data.message || 'Failed to check-in');
+            throw new Error(data.message || 'Failed to postpone reservation');
          }
          return data;
       },

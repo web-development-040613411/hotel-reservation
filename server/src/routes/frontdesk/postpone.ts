@@ -18,6 +18,8 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
         }
         const { reservationID, currentCheckout, newCheckOut } = validation.data;
 
+        console.log(reservationID, currentCheckout, newCheckOut);
+
         const [postponeReservation] = await sql`
             SELECT
 	            reservations.room_id,
@@ -99,7 +101,6 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                 reservationId: preserveReservation.id,
             };
         } catch (error) {
-            console.log(error);
             set.status = 400;
             return {
                 status: 400,
@@ -108,11 +109,5 @@ export const postPoneRoute = new Elysia({ prefix: '/postpone' }).put(
                 },
             };
         }
-    }, {
-        body: t.Object({
-            reservationID: t.String(),
-            currentCheckout: t.Date(),
-            newCheckOut: t.Date()
-        })
     }
 );

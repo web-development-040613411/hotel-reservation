@@ -5,7 +5,7 @@ import { sql } from '@/libs/db';
 export const crontab = new Elysia()
     .use(
         cron({
-            name: 'heartbeat',
+            name: 'removerPreserveReserveRecord',
             pattern: '0 */10 * * * *',
             async run() {
       

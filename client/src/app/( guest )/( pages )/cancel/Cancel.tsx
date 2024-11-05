@@ -35,19 +35,19 @@ export default function Cancel({ reservationId }: CancelProps) {
               <h1 className="text-xl font-bold">Your reservation is already canceled.</h1>
               <p>Any problem please contact: <a href={`mailto:${customerServiceEmail}`} className="underline text-primary font-black">Customer Service Email.</a>.</p>
             </div>
+            <Link href="/">
+              <Button
+                className=" bg-primary max-w-96 w-11/12 rounded-lg  hover:bg-gray-800 active:bg-gray-800
+                            hover:bg-primary
+                            my-4
+                            font-bold text-white
+                            absolute bottom-20 left-1/2 -translate-x-1/2"
+                type="button"
+              >
+                Back to booking
+              </Button>
+            </Link>
           </div>
-          <Link href="/">
-            <Button
-              className=" bg-primary max-w-96 w-11/12 rounded-lg  hover:bg-gray-800 active:bg-gray-800
-                          hover:bg-primary
-                          my-4
-                          font-bold text-white
-                          absolute bottom-20 left-1/2 -translate-x-1/2"
-              type="button"
-            >
-              Back to booking
-            </Button>
-          </Link>
         </div>
       </div>
     </>

@@ -1,14 +1,30 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useQueryClient } from "@tanstack/react-query";
 import { Check } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 interface SuccessProps {
   email: string;
 }
 
 export default function Success({ email }: SuccessProps) {
+
+  const queryClient = useQueryClient();
+   useEffect(() => {
+      queryClient.invalidateQueries({
+         queryKey: ['rooms'],
+      });
+      queryClient.invalidateQueries({
+         queryKey: ['reservations'],
+      });
+      queryClient.invalidateQueries({
+         queryKey: ['roomTypes'],
+      });
+   });
+   
   return (
     <>
       <div className="w-full flex justify-center">
@@ -25,19 +41,19 @@ export default function Success({ email }: SuccessProps) {
               <p>The reservation has send to your email address name <span className="font-black text-primary">{email}</span>,</p>
               <p>please check your email for more details.</p>
             </div>
+            <Link href="/">
+              <Button
+                className=" bg-primary w-11/12 max-w-96 rounded-lg  hover:bg-gray-800 active:bg-gray-800
+                            hover:bg-primary
+                            my-4
+                            font-bold text-white
+                            absolute bottom-20 left-1/2 -translate-x-1/2"
+                type="button"
+              >
+                Back to booking
+              </Button>
+            </Link>
           </div>
-          <Link href="/">
-            <Button
-              className=" bg-primary w-11/12 max-w-96 rounded-lg  hover:bg-gray-800 active:bg-gray-800
-                          hover:bg-primary
-                          my-4
-                          font-bold text-white
-                          absolute bottom-20 left-1/2 -translate-x-1/2"
-              type="button"
-            >
-              Back to booking
-            </Button>
-          </Link>
         </div>
       </div>
     </>

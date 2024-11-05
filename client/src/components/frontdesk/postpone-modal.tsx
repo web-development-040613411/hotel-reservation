@@ -13,15 +13,19 @@ import {
 import { Button } from '../ui/button';
 import { Reservation } from '@/lib/frontdesk/type';
 import { DialogClose } from '@radix-ui/react-dialog';
+import { usePostPoneMutation } from '@/hooks/frontdesk/postpone';
+import { useState } from 'react';
 
 interface PostponeModalProps {
    thisReservation: Reservation;
 }
 
 export function PostponeModal({ thisReservation }: PostponeModalProps) {
-   const postpone = (id: string) => {
-      console.log('Postpone reservation with id: ', id);
-   };
+   const { mutate: postpone, isPending: postponeIsPending } =
+      usePostPoneMutation();
+   const [newCheckOut, setNewCheckOut] = useState<string>(
+      new Date(thisReservation.check_out).toISOString().split('T')[0]
+   );
    return (
       <Dialog>
          <DialogTrigger
@@ -41,7 +45,7 @@ export function PostponeModal({ thisReservation }: PostponeModalProps) {
             </DialogHeader>
             <div className="flex flex-col">
                <label htmlFor="check-in" className="text-sm">
-                  Check-in
+                  New Check-in
                </label>
                <input
                   type="date"
@@ -49,7 +53,7 @@ export function PostponeModal({ thisReservation }: PostponeModalProps) {
                   name="check-in"
                   className="border border-gray-400 rounded-lg p-2"
                   value={
-                     new Date(thisReservation.check_in)
+                     new Date(thisReservation.check_out)
                         .toISOString()
                         .split('T')[0]
                   }
@@ -63,13 +67,25 @@ export function PostponeModal({ thisReservation }: PostponeModalProps) {
                   id="check-out"
                   name="check-out"
                   className="border border-gray-400 rounded-lg p-2"
+                  value={newCheckOut}
+                  onChange={(e) => setNewCheckOut(e.target.value)}
                />
             </div>
             <DialogFooterStart>
                <Button
                   variant="default"
                   className="border-0 bg-green-600 text-white hover:bg-green-700 font-bold w-28 flex items-center justify-center"
-                  onClick={() => postpone(thisReservation.reservations_id)}
+                  onClick={() =>
+                     postpone({
+                        reservationID: thisReservation.reservations_id,
+                        currentCheckout: new Date(thisReservation.check_out)
+                           .toISOString()
+                           .split('T')[0],
+                        newCheckOut: newCheckOut,
+                        roomTypeId: thisReservation.type_id,
+                        email: thisReservation.email,
+                     })
+                  }
                >
                   Post-pone
                </Button>

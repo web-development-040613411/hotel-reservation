@@ -58,14 +58,14 @@ export default function RoomCard({ type, clickHandler }: Props) {
                            <p className="text-start font-bold">
                               <span>total:</span>
 
-                    <span className="text-primary">
-                      &nbsp;{type.total_price} bath
-                    </span>
-                  </p>
-                </div>
-                <Button
-                variant="reservation"
-                  className=" bg-primary w-full rounded-lg  hover:bg-gray-800 active:bg-gray-800
+                              <span className="text-primary">
+                                 &nbsp;{type.total_price} bath
+                              </span>
+                           </p>
+                        </div>
+                        <Button
+                           variant="reservation"
+                           className=" bg-primary w-full rounded-lg  hover:bg-gray-800 active:bg-gray-800
                                           p-4 hover:bg-primary-hover
                                           font-bold text-white"
                            onClick={() => clickHandler(type)}

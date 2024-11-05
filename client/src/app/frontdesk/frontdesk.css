@@ -4,5 +4,6 @@
 }
 
 #body {
+    margin-right: 0px !important;
     overflow: scroll !important;
 }

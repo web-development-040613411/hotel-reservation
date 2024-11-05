@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import AllRoomTable from '@/components/frontdesk/allroom-table';
 import Frontdesk_Header from '@/components/frontdesk/header';
@@ -43,6 +43,13 @@ export default function Child() {
             ) : (
                <Frontdesk_Header />
             )}
+            {reservationError || roomsError || roomsTypeError ? (
+               <div className="w-full flex justify-center">
+                  <p className="text-2xl font-bold text-red-600">
+                     Error something went wrong
+                  </p>
+               </div>
+            ) : null}
             {reservationLoading || roomsLoading || roomsTypeLoading ? (
                <Skeleton_table />
             ) : (

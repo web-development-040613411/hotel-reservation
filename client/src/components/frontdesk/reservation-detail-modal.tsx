@@ -24,6 +24,7 @@ import { LoaderCircle } from 'lucide-react';
 
 interface Reservation_detail_modalProps {
    thisReservation: Reservation;
+   nextReservation: Reservation | undefined;
    isOverflowFromPreviousMonth: boolean;
    isOverflowToNextMonth: boolean;
 }
@@ -32,6 +33,7 @@ export default function Reservation_detail_modal({
    thisReservation,
    isOverflowFromPreviousMonth,
    isOverflowToNextMonth,
+   nextReservation,
 }: Reservation_detail_modalProps) {
    const { mutate: checkInMutate, isPending: checkInIsPending } =
       useCheckInMutation();
@@ -50,10 +52,10 @@ export default function Reservation_detail_modal({
                   padding: '0.35rem',
                   borderRadius: `${
                      isOverflowFromPreviousMonth
-                        ? '0 0.5rem 0.5rem 0'
+                        ? '0 0.6rem 0.6rem 0'
                         : isOverflowToNextMonth
-                        ? '0.5rem 0 0 0.5rem'
-                        : '0.5rem'
+                        ? '0.6rem 0 0 0.6rem'
+                        : '0.6rem'
                   }`,
                   borderLeft: `${
                      isOverflowFromPreviousMonth ? '0' : '0.4rem'
@@ -69,12 +71,14 @@ export default function Reservation_detail_modal({
                   textOverflow: 'ellipsis',
                   margin: '0px',
                   position: 'relative',
-                  left: `${isOverflowFromPreviousMonth ? '0' : '1.4rem'}`,
+                  left: `${isOverflowFromPreviousMonth ? '0' : '1.1rem'}`,
                   width: `${
                      isOverflowToNextMonth
-                        ? 'calc(100% - 1.4rem)'
+                        ? 'calc(100% - 1rem)'
                         : isOverflowFromPreviousMonth
-                        ? 'calc(100% + 1.4rem)'
+                        ? 'calc(100% + 1.5rem)'
+                        : nextReservation
+                        ? 'calc(100% + 0.1rem) '
                         : 'calc(100% - 2.8rem)'
                   }`,
                }}

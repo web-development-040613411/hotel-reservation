@@ -49,7 +49,8 @@ export const reservationRoute = new Elysia({ prefix: '/reservations' }).get(
                     room_types.capacity,
                     room_types.detail,
                     room_types.picture_path,
-                    room_types.price AS price_per_night  
+                    room_types.price AS price_per_night ,
+                    room_types.id AS type_id
                     FROM
                     rooms
                     INNER JOIN reservations ON rooms."id" = reservations.room_id
@@ -94,7 +95,8 @@ export const reservationRoute = new Elysia({ prefix: '/reservations' }).get(
             room_types.capacity,
             room_types.detail,
             room_types.picture_path,
-            room_types.price AS price_per_night  
+            room_types.price AS price_per_night ,
+                 room_types.id AS type_id
             FROM
             rooms
             INNER JOIN reservations ON rooms."id" = reservations.room_id

@@ -234,7 +234,7 @@ export default function PersonalInformationForm() {
           />
         </div>
 
-        <Button className={btnClass} type="submit" disabled={!isChange}>
+        <Button className={btnClass} type="submit" disabled={!isChange && state == 4}>
           {state == 4 ? "Confirm Edit" : "Confirm"}
         </Button>
       </div>

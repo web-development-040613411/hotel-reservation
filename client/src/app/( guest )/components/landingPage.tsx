@@ -11,6 +11,7 @@ import { RoomTypeCarousel } from './roomtype-carousel';
 import GuestFooter from '@/components/guest/footer';
 import { UseAllRoomTypes } from '@/hooks/guest/room-types';
 import { FacilityCard } from './facility-card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 function LandingPage() {
    const { data, isLoading, isError } = UseAllRoomTypes();
@@ -72,10 +73,18 @@ function LandingPage() {
             <h1 className="text-3xl mb-4 mt-8 text-center font-bold">
                {'Our Rooms'}
             </h1>
-            <div className="flex w-full justify-center pr-10 pl-10 items-center">
-               {' '}
-               <RoomTypeCarousel allroomtypes={data} />
-            </div>
+            {isLoading ? (
+               <div className="grid grid-cols-3 gap-5 mx-16">
+                  <Skeleton className="h-64" />
+                  <Skeleton className="h-64" />
+                  <Skeleton className="h-64" />
+               </div>
+            ) : (
+               <div className="flex w-full justify-center pr-10 pl-10 items-center">
+                  {' '}
+                  <RoomTypeCarousel allroomtypes={data} />
+               </div>
+            )}
          </section>
          <section>
             <div className="mt-10  mx-4">

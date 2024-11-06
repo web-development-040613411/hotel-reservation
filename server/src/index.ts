@@ -11,6 +11,8 @@ import { stripeRoutes } from './routes/stripe';
 import { crontab } from './routes/crontab';
 import { authRoutes } from './routes/auth-route';
 
+const port = process.env.PORT || 3001;
+
 export const app = new Elysia()
     .use(swagger())
     .onError(({ set, error, code }) => {
@@ -42,7 +44,7 @@ export const app = new Elysia()
     .use(crontab)
     .use(authRoutes)
     .use(cors())
-    .listen(3001);
+    .listen(port);
 
 console.log(
     `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`

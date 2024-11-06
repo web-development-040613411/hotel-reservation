@@ -14,16 +14,6 @@ import { authRoutes } from './routes/auth-route';
 const port = process.env.PORT || 3001;
 
 export const app = new Elysia()
-    .onAfterHandle(({ request, set }) => {
-        // Only process CORS requests
-        if (request.method !== "OPTIONS") return;
-
-        const allowHeader = set.headers["Access-Control-Allow-Headers"];
-        if (allowHeader === "*") {
-        set.headers["Access-Control-Allow-Headers"] =
-            request.headers.get("Access-Control-Request-Headers") ?? "";
-        }
-    })
     .use(swagger())
     .onError(({ set, error, code }) => {
         if (error instanceof postgres.PostgresError && error.code == '23505') {
@@ -53,7 +43,9 @@ export const app = new Elysia()
     .use(stripeRoutes)
     .use(crontab)
     .use(authRoutes)
-    .use(cors())
+    .use(cors({
+        origin: ['http://localhost:3000', 'https://hotel-reservation-api-ajio.onrender.com']
+    }))
     .listen(port);
 
 console.log(

@@ -12,11 +12,12 @@ const nextConfig = {
       },
     ],
   },
-  async rewrites() {
+  async redirects() {
     return [
       {
-        source: 'https://hotel-reservation-api-ajio.onrender.com/:path*',
-        destination: '/api/:path*',
+        source: '/api',
+        destination: 'https://hotel-reservation-api-ajio.onrender.com/:path*',
+        permanent: true
       },
     ]
   },

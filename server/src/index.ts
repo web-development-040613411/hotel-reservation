@@ -44,7 +44,7 @@ export const app = new Elysia()
     .use(crontab)
     .use(authRoutes)
     .use(cors({
-        origin: ['http://localhost:3000', 'https://hotel-reservation-api-ajio.onrender.com']
+        origin: ['http://localhost:3000', 'https://hotel-reservation-theta.vercel.app']
     }))
     .listen(port);
 

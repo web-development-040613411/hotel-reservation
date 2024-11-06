@@ -15,7 +15,7 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/api',
+        source: '/api/:path*',
         destination: 'https://hotel-reservation-api-ajio.onrender.com/:path*',
         permanent: true
       },

@@ -46,7 +46,6 @@ export const app = new Elysia()
     .use(cors({
         origin: ['http://localhost:3000', process.env.CLIENT_URL!],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
     }))
     .listen(port);
 

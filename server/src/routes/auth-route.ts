@@ -1,9 +1,14 @@
 import { sql } from '@/libs/db';
 import { lucia } from '@/libs/lucia';
 import { loginSchema } from '@/libs/validation';
+import cors from '@elysiajs/cors';
 import Elysia from 'elysia';
 
 export const authRoutes = new Elysia({ prefix: '/auth' })
+    .use(cors({
+        origin: ['http://localhost:3000', process.env.CLIENT_URL!],
+        methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+    }))
     .post('/login', async ({ set, cookie, body }) => {
         const validate = loginSchema.safeParse(body);
 

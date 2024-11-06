@@ -44,7 +44,7 @@ export const app = new Elysia()
     .use(crontab)
     .use(authRoutes)
     .use(cors({
-        origin: "*"
+        origin: ['http://localhost:3000/', process.env.CLIENT_URL!]
     }))
     .listen(port);
 

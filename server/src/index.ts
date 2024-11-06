@@ -44,8 +44,9 @@ export const app = new Elysia()
     .use(crontab)
     .use(authRoutes)
     .use(cors({
-        origin: ['http://localhost:3000', process.env.CLIENT_URL!, 'https://hotel-reservation-theta.vercel.app'],
+        origin: ['http://localhost:3000', 'https://hotel-reservation-theta.vercel.app'],
         methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT'],
+        credentials: true
     }))
     .listen(port);
 

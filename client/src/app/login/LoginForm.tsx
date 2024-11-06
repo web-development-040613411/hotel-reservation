@@ -61,6 +61,7 @@ export default function LoginForm() {
         toast.error(data.message);
       }
     } catch (error) {
+      setIsLoading(false);
       toast.error("An error occurred.");
     }
   };

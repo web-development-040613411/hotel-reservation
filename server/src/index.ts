@@ -43,7 +43,9 @@ export const app = new Elysia()
     .use(stripeRoutes)
     .use(crontab)
     .use(authRoutes)
-    .use(cors())
+    .use(cors({
+        origin: "*"
+    }))
     .listen(port);
 
 console.log(

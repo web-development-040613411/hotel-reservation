@@ -37,7 +37,7 @@ export default function AdminSidebarMenu() {
         <Link
           className={cn(
             "text-foreground text-lg font-semibold flex items-center gap-2 hover:text-primary transition-colors", {
-              "text-primary": pathname.split("/")[2] === menu.href.split("/")[2],
+              "text-primary": pathname.split("/")[2] === menu.href.split("/")[2] && menu.href !== "/frontdesk",
             }
           )}
           href={menu.href}

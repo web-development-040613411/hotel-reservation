@@ -16,6 +16,7 @@ import Image from "next/image";
 import DeleteEmployeeModal from "./DeleteEmployeeModal";
 import EditAccountModal from "./EditAccountModal";
 import ResetPasswordModal from "./ResetPasswordModal";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface EmployeeTableClientProps {
   employees: Employee[];
@@ -40,14 +41,10 @@ export default function EmployeeTableClient({
             <TableRow key={employee.id}>
               <TableCell>
               <div className="flex gap-2">
-                <Image
-                  src={employee.profile_picture ? `${process.env.NEXT_PUBLIC_BACKEND_URL}${employee.profile_picture}` : "/default-profile.png"}
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  alt={employee.username}
-                  className="size-28 aspect-square"
-                />
+                <Avatar className="size-28">
+                  <AvatarImage src={`${process.env.NEXT_PUBLIC_BACKEND_URL}${employee.profile_picture}`}/>
+                  <AvatarFallback>{employee.first_name[0]}</AvatarFallback>
+                </Avatar>
               <div className="space-y-2">
                 <p><span className="font-semibold">Name: </span> {employee.first_name} {employee.last_name}</p>
                 <p><span className="font-semibold">Username: </span> {employee.username}</p>

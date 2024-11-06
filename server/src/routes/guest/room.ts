@@ -13,22 +13,22 @@ export const roomRoutes = new Elysia({ prefix: '/rooms' })
             const roomTypes = await sql`SELECT id FROM room_types`;
             const uniqueRooms = [];
 
+            if  ( !query.check_in || !query.check_out ) { 
+                return {
+                    status: 'error',
+                    message: 'Check in and check out date is required',
+                }
+            }
             const { check_in, check_out } = query;
           
             for (const roomType of roomTypes) {
-                const res = await getVacantRoom({ type_id: roomType.id, check_in, check_out});
+                const res = await getVacantRoom({ type_id: roomType.id, check_in: new Date(check_in), check_out: new Date(check_out)});
                 uniqueRooms.push(res);
             }
             return {
                 status: 'success',
                 data: uniqueRooms,
             };
-        },
-        {
-            query: t.Object({
-                check_in: t.Date(),
-                check_out: t.Date(),
-            }),
         }
     )
     .post('/preserve', async ({ body, set }) => {
